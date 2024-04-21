@@ -1,0 +1,9 @@
+{
+  "name": "framer",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/framer",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project framer --web",
+  "targets": {}
+}

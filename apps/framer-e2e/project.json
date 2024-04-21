@@ -1,0 +1,9 @@
+{
+  "name": "framer-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/framer-e2e/src",
+  "tags": [],
+  "implicitDependencies": ["framer"],
+  "// targets": "to see all targets run: nx show project framer-e2e --web",
+  "targets": {}
+}
