@@ -4,6 +4,20 @@
 - [NX Things](#nx-things)
 - [Database](#database)
 
+# Set up
+
+We're using npm instead of yarn for this project.
+
+1. Install correct Node version
+    ```bash
+    nvm install
+    nvm use
+    ```
+2. Install dependencies
+    ```bash
+    npm install
+    ```
+
 # Database
 
 We're using our typical Prisma + Supabase setup.
