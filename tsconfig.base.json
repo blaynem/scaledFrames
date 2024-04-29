@@ -15,8 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@framer/framer-db": ["framer-db/src/index.ts"],
-      "@framer/framer-db/server": ["framer-db/src/server.ts"]
+      "@framer/framer-db": ["libs/framer-db/src/index.ts"],
+      "@framer/framer-db/server": ["libs/framer-db/src/server.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
