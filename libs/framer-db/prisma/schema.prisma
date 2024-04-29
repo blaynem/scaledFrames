@@ -14,3 +14,113 @@ generator client {
   provider = "prisma-client-js"
   output   = "../../../node_modules/.prisma/client"
 }
+
+/// Individual User that have signed up
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  display_name String
+  first_name   String
+  last_name    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Teams the user belongs to
+  teams             UserTeam[]
+  // Teams the user owns
+  ownedTeams        Team[]     @relation("TeamOwner")
+  // Frames the user has created
+  createdFrames     Frame[]    @relation("FrameCreatedBy")
+  // Frames the user has last updated
+  lastUpdatedFrames Frame[]    @relation("FrameLastUpdatedBy")
+}
+
+/// Team that a user can be a part of
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Owner of the team
+  owner   User   @relation("TeamOwner", fields: [ownerId], references: [id])
+  ownerId String
+
+  // Users that are part of the team
+  users  UserTeam[]
+  // Frames that the team owns
+  frames Frame[]    @relation("FrameOwner")
+}
+
+/// UserTeam is the join table between User and Team
+model UserTeam {
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  team   Team   @relation(fields: [teamId], references: [id])
+  teamId String
+
+  @@id([userId, teamId])
+}
+
+/// The Frame, or Page, that we are displaying to the end user.
+model Frame {
+  id           String    @id @default(cuid())
+  path         String
+  title        String
+  /// The image url
+  image_url    String
+  /// Type of image that this will be.
+  image_type   ImageType
+  aspect_ratio String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  /// The user who created the frame
+  createdBy       User   @relation("FrameCreatedBy", fields: [createdById], references: [id])
+  createdById     String
+  /// The team that owns this frame
+  team            Team   @relation("FrameOwner", fields: [teamId], references: [id])
+  teamId          String
+  /// The user who last updated the frame
+  lastUpdatedBy   User   @relation("FrameLastUpdatedBy", fields: [lastUpdatedById], references: [id])
+  lastUpdatedById String
+
+  // Intents that are part of this frame
+  intents Intents[]
+}
+
+model Intents {
+  id          String     @id @default(cuid())
+  type        IntentType
+  link        String
+  displayText String
+
+  // Frame that this intent is part of
+  Frame    Frame  @relation(fields: [framesId], references: [id])
+  framesId String
+}
+
+/// The type of image that we are displaying to the end user.
+/// This is not considering if its a gif, or png, etc. It is considering whether the images change based on inputs.
+enum ImageType {
+  /// An image is considered dynamic if it changes depending on inputs.
+  Dynamic
+  /// An image is static if it does not change, regardless of inputs.
+  Static
+}
+
+enum IntentType {
+  /// Sends a POST request to the current frame, or target frame.
+  Post
+  /// Links to an external site
+  ExternalLink
+  /// This links to another frame
+  InternalLink
+  /// The post_redirect action sends an HTTP POST request to the frame or button post_url.
+  /// You can use this action to redirect to a URL based on frame state or user input.
+  Redirect
+  /// This is related to an Ethereum transaction.
+  Transaction
+  /// Renders the intent as a text input field.
+  TextInput
+}
