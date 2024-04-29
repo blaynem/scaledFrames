@@ -53,6 +53,10 @@ model Team {
   ///
   /// We should likely lock this to a subscription type.
   customSubDomain  String
+  /// If true, the Team has been deleted and should not be shown to the user.
+  /// This is a soft delete, since we have a bunch of relations.
+  /// If there are no relations, then we can fully delete the team.
+  isDeleted        Boolean          @default(false)
 
   /// Owner of the team
   owner   User   @relation("TeamOwner", fields: [ownerId], references: [id])
@@ -77,25 +81,30 @@ model UserTeam {
 
 /// Projects are the construct of a collection of "frames" to be displayed to an end user.
 model Project {
-  id          String   @id @default(cuid())
+  id            String   @id @default(cuid())
   /// The title of the project to be displayed to the end user.
-  title       String
+  title         String
   /// A description of the project
-  description String
+  description   String
   /// Any extra notes that the user wants to add to the project.
-  notes       String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  notes         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  /// If true, the project can be linked to and viewed by the public.
+  isProjectLive Boolean
+  /// If true, the project has been deleted and should not be shown to the user.
+  /// This is a soft delete, since we have a bunch of relations.
+  isDeleted     Boolean  @default(false)
 
   /// The custom path that the project will be shown at.
   /// If the custom path is "example", then the project will be shown at "https://www.framer.com/example"
   /// All frames will then be shown  at "https://www.framer.com/example/{frame.path}"
-  /// If the user has custom subdomain, then it will be shown at "https://{subdomain}.framer.com/{customPath}/{frame.path}"
-  customPath String
+  /// If the user has custom subdomain, then it will be shown at "https://{subdomain}.framer.com/{customBasePath}/{frame.path}"
+  customBasePath String
 
   /// If a user tries to visit this projects url on something that doesn't support frames, then they will be redirected to this page.
   /// Example should be the full url: "https://www.example.com/unsupported-browser"
-  websiteFallbackPage String
+  customFallbackUrl String
 
   /// ---DO NOT USE YET---
   /// TODO: Just setting it here as a reminder to implement it in the future!
@@ -132,6 +141,10 @@ model Frame {
   aspectRatio String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  /// If true, the frame itself is soft deleted and should not be shown to the user.
+  /// It is soft deleted since we have potential relations that we don't want to delete.
+  /// If there are no relations, then we can fully delete the frame.
+  isDeleted   Boolean   @default(false)
 
   /// The user who created the frame
   createdBy       User   @relation("FrameCreatedBy", fields: [createdById], references: [id])
@@ -153,14 +166,25 @@ model Frame {
   IntentClickTracking IntentClickTracking[]
 }
 
+/// Intents are the actions that a user can take on a frame.
 model Intents {
   id           String     @id @default(cuid())
   type         IntentType
-  link         String
+  /// The URL that the intent will redirect to.
+  /// If it's a local link it will be the frame path - ex: "/about"
+  /// If it's an external link it will be the full URL - ex: "https://www.google.com"
+  linkUrl      String
+  /// For a button, this is the text that will be displayed on the button.
+  /// For a text input, this is the placeholder text.
   displayText  String
   /// The order in which this intent should be displayed.
   /// Should be between 0 and 6. (I don't think we can have more than 6, have to double check)
+  /// For a TextInput, this field is not used.
   displayOrder Int
+  /// If true, the frame itself is soft deleted and should not be shown to the user.
+  /// It is soft deleted since we have potential relations that we don't want to delete.
+  /// If there are no relations, then we can fully delete the frame.
+  isDeleted    Boolean    @default(false)
 
   // Frame that this intent is part of
   Frame               Frame                 @relation(fields: [framesId], references: [id])
@@ -201,25 +225,25 @@ model ErrorLog {
 
 /// ProjectAnalytics tracks the performance metrics of a project to help users understand how their projects are performing.
 model ProjectAnalytics {
-  id               String   @id @default(cuid())
+  id                     String   @id @default(cuid())
   /// Link to the associated project
-  projectId        String
-  project          Project  @relation(fields: [projectId], references: [id])
+  projectId              String
+  project                Project  @relation(fields: [projectId], references: [id])
   /// Number of times the project was viewed.
   /// We may not be able to track when the "view" technically happens. So for now we consider any _initial_ interaction.
   /// Though let's try to keep it to a single session. How? I'm not sure. TODO!
-  views            Int
+  views                  Int
   /// Number of times any button was clicked for this project.
-  clicks           Int
+  clicks                 Int
   /// Number of conversions achieved by the project.
   /// We will consider a conversion to be a successful click on any external link for now.
-  conversions      Int
+  conversions            Int
   /// Percentage of visitors who navigate away after viewing only one page
-  bounceRate       Float
-  /// Times websiteFallbackPage was redirect to
-  fallbackUrlCount Int
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  bounceRate             Float
+  /// Times customFallbackUrl was redirect to
+  customFallbackUrlCount Int
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }
 
 /// A table to store data about the users that have interacted with the project.
@@ -229,6 +253,9 @@ model ConsumerKnownData {
   farcasterId            String                @unique
   /// Farcaster bio
   farcasterBio           String?
+  /// Usernames are how a user get's "@" tagged. Example username - drilkmops
+  farcasterUsername      String?
+  /// Example Display name - Blayne
   farcasterDisplayName   String?
   /// Verified addresses of the user fetched from Farcaster
   farcasterVerifications String[]
@@ -243,7 +270,18 @@ model ConsumerKnownData {
 
 /// IntentClickTracking records each click on intents by users, including contextual data like time and location.
 model IntentClickTracking {
-  id         String            @id @default(cuid())
+  id                String   @id @default(cuid())
+  /// The written text that was inputted by the user.
+  /// Will only exist if the intent type is a TextInput
+  intentTextValue   String?
+  /// The context of the text input. For example, if the user was asked to input their name, this would be "name".
+  /// Will only exist if the intent type is a TextInput
+  intentTextContext String?
+  /// Time the intent was interacted with
+  interactedTime    DateTime @default(now())
+  /// The hash of the "cast" made on Farcaster that this click is associated with.
+  castHash          String
+
   /// Link to the clicked intent
   intentId   String
   intent     Intents           @relation(fields: [intentId], references: [id])
@@ -256,8 +294,6 @@ model IntentClickTracking {
   /// User who clicked the intent
   consumerId String
   consumer   ConsumerKnownData @relation(fields: [consumerId], references: [id])
-  /// Exact time of the click
-  clickTime  DateTime          @default(now())
 }
 
 // =============== ENUMS ===============
@@ -283,6 +319,8 @@ enum IntentType {
   Redirect
   /// This is related to an Ethereum transaction.
   Transaction
+  /// When clicked will set the frames path back to the root frame.
+  Reset
   /// Renders the intent as a text input field.
   TextInput
 }
@@ -295,10 +333,10 @@ enum SubscriptionType {
   Free
   /// Pro subscription type
   /// Limits - 5 teams, 5 projects, 25 frames (example)
-  /// Unlock - Custom subdomain, Website URL Fallback etc
+  /// Unlock - Custom subdomain, Custom Fallback Url etc
   Pro
   /// Enterprise subscription type
   /// Limits - Unlimited teams, projects, and frames
-  /// Unlock - Custom subdomain, Website URL Fallback etc
+  /// Unlock - Custom subdomain, Custom Fallback Url etc
   Enterprise
 }
