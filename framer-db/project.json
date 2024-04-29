@@ -1,0 +1,9 @@
+{
+  "name": "framer-db",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "framer-db/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project framer-db --web",
+  "targets": {}
+}

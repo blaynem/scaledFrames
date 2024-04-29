@@ -14,7 +14,10 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@framer/framer-db": ["framer-db/src/index.ts"],
+      "@framer/framer-db/server": ["framer-db/src/server.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
