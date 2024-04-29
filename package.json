@@ -2,9 +2,12 @@
   "name": "@framer/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev": "nx start"
+  },
   "private": true,
   "dependencies": {
+    "frames.js": "^0.15.0",
     "next": "14.0.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",

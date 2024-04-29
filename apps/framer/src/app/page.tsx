@@ -1,3 +1,4 @@
+import FrameDebugger from './components/FrameDebugger/frameDebugger';
 import styles from './page.module.css';
 
 export default function Index() {
@@ -13,7 +14,7 @@ export default function Index() {
           <div id="welcome">
             <h1>
               <span> Hello there, </span>
-              Welcome framer 👋
+              <FrameDebugger></FrameDebugger>
             </h1>
           </div>
 
