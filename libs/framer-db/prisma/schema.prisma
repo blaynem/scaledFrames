@@ -124,27 +124,36 @@ model Project {
 
   /// The frames that are part of this project
   frames              Frame[]
-  ProjectAnalytics    ProjectAnalytics[]
+  projectAnalytics    ProjectAnalytics[]
+  sessions            Session[]
   IntentClickTracking IntentClickTracking[]
 }
 
 /// The Frame, or Page, that we are displaying to the end user.
 model Frame {
-  id          String    @id @default(cuid())
-  path        String
-  title       String
-  /// The image url
-  imageUrl    String
+  id           String    @id @default(cuid())
+  path         String
+  title        String
+  /// The image url in our database, this is the image that will be displayed to the user in the frame.
+  imageUrl     String
+  /// User provided link to the image.
+  /// This is another upload option for the user to provide an image.
+  /// 
+  /// If this is present, then the image itself was provided by a link from an external host like imgur.
+  /// We fetch this image and store it in our database. But we need to know where it came from.
+  imageLinkUrl String?
   /// Type of image that this will be.
-  imageType   ImageType
+  /// Will likely be Static for the short term future.
+  /// Dynamic images will be images that change based on inputs.
+  imageType    ImageType
   /// Should typically only be 1:1 or 1.91:1 as these are the most common aspect ratios.
-  aspectRatio String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  aspectRatio  String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
   /// If true, the frame itself is soft deleted and should not be shown to the user.
   /// It is soft deleted since we have potential relations that we don't want to delete.
   /// If there are no relations, then we can fully delete the frame.
-  isDeleted   Boolean   @default(false)
+  isDeleted    Boolean   @default(false)
 
   /// The user who created the frame
   createdBy       User   @relation("FrameCreatedBy", fields: [createdById], references: [id])
@@ -187,7 +196,7 @@ model Intents {
   isDeleted    Boolean    @default(false)
 
   // Frame that this intent is part of
-  Frame               Frame                 @relation(fields: [framesId], references: [id])
+  frame               Frame                 @relation(fields: [framesId], references: [id])
   framesId            String
   IntentClickTracking IntentClickTracking[]
 }
@@ -226,24 +235,72 @@ model ErrorLog {
 /// ProjectAnalytics tracks the performance metrics of a project to help users understand how their projects are performing.
 model ProjectAnalytics {
   id                     String   @id @default(cuid())
-  /// Link to the associated project
-  projectId              String
-  project                Project  @relation(fields: [projectId], references: [id])
-  /// Number of times the project was viewed.
-  /// We may not be able to track when the "view" technically happens. So for now we consider any _initial_ interaction.
-  /// Though let's try to keep it to a single session. How? I'm not sure. TODO!
-  views                  Int
-  /// Number of times any button was clicked for this project.
-  clicks                 Int
-  /// Number of conversions achieved by the project.
-  /// We will consider a conversion to be a successful click on any external link for now.
-  conversions            Int
-  /// Percentage of visitors who navigate away after viewing only one page
-  bounceRate             Float
   /// Times customFallbackUrl was redirect to
   customFallbackUrlCount Int
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
+  /// Link to the associated project
+  projectId              String
+  project                Project  @relation(fields: [projectId], references: [id])
+}
+
+/// The Session model is a way for us to keep track of how much a user interacted with a project.
+/// This allows us to get a Bounce Rate, and other metrics.
+model Session {
+  id                  String                @id @default(cuid())
+  /// True on session initialization, as the user has not visited any pages yet.
+  /// If the user interacts with an intent, then this will be set to false.
+  /// We can calculate the bounce rate by counting the number of sessions that are single page.
+  isSinglePage        Boolean               @default(true)
+  /// The time the session was started
+  startedAt           DateTime              @default(now())
+  /// The time the session was last active.
+  lastActiveAt        DateTime              @updatedAt
+  /// The project that the session is associated with
+  projectId           String
+  project             Project               @relation(fields: [projectId], references: [id])
+  /// The user who started the session
+  consumerId          String
+  consumer            ConsumerKnownData     @relation(fields: [consumerId], references: [id])
+  IntentClickTracking IntentClickTracking[]
+}
+
+/// IntentClickTracking records each click on intents by users, including contextual data like time and user.
+/// It will also store whether the intent was a conversion.
+model IntentClickTracking {
+  id                String               @id @default(cuid())
+  /// The written text that was inputted by the user.
+  /// Will only exist if the intent type is a TextInput
+  intentTextValue   String?
+  /// The context of the text input. For example, if the user was asked to input their name, this would be "name".
+  /// Will only exist if the intent type is a TextInput
+  intentTextContext String?
+  /// Time the intent was interacted with
+  interactedTime    DateTime             @default(now())
+  /// The hash of the "cast" made on Farcaster that this click is associated with.
+  castHash          String
+  /// The type of conversion that this click was.
+  /// None - if buttons were clicked
+  /// ExternalLink - if an external link was clicked
+  /// Purchase - If we can somehow track a purchase made through Stripe, etc.
+  conversionType    IntentConversionType @default(None)
+
+  /// Link to the clicked intent
+  intentId  String
+  intent    Intents @relation(fields: [intentId], references: [id])
+  /// Link to the frame containing the intent
+  frameId   String
+  frame     Frame   @relation(fields: [frameId], references: [id])
+  /// Link to the project containing the frame
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  /// User who clicked the intent
+  consumerId String
+  consumer   ConsumerKnownData @relation(fields: [consumerId], references: [id])
+  /// The session that the click was part of
+  sessionId  String
+  session    Session           @relation(fields: [sessionId], references: [id])
 }
 
 /// A table to store data about the users that have interacted with the project.
@@ -266,34 +323,7 @@ model ConsumerKnownData {
   /// User's email
   email                  String?
   IntentClickTracking    IntentClickTracking[]
-}
-
-/// IntentClickTracking records each click on intents by users, including contextual data like time and location.
-model IntentClickTracking {
-  id                String   @id @default(cuid())
-  /// The written text that was inputted by the user.
-  /// Will only exist if the intent type is a TextInput
-  intentTextValue   String?
-  /// The context of the text input. For example, if the user was asked to input their name, this would be "name".
-  /// Will only exist if the intent type is a TextInput
-  intentTextContext String?
-  /// Time the intent was interacted with
-  interactedTime    DateTime @default(now())
-  /// The hash of the "cast" made on Farcaster that this click is associated with.
-  castHash          String
-
-  /// Link to the clicked intent
-  intentId   String
-  intent     Intents           @relation(fields: [intentId], references: [id])
-  /// Link to the frame containing the intent
-  frameId    String
-  frame      Frame             @relation(fields: [frameId], references: [id])
-  /// Link to the project containing the frame
-  projectId  String
-  project    Project           @relation(fields: [projectId], references: [id])
-  /// User who clicked the intent
-  consumerId String
-  consumer   ConsumerKnownData @relation(fields: [consumerId], references: [id])
+  sessions               Session[]
 }
 
 // =============== ENUMS ===============
@@ -307,6 +337,7 @@ enum ImageType {
   Static
 }
 
+/// The type of intent that a user can take on a frame.
 enum IntentType {
   /// Sends a POST request to the current frame, or target frame.
   Post
@@ -323,6 +354,15 @@ enum IntentType {
   Reset
   /// Renders the intent as a text input field.
   TextInput
+}
+
+/// The type of conversion that a click was.
+enum IntentConversionType {
+  None
+  /// If an external link was clicked
+  ExternalLink
+  /// If a purchase was confirmed
+  Purchase
 }
 
 /// The type of subscription that a team can have.

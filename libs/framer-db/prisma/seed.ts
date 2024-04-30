@@ -3,6 +3,14 @@ import { Prisma, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
+  prisma.intentClickTracking.findFirst({
+    include: {
+      project: true,
+      intent: {
+        inclu
+      }
+    }
+  }).then((res) => {res?.intent
   // Create the contract
 }
 main()
