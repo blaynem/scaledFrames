@@ -85,13 +85,13 @@ model Project {
   /// The title of the project to be displayed to the end user.
   title         String
   /// A description of the project
-  description   String
+  description   String   @default("")
   /// Any extra notes that the user wants to add to the project.
-  notes         String
+  notes         String   @default("")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   /// If true, the project can be linked to and viewed by the public.
-  isProjectLive Boolean
+  isProjectLive Boolean  @default(false)
   /// If true, the project has been deleted and should not be shown to the user.
   /// This is a soft delete, since we have a bunch of relations.
   isDeleted     Boolean  @default(false)
@@ -100,16 +100,16 @@ model Project {
   /// If the custom path is "example", then the project will be shown at "https://www.framer.com/example"
   /// All frames will then be shown  at "https://www.framer.com/example/{frame.path}"
   /// If the user has custom subdomain, then it will be shown at "https://{subdomain}.framer.com/{customBasePath}/{frame.path}"
-  customBasePath String
+  customBasePath String @default("")
 
   /// If a user tries to visit this projects url on something that doesn't support frames, then they will be redirected to this page.
   /// Example should be the full url: "https://www.example.com/unsupported-browser"
-  customFallbackUrl String
+  customFallbackUrl String @default("")
 
   /// ---DO NOT USE YET---
   /// TODO: Just setting it here as a reminder to implement it in the future!
   /// ---DO NOT USE YET---
-  unusedWebhooks String
+  unusedWebhooks String @default("")
 
   /// The team that owns this project
   team   Team   @relation("ProjectOwner", fields: [teamId], references: [id])
@@ -145,9 +145,10 @@ model Frame {
   /// Type of image that this will be.
   /// Will likely be Static for the short term future.
   /// Dynamic images will be images that change based on inputs.
-  imageType    ImageType
+  imageType    ImageType @default(Static)
   /// Should typically only be 1:1 or 1.91:1 as these are the most common aspect ratios.
-  aspectRatio  String
+  /// Defaults to 1:1
+  aspectRatio  String    @default("1:1")
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   /// If true, the frame itself is soft deleted and should not be shown to the user.
