@@ -1,6 +1,9 @@
+import {
+  GetUsersRequestQueries,
+  GetUsersResponse,
+} from 'libs/FramerServerSDK/src/types';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
-import { GetUsersRequestQueries, GetUsersResponse } from '../../types';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const usersFrogInstance = new Frog();
@@ -17,10 +20,14 @@ usersFrogInstance.get('/', async (c) => {
       },
     });
 
+    if (!user) {
+      return c.json<GetUsersResponse>({ error: 'User not found' });
+    }
+
     return c.json<GetUsersResponse>(user);
   } catch (error) {
     console.log('Get Users Error: ', error);
-    return c.json<GetUsersResponse>(null);
+    return c.json<GetUsersResponse>({ error: 'Error fetching user' });
   }
 });
 

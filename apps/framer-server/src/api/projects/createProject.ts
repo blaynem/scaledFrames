@@ -1,6 +1,9 @@
 import { IntentType } from '@prisma/client';
 import prisma from '../../prismaClient';
-import { CreateProjectRequestBody, CreateProjectResponse } from '../../types';
+import {
+  CreateProjectRequestBody,
+  CreateProjectResponse,
+} from 'libs/FramerServerSDK/src/types';
 
 // Create Project builds the initial project and frame for the user.
 export const createProject = async ({

@@ -8,27 +8,34 @@ import {
   CreateProjectRequestBody,
   CreateProjectResponse,
   EditProjectRequestBody,
-} from '../../types';
+} from 'libs/FramerServerSDK/src/types';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const projectsFrogInstance = new Frog();
 
 // Fetch all projects
 projectsFrogInstance.get('/', async (c) => {
-  const queries: GetProjectsRequestQueries = {
-    isProjectLive: c.req.query('isProjectLive') === 'true',
-  };
+  const queries: GetProjectsRequestQueries = {};
+
+  const _isProjectLive = c.req.query('isProjectLive');
+  if (_isProjectLive !== undefined) {
+    queries.isProjectLive = _isProjectLive === 'true';
+  }
+
   try {
+    // only check isProjectLive if it is defined
     const projects = await prisma.project.findMany({
       where: {
-        isProjectLive: queries.isProjectLive,
+        ...(queries.isProjectLive !== undefined && {
+          isProjectLive: queries.isProjectLive,
+        }),
       },
     });
 
     return c.json<GetProjectsResponse>(projects);
   } catch (error) {
     console.log('Fetch All Projects Error: ', error);
-    return c.json<GetProjectsResponse>(null);
+    return c.json<GetProjectsResponse>({ error: 'Error fetching projects' });
   }
 });
 
@@ -42,10 +49,14 @@ projectsFrogInstance.get('/:id', async (c) => {
       },
     });
 
+    if (!project) {
+      return c.json<GetProjectResponse>({ error: 'Project not found' });
+    }
+
     return c.json<GetProjectResponse>(project);
   } catch (error) {
     console.log('Fetch Project by Id Error : ', error);
-    return c.json<GetProjectResponse>(null);
+    return c.json<GetProjectResponse>({ error: 'Error fetching project' });
   }
 });
 
@@ -58,7 +69,7 @@ projectsFrogInstance.post('/create', async (c) => {
     return c.json<CreateProjectResponse>(project);
   } catch (error) {
     console.log('Create a project Error: ', error);
-    return c.json<CreateProjectResponse>(null);
+    return c.json<CreateProjectResponse>({ error: 'Error creating project' });
   }
 });
 
@@ -90,7 +101,7 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
     return c.json<CreateProjectResponse>(project);
   } catch (error) {
     console.log('Edit a project Error: ', error);
-    return c.json<CreateProjectResponse>(null);
+    return c.json<CreateProjectResponse>({ error: 'Error editing project' });
   }
 });
 
