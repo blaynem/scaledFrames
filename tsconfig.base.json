@@ -20,5 +20,5 @@
       "@framer/framer-db/server": ["libs/framer-db/src/server.ts"]
     }
   },
-  "exclude": ["node_modules", "tmp", "apps/framer-server"]
+  "exclude": ["node_modules", "tmp"]
 }

@@ -6,7 +6,14 @@
     "tags": [],
     "// targets": "to see all targets run: nx show project framer-server --web",
     "targets": {
-        "serve": {
+        "serve:dev": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "apps/framer-server",
+                "command": "tsx watch src/index.tsx"
+            }
+        },
+        "serve:prod": {
             "executor": "nx:run-commands",
             "options": {
                 "cwd": "apps/framer-server",
