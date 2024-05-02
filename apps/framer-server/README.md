@@ -1,6 +1,6 @@
-```
-npm install
-npm run dev
-```
+# To run the server
 
-Head to http://localhost:5173
+Nx Console or this bash command.
+```bash
+nx run framer-server:serve:dev
+```

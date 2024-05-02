@@ -1,72 +1,31 @@
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
-import { Button, Frog, TextInput } from 'frog';
+import { Frog } from 'frog';
 import { devtools } from 'frog/dev';
-// import { neynar } from 'frog/hubs'
+import { pinata } from 'frog/hubs';
+import apiRoutes from './api';
+import framesRoute from './frames';
 
-export const app = new Frog({
+const PORT = 3000;
+
+export const frogApp = new Frog({
+  assetsPath: '/',
+  basePath: '/',
+  browserLocation: '/',
   // Supply a Hub to enable frame verification.
-  // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
+  hub: pinata(),
+  // If silent we will not throw an error if verification fails. We will still return `verified` as false though
+  verify: 'silent',
 });
 
-app.use('/*', serveStatic({ root: './public' }));
+// This is how we add routes to our Frog instance./
+frogApp.route('/api', apiRoutes);
+frogApp.route('/frames', framesRoute);
 
-app.frame('/', (c) => {
-  console.log('-----c', c);
-  const { buttonValue, inputText, status } = c;
-  const fruit = inputText || buttonValue;
-  return c.res({
-    image: (
-      <div
-        style={{
-          alignItems: 'center',
-          background:
-            status === 'response'
-              ? 'linear-gradient(to right, #432889, #17101F)'
-              : 'black',
-          backgroundSize: '100% 100%',
-          display: 'flex',
-          flexDirection: 'column',
-          flexWrap: 'nowrap',
-          height: '100%',
-          justifyContent: 'center',
-          textAlign: 'center',
-          width: '100%',
-        }}
-      >
-        <div
-          style={{
-            color: 'white',
-            fontSize: 60,
-            fontStyle: 'normal',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.4,
-            marginTop: 30,
-            padding: '0 120px',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {status === 'response'
-            ? `Nice choice.${fruit ? ` ${fruit.toUpperCase()}!!` : ''}`
-            : 'Welcome!'}
-        </div>
-      </div>
-    ),
-    intents: [
-      <TextInput placeholder="Enter custom fruit..." />,
-      <Button value="apples">Apples</Button>,
-      <Button value="oranges">Oranges</Button>,
-      <Button value="bananas">Bananas</Button>,
-    ],
-  });
-});
-
-const port = 3000;
-console.log(`Server is running on port ${port}`);
-
-devtools(app, { serveStatic });
+console.log('Serving on port', PORT);
+devtools(frogApp, { serveStatic });
 
 serve({
-  fetch: app.fetch,
-  port,
+  fetch: frogApp.fetch,
+  port: PORT,
 });
