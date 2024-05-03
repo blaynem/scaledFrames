@@ -1,0 +1,394 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/client"
+}
+
+/// Individual User that have signed up.
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  displayName String   @unique
+  firstName   String
+  lastName    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Teams the user belongs to
+  teams               UserTeam[]
+  // Teams the user owns relation
+  ownedTeams          Team[]        @relation("TeamOwner")
+  // Frames the user has created relation
+  createdFrames       Frame[]       @relation("FrameCreatedBy")
+  // Frames the user has last updated relation
+  lastUpdatedFrames   Frame[]       @relation("FrameLastUpdatedBy")
+  // Projects the user has last updated relation
+  lastUpdatedProjects Project[]     @relation("ProjectLastUpdatedBy")
+  // The activities this user has done relation
+  ActivityLog         ActivityLog[]
+}
+
+/// Team that a user can be a part of
+model Team {
+  id               String           @id @default(cuid())
+  name             String
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  /// Depending on the Subscription type, the team will have different limits.
+  subscriptionType SubscriptionType
+  /// The custom subdomain that the team has for their frames.
+  /// "https://{subdomain}.framer.com" is the format.
+  /// This is so if an advertiser is linking to a frame, they can have a custom domain that will be shown.
+  ///
+  /// We should likely lock this to a subscription type.
+  customSubDomain  String
+  /// If true, the Team has been deleted and should not be shown to the user.
+  /// This is a soft delete, since we have a bunch of relations.
+  /// If there are no relations, then we can fully delete the team.
+  isDeleted        Boolean          @default(false)
+
+  /// Owner of the team
+  owner   User   @relation("TeamOwner", fields: [ownerId], references: [id])
+  ownerId String
+
+  // Users that are part of the team
+  users    UserTeam[]
+  // Frames that the team owns
+  frames   Frame[]    @relation("FrameOwner")
+  Projects Project[]  @relation("ProjectOwner")
+}
+
+/// UserTeam is the join table between User and Team
+model UserTeam {
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  team   Team   @relation(fields: [teamId], references: [id])
+  teamId String
+
+  @@id([userId, teamId])
+}
+
+/// Projects are the construct of a collection of "frames" to be displayed to an end user.
+model Project {
+  id            String   @id @default(cuid())
+  /// The title of the project to be displayed to the end user.
+  title         String
+  /// A description of the project
+  description   String   @default("")
+  /// Any extra notes that the user wants to add to the project.
+  notes         String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  /// If true, the project can be linked to and viewed by the public.
+  isProjectLive Boolean  @default(false)
+  /// If true, the project has been deleted and should not be shown to the user.
+  /// This is a soft delete, since we have a bunch of relations.
+  isDeleted     Boolean  @default(false)
+
+  /// The custom path that the project will be shown at.
+  /// If the custom path is "example", then the project will be shown at "https://www.framer.com/example"
+  /// All frames will then be shown  at "https://www.framer.com/example/{frame.path}"
+  /// If the user has custom subdomain, then it will be shown at "https://{subdomain}.framer.com/{customBasePath}/{frame.path}"
+  customBasePath String @default("")
+
+  /// If a user tries to visit this projects url on something that doesn't support frames, then they will be redirected to this page.
+  /// Example should be the full url: "https://www.example.com/unsupported-browser"
+  /// TBD: This could be an external link, or potentially an image?
+  customFallbackUrl String @default("")
+
+  /// ---DO NOT USE YET---
+  /// TODO: Just setting it here as a reminder to implement it in the future!
+  /// ---DO NOT USE YET---
+  unusedWebhooks String @default("")
+
+  /// The team that owns this project
+  team   Team   @relation("ProjectOwner", fields: [teamId], references: [id])
+  teamId String
+
+  lastUpdatedBy   User   @relation("ProjectLastUpdatedBy", fields: [lastUpdatedById], references: [id])
+  lastUpdatedById String
+
+  /// The initial frame that will be shown as the root page of the project
+  rootFrame   Frame?  @relation("ProjectRootFrame", fields: [rootFrameId], references: [id])
+  rootFrameId String?
+
+  /// The frames that are part of this project
+  frames              Frame[]
+  projectAnalytics    ProjectAnalytics[]
+  sessions            Session[]
+  IntentClickTracking IntentClickTracking[]
+}
+
+/// The Frame, or Page, that we are displaying to the end user.
+model Frame {
+  id           String    @id @default(cuid())
+  /// The API path that the frame will be shown at.
+  path         String
+  /// Title of the frame that will be displayed to the Project User, not to consumers.
+  title        String
+  /// The image url in our database, this is the image that will be displayed to the user in the frame.
+  /// 
+  /// If someone is using the "debugger" tool to create a customized frame, we would parse and create the image,
+  /// save it to our db, then this would be that url.
+  imageUrl     String
+  /// User provided link to the image.
+  /// This is another upload option for the user to provide an image.
+  /// 
+  /// If this is present, then the image itself was provided by a link from an external host like imgur.
+  /// We fetch this image and store it in our database. But we need to know where it came from.
+  imageLinkUrl String?
+  /// Type of image that this will be.
+  /// Will likely be Static for the short term future.
+  /// Dynamic images will be images that change based on inputs.
+  /// Static images do NOT need to be parsed, they can be stored in our DB for speed.
+  imageType    ImageType @default(Static)
+  /// Should typically only be 1:1 or 1.91:1 as these are the most common aspect ratios.
+  /// Defaults to 1:1
+  aspectRatio  String    @default("1:1")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  /// If true, the frame itself is soft deleted and should not be shown to the user.
+  /// It is soft deleted since we have potential relations that we don't want to delete.
+  /// If there are no relations, then we can fully delete the frame.
+  isDeleted    Boolean   @default(false)
+
+  /// The user who created the frame
+  createdBy       User   @relation("FrameCreatedBy", fields: [createdById], references: [id])
+  createdById     String
+  /// The team that owns this frame
+  team            Team   @relation("FrameOwner", fields: [teamId], references: [id])
+  teamId          String
+  /// The user who last updated the frame
+  lastUpdatedBy   User   @relation("FrameLastUpdatedBy", fields: [lastUpdatedById], references: [id])
+  lastUpdatedById String
+
+  /// Intents that are part of this frame
+  intents             Intents[]
+  /// The project that this frame is part of
+  project             Project               @relation(fields: [projectId], references: [id])
+  projectId           String
+  /// What project this frame is the root of
+  rootFrameOfProjects Project[]             @relation("ProjectRootFrame")
+  IntentClickTracking IntentClickTracking[]
+}
+
+/// Intents are the actions that a user can take on a frame.
+model Intents {
+  id           String     @id @default(cuid())
+  type         IntentType
+  /// The URL that the intent will redirect to.
+  /// If it's a local link it will be the frame path - ex: "/about"
+  /// If it's an external link it will be the full URL - ex: "https://www.google.com"
+  linkUrl      String
+  /// For a button, this is the text that will be displayed on the button.
+  /// For a text input, this is the placeholder text.
+  displayText  String
+  /// The order in which this intent should be displayed.
+  /// Should be between 0 and 4. (I don't think we can have more than 4, have to double check)
+  /// For a TextInput, this field is not used.
+  displayOrder Int
+  /// If true, the frame itself is soft deleted and should not be shown to the user.
+  /// It is soft deleted since we have potential relations that we don't want to delete.
+  /// If there are no relations, then we can fully delete the frame.
+  isDeleted    Boolean    @default(false)
+
+  // Frame that this intent is part of
+  frame               Frame                 @relation(fields: [framesId], references: [id])
+  framesId            String
+  IntentClickTracking IntentClickTracking[]
+}
+
+// ================= LOGGING =================
+
+/// ActivityLog records actions performed by users to track usage patterns, debug issues, and to potentially revert changes.
+model ActivityLog {
+  id          String   @id @default(cuid())
+  /// Reference to the user performing the action
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  /// Type of action performed (e.g., login, update)
+  action      String
+  /// Detailed description of the action
+  description String
+  /// Time when the action was performed
+  timestamp   DateTime @default(now())
+}
+
+/// ErrorLog keeps track of application errors and unexpected behavior for debugging and monitoring.
+model ErrorLog {
+  id         String   @id @default(cuid())
+  /// Type of error (e.g., runtime, syntax)
+  errorType  String
+  /// Error message
+  message    String
+  /// Optional detailed stack trace for deeper analysis
+  stackTrace String?
+  /// Time when the error occurred
+  timestamp  DateTime @default(now())
+}
+
+// =============== CONSUMER ANALYTICS ===============
+
+/// ProjectAnalytics tracks the performance metrics of a project to help users understand how their projects are performing.
+model ProjectAnalytics {
+  id                     String   @id @default(cuid())
+  /// Times customFallbackUrl was redirect to
+  customFallbackUrlCount Int
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  /// Link to the associated project
+  projectId              String
+  project                Project  @relation(fields: [projectId], references: [id])
+}
+
+/// The Session model is a way for us to keep track of how much a user interacted with a project.
+/// This allows us to get a Bounce Rate, and other metrics.
+model Session {
+  id                  String                @id @default(cuid())
+  /// True on session initialization, as the user has not visited any pages yet.
+  /// If the user interacts with an intent, then this will be set to false.
+  /// We can calculate the bounce rate by counting the number of sessions that are single page.
+  isSinglePage        Boolean               @default(true)
+  /// The time the session was started
+  startedAt           DateTime              @default(now())
+  /// The time the session was last active.
+  lastActiveAt        DateTime              @updatedAt
+  /// The project that the session is associated with
+  projectId           String
+  project             Project               @relation(fields: [projectId], references: [id])
+  /// The user who started the session
+  consumerId          String
+  consumer            ConsumerKnownData     @relation(fields: [consumerId], references: [id])
+  IntentClickTracking IntentClickTracking[]
+}
+
+/// IntentClickTracking records each click on intents by users, including contextual data like time and user.
+/// It will also store whether the intent was a conversion.
+model IntentClickTracking {
+  id                String               @id @default(cuid())
+  /// The written text that was inputted by the user.
+  /// Will only exist if the intent type is a TextInput
+  intentTextValue   String?
+  /// The context of the text input. For example, if the user was asked to input their name, this would be "name".
+  /// Will only exist if the intent type is a TextInput
+  intentTextContext String?
+  /// Time the intent was interacted with
+  interactedTime    DateTime             @default(now())
+  /// Think of a "tweet" on twitter, we want to track where the click is coming from.
+  // TODO: Change this variable name.
+  urlInteractedWith String
+  /// The type of conversion that this click was.
+  /// None - if buttons were clicked
+  /// ExternalLink - if an external link was clicked
+  /// Purchase - If we can somehow track a purchase made through Stripe, etc.
+  ///            Ex: A stripe checkout happened, and a webhook was sent to us.
+  conversionType    IntentConversionType @default(None)
+
+  /// Link to the clicked intent
+  intentId  String
+  intent    Intents @relation(fields: [intentId], references: [id])
+  /// Link to the frame containing the intent
+  frameId   String
+  frame     Frame   @relation(fields: [frameId], references: [id])
+  /// Link to the project containing the frame
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  /// User who clicked the intent
+  consumerId String
+  consumer   ConsumerKnownData @relation(fields: [consumerId], references: [id])
+  /// The session that the click was part of
+  sessionId  String
+  session    Session           @relation(fields: [sessionId], references: [id])
+}
+
+/// A table to store data about the users that have interacted with the project.
+model ConsumerKnownData {
+  id                     String                @id @default(cuid())
+  /// Verified farcaster ID
+  farcasterId            String                @unique
+  /// Farcaster bio
+  farcasterBio           String?
+  /// Usernames are how a user get's "@" tagged. Example username - drilkmops
+  farcasterUsername      String?
+  /// Example Display name - Blayne
+  farcasterDisplayName   String?
+  /// Verified addresses of the user fetched from Farcaster
+  farcasterVerifications String[]
+  /// User's first name
+  firstName              String?
+  /// User's last name
+  lastName               String?
+  /// User's email
+  email                  String?
+  IntentClickTracking    IntentClickTracking[]
+  sessions               Session[]
+}
+
+// =============== ENUMS ===============
+
+/// The type of image that we are displaying to the end user.
+/// This is not considering if its a gif, or png, etc. It is considering whether the images change based on inputs.
+enum ImageType {
+  /// An image is considered dynamic if it changes depending on inputs.
+  Dynamic
+  /// An image is static if it does not change, regardless of inputs.
+  Static
+}
+
+/// The type of intent that a user can take on a frame.
+/// For more information view https://docs.farcaster.xyz/reference/frames/spec#button-actions
+enum IntentType {
+  /// Sends a POST request to the current frame, or target frame.
+  /// This is the default button type.
+  Post
+  /// The post_redirect action sends an HTTP POST request to the frame or button post_url.
+  /// You can use this action to redirect to a URL based on frame state or user input.
+  Redirect
+  /// Links to an external site
+  ExternalLink
+  /// This links to another frame
+  InternalLink
+  /// This is related to an Ethereum transaction.
+  Transaction
+  /// When clicked will set the frames path back to the root frame.
+  Reset
+  /// Renders the intent as a text input field.
+  TextInput
+}
+
+/// The type of conversion that a click was.
+enum IntentConversionType {
+  None
+  /// If an external link was clicked
+  ExternalLink
+  /// If a purchase was confirmed
+  Purchase
+}
+
+/// The type of subscription that a team can have.
+/// Is directly applied to all of the projects of a given team.
+enum SubscriptionType {
+  /// Free subscription type
+  /// Limits - 1 team, 1 project, 5 frames (example)
+  Free
+  /// Pro subscription type
+  /// Limits - 5 teams, 5 projects, 25 frames (example)
+  /// Unlock - Custom subdomain, Custom Fallback Url etc
+  Pro
+  /// Enterprise subscription type
+  /// Limits - Unlimited teams, projects, and frames
+  /// Unlock - Custom subdomain, Custom Fallback Url etc
+  Enterprise
+}

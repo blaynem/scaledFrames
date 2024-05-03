@@ -1,0 +1,58 @@
+{
+  "name": "framer-db",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/framer-db/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project framer-db --web",
+  "targets": {
+    "prisma:deploy": {
+      "_comment": "Deploy the prisma schema to the database.",
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/framer-db",
+        "command": "prisma migrate deploy"
+      }
+    },
+    "prisma:create-migration": {
+      "_comment": "Create a migration based on updated schema values.",
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/framer-db",
+        "command": "prisma migrate dev"
+      }
+    },
+    "prisma:generate": {
+      "_comment": "Generates the prisma client based on the schema.",
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/framer-db",
+        "command": "prisma generate"
+      }
+    },
+    "prisma:reset--dev-only": {
+      "_comment": "WARNING: Should only be used in development. Clear all data from the database, then will apply all migrations, and finally run all seed scripts.",
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/framer-db",
+        "command": "npx prisma migrate reset"
+      }
+    },
+    "supabase:start": {
+      "_comment": "Start the local supabase server.",
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/framer-db",
+        "command": "npx supabase start"
+      }
+    },
+    "supabase:stop": {
+      "_comment": "Stop the local supabase server.",
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/framer-db",
+        "command": "npx supabase stop"
+      }
+    }
+  }
+}

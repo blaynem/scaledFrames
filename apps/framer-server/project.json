@@ -1,0 +1,24 @@
+{
+    "name": "framer-server",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/framer-server/src",
+    "projectType": "application",
+    "tags": [],
+    "// targets": "to see all targets run: nx show project framer-server --web",
+    "targets": {
+        "serve:dev": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "apps/framer-server",
+                "command": "tsx watch src/index.tsx"
+            }
+        },
+        "serve:prod": {
+            "executor": "nx:run-commands",
+            "options": {
+                "cwd": "apps/framer-server",
+                "command": "tsx src/index.tsx"
+            }
+        }
+    }
+}

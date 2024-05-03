@@ -13,8 +13,13 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "jsx": "react-jsx",
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@framer/FramerServerSDK": ["libs/FramerServerSDK/src/index.ts"],
+      "@framer/framer-db": ["libs/framer-db/src/index.ts"],
+      "@framer/framer-db/server": ["libs/framer-db/src/server.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
