@@ -104,6 +104,7 @@ model Project {
 
   /// If a user tries to visit this projects url on something that doesn't support frames, then they will be redirected to this page.
   /// Example should be the full url: "https://www.example.com/unsupported-browser"
+  /// TBD: This could be an external link, or potentially an image?
   customFallbackUrl String @default("")
 
   /// ---DO NOT USE YET---
@@ -132,9 +133,14 @@ model Project {
 /// The Frame, or Page, that we are displaying to the end user.
 model Frame {
   id           String    @id @default(cuid())
+  /// The API path that the frame will be shown at.
   path         String
+  /// Title of the frame that will be displayed to the Project User, not to consumers.
   title        String
   /// The image url in our database, this is the image that will be displayed to the user in the frame.
+  /// 
+  /// If someone is using the "debugger" tool to create a customized frame, we would parse and create the image,
+  /// save it to our db, then this would be that url.
   imageUrl     String
   /// User provided link to the image.
   /// This is another upload option for the user to provide an image.
@@ -145,6 +151,7 @@ model Frame {
   /// Type of image that this will be.
   /// Will likely be Static for the short term future.
   /// Dynamic images will be images that change based on inputs.
+  /// Static images do NOT need to be parsed, they can be stored in our DB for speed.
   imageType    ImageType @default(Static)
   /// Should typically only be 1:1 or 1.91:1 as these are the most common aspect ratios.
   /// Defaults to 1:1
@@ -188,7 +195,7 @@ model Intents {
   /// For a text input, this is the placeholder text.
   displayText  String
   /// The order in which this intent should be displayed.
-  /// Should be between 0 and 6. (I don't think we can have more than 6, have to double check)
+  /// Should be between 0 and 4. (I don't think we can have more than 4, have to double check)
   /// For a TextInput, this field is not used.
   displayOrder Int
   /// If true, the frame itself is soft deleted and should not be shown to the user.
@@ -231,7 +238,7 @@ model ErrorLog {
   timestamp  DateTime @default(now())
 }
 
-// =============== ANALYTICS ===============
+// =============== CONSUMER ANALYTICS ===============
 
 /// ProjectAnalytics tracks the performance metrics of a project to help users understand how their projects are performing.
 model ProjectAnalytics {
@@ -278,12 +285,14 @@ model IntentClickTracking {
   intentTextContext String?
   /// Time the intent was interacted with
   interactedTime    DateTime             @default(now())
-  /// The hash of the "cast" made on Farcaster that this click is associated with.
-  castHash          String
+  /// Think of a "tweet" on twitter, we want to track where the click is coming from.
+  // TODO: Change this variable name.
+  urlInteractedWith String
   /// The type of conversion that this click was.
   /// None - if buttons were clicked
   /// ExternalLink - if an external link was clicked
   /// Purchase - If we can somehow track a purchase made through Stripe, etc.
+  ///            Ex: A stripe checkout happened, and a webhook was sent to us.
   conversionType    IntentConversionType @default(None)
 
   /// Link to the clicked intent
@@ -339,16 +348,18 @@ enum ImageType {
 }
 
 /// The type of intent that a user can take on a frame.
+/// For more information view https://docs.farcaster.xyz/reference/frames/spec#button-actions
 enum IntentType {
   /// Sends a POST request to the current frame, or target frame.
+  /// This is the default button type.
   Post
+  /// The post_redirect action sends an HTTP POST request to the frame or button post_url.
+  /// You can use this action to redirect to a URL based on frame state or user input.
+  Redirect
   /// Links to an external site
   ExternalLink
   /// This links to another frame
   InternalLink
-  /// The post_redirect action sends an HTTP POST request to the frame or button post_url.
-  /// You can use this action to redirect to a URL based on frame state or user input.
-  Redirect
   /// This is related to an Ethereum transaction.
   Transaction
   /// When clicked will set the frames path back to the root frame.
