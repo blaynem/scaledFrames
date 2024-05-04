@@ -31,3 +31,23 @@ export type GetUsersRequestQueries = {
 };
 
 export type GetUsersResponse = User | { error: string };
+
+/**
+ * Exposed methods for the users SDK.
+ */
+export type UsersSDKType = {
+  /**
+   * Get a user by either the id or email. One must be supplied.
+   * @param queries id, email
+   * @returns User | { error: string}
+   */
+  get: (queries: GetUsersRequestQueries) => Promise<GetUsersResponse>;
+  /**
+   * Signup a user. Creates a user, team, and project.
+   *
+   * This login should only be called from the Supabase auth client I believe...
+   * @param body
+   * @returns UserSignupResponse | { error: string}
+   */
+  signup: (body: UserSignupRequestBody) => Promise<UserSignupResponse>;
+};

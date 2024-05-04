@@ -1,15 +1,21 @@
-import { FramerClientSDKType } from './types';
+import { FramerClientSDKConfig, FramerClientSDKType } from './types';
 
+/**
+ * Framer Client SDK
+ *
+ * If no `config` is provided, it will default to `http://localhost:3000/api`.
+ * @returns FramerClientSDK
+ */
 export const FramerClientSDK = (
-  /**
-   * Defaults to 'http://localhost:3000/api'
-   */
-  baseUrl = 'http://localhost:3000/api'
+  config?: FramerClientSDKConfig
 ): FramerClientSDKType => {
+  // Base URL for the Framer Server. `/api` is the path for the Client APIs.
+  const _baseUrl = config?.baseUrl || 'http://localhost:3000/api';
+
   return {
     users: {
       get: async (queries) => {
-        const url = new URL(baseUrl);
+        const url = new URL(_baseUrl);
         url.pathname += '/users';
         if (queries.id) {
           url.searchParams.append('id', queries.id);
@@ -20,7 +26,7 @@ export const FramerClientSDK = (
         return fetch(url.toString()).then((res) => res.json());
       },
       signup: async (body) => {
-        const url = new URL(baseUrl);
+        const url = new URL(_baseUrl);
         url.pathname += '/users/signup';
         return fetch(url.toString(), {
           method: 'POST',
@@ -33,7 +39,7 @@ export const FramerClientSDK = (
     },
     projects: {
       get: async (queries) => {
-        const url = new URL(baseUrl);
+        const url = new URL(_baseUrl);
         url.pathname += '/projects';
         if (queries.isProjectLive) {
           url.searchParams.append(
@@ -44,12 +50,12 @@ export const FramerClientSDK = (
         return fetch(url.toString()).then((res) => res.json());
       },
       getById: async (id) => {
-        const url = new URL(baseUrl);
+        const url = new URL(_baseUrl);
         url.pathname += `/projects/${id}`;
         return fetch(url.toString()).then((res) => res.json());
       },
       create: async (body) => {
-        const url = new URL(baseUrl);
+        const url = new URL(_baseUrl);
         url.pathname += '/projects/create';
         return fetch(url.toString(), {
           method: 'POST',
@@ -60,7 +66,7 @@ export const FramerClientSDK = (
         }).then((res) => res.json());
       },
       edit: async (id, body) => {
-        const url = new URL(baseUrl);
+        const url = new URL(_baseUrl);
         url.pathname += `/projects/edit/${id}`;
         return fetch(url.toString(), {
           method: 'POST',
@@ -73,7 +79,7 @@ export const FramerClientSDK = (
     },
     frames: {
       get: async (queries) => {
-        const url = new URL(baseUrl);
+        const url = new URL(_baseUrl);
         url.pathname += '/frames';
         if (queries.projectId) {
           url.searchParams.append('projectId', queries.projectId);
@@ -84,12 +90,12 @@ export const FramerClientSDK = (
         return fetch(url.toString()).then((res) => res.json());
       },
       getById: async (id) => {
-        const url = new URL(baseUrl);
+        const url = new URL(_baseUrl);
         url.pathname += `/frames/${id}`;
         return fetch(url.toString()).then((res) => res.json());
       },
       create: async (body) => {
-        const url = new URL(baseUrl);
+        const url = new URL(_baseUrl);
         url.pathname += '/frames/create';
         return fetch(url.toString(), {
           method: 'POST',
@@ -100,7 +106,7 @@ export const FramerClientSDK = (
         }).then((res) => res.json());
       },
       edit: async (id, body) => {
-        const url = new URL(baseUrl);
+        const url = new URL(_baseUrl);
         url.pathname += `/frames/edit/${id}`;
         return fetch(url.toString(), {
           method: 'POST',

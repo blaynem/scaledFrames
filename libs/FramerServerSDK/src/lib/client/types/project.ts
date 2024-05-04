@@ -68,3 +68,37 @@ export type EditProjectRequestBody = {
    */
   isProjectLive?: boolean;
 };
+
+/**
+ * Exposed SDK for Projects.
+ */
+export type ProjectSDKType = {
+  /**
+   * Get all projects, or filter by isProjectLive
+   * @param queries isProjectLive
+   * @returns Project[] | { error: string}
+   */
+  get: (queries: GetProjectsRequestQueries) => Promise<GetProjectsResponse>;
+  /**
+   * Get a project by id
+   * @param id project id
+   * @returns Project | { error: string}
+   */
+  getById: (id: string) => Promise<GetProjectResponse>;
+  /**
+   * Create a project. Also creates an initial frame and intent for the project.
+   * @param body userId, teamId, title, description, notes
+   * @returns Project | { error: string}
+   */
+  create: (body: CreateProjectRequestBody) => Promise<CreateProjectResponse>;
+  /**
+   * Edit a project
+   * @param id Project id
+   * @param body userId, teamId, title, description, notes, isProjectLive
+   * @returns Project | { error: string}
+   */
+  edit: (
+    id: string,
+    body: EditProjectRequestBody
+  ) => Promise<CreateProjectResponse>;
+};

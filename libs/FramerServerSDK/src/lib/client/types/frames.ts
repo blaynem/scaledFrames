@@ -69,3 +69,34 @@ export type EditFrameRequestBody = {
    */
   projectId: string;
 } & Partial<EditableFrameFields>;
+
+/**
+ * Exposed SDK for Frames.
+ */
+export type FrameSDKType = {
+  /**
+   * Get all frames for a project
+   * @param queries projectId, title
+   * @returns FrameResponseType[] | { error: string}
+   */
+  get: (queries: GetFrameRequestQueries) => Promise<GetFramesResponse>;
+  /**
+   * Get a frame by id
+   * @param id Frame id
+   * @returns FrameResponseType | { error: string}
+   */
+  getById: (id: string) => Promise<GetFrameResponse>;
+  /**
+   * Create a frame
+   * @param body userId, teamId, projectId, path, title, imageUrl, aspectRatio, imageLinkUrl, imageType
+   * @returns FrameResponseType | { error: string}
+   */
+  create: (body: CreateFrameRequestBody) => Promise<CreateFrameResponse>;
+  /**
+   * Edit a frame
+   * @param id Frame id
+   * @param body userId, teamId, projectId, path, title, imageUrl, aspectRatio, imageLinkUrl, imageType
+   * @returns FrameResponseType | { error: string}
+   */
+  edit: (id: string, body: EditFrameRequestBody) => Promise<EditFrameResponse>;
+};
