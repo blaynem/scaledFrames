@@ -5,18 +5,17 @@ import { PrismaClient } from '@prisma/client';
  *
  * Should be fired and forgotten.
  */
-export const logError = async (
-  {
-    errorType,
-    message,
-    stackTrace,
-  }: {
-    errorType: string;
-    message: string;
-    stackTrace?: string;
-  },
-  prisma: PrismaClient
-) => {
+export const logError = async ({
+  prisma,
+  error,
+  errorType,
+}: {
+  prisma: PrismaClient;
+  error: any;
+  errorType: LOG_ERROR_TYPES;
+}) => {
+  const message = (error as Error)?.message || 'Error signing up user.';
+  const stackTrace = (error as Error)?.stack || '';
   return await prisma.errorLog.create({
     data: {
       errorType,
@@ -26,12 +25,21 @@ export const logError = async (
   });
 };
 
-export const LogActions = {
+export enum LOG_ERROR_TYPES {
+  USER_SIGNUP = 'User Signup Error',
+  USER_CREATE = 'User Create Error',
+  PROJECT_CREATE = 'Project Create Error',
+  PROJECT_UPDATE = 'Project Update Error',
+  FRAME_CREATE = 'Frame Create Error',
+  FRAME_UPDATE = 'Frame Update Error',
+}
+
+export const LOG_ACTIONS = {
   UserCreated: 'User created',
   ProjectCreated: 'Project created',
   FrameCreated: 'Frame created',
 };
-export const LogDescriptions = {
+export const LOG_DESCRIPTIONS = {
   UserCreated: 'User created their account',
   ProjectCreated: 'User created a project',
   FrameCreated: 'User created a frame',
@@ -43,6 +51,7 @@ export const LogDescriptions = {
  * Should be fired and forgotten.
  */
 export const logActivity = async (
+  prisma: PrismaClient,
   {
     action,
     description,
@@ -51,8 +60,7 @@ export const logActivity = async (
     action: string;
     description: string;
     userId: string;
-  },
-  prisma: PrismaClient
+  }
 ) => {
   return await prisma.activityLog.create({
     data: {

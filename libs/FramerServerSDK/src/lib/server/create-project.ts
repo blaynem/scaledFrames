@@ -4,6 +4,13 @@ import {
   CreateProjectResponse,
 } from '../client/types';
 import { convertToUrlSafe } from './utils';
+import {
+  logActivity,
+  LOG_ACTIONS,
+  logError,
+  LOG_ERROR_TYPES,
+  LOG_DESCRIPTIONS,
+} from './logging';
 
 /**
  * Creates a Project and Frame for the user.
@@ -18,7 +25,7 @@ export const createProject = async (
   { teamId, userId, title, notes, description }: CreateProjectRequestBody
 ): Promise<CreateProjectResponse | { error: string }> => {
   try {
-    return prismaClient.$transaction(async (_prisma) => {
+    const createdProject = await prismaClient.$transaction(async (_prisma) => {
       const createdProject = await _prisma.project.create({
         data: {
           title,
@@ -90,10 +97,19 @@ export const createProject = async (
       });
       return updatedProjectData.project;
     });
-    // TODO: Add success analytics event
+    logActivity(prismaClient, {
+      action: LOG_ACTIONS.UserCreated,
+      description: LOG_DESCRIPTIONS.UserCreated,
+      userId: createdProject.lastUpdatedById,
+    });
+    return createdProject;
   } catch (error) {
-    // TODO: Add error analytics event
     console.error('Create Project Error: ', error);
+    logError({
+      prisma: prismaClient,
+      error,
+      errorType: LOG_ERROR_TYPES.USER_SIGNUP,
+    });
     return { error: 'Error creating project' };
   }
 };

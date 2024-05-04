@@ -1,8 +1,4 @@
-import {
-  createProject,
-  createSubscriptionPlans,
-  signupUser,
-} from '@framer/FramerServerSDK';
+import { createSubscriptionPlans, signupUser } from '@framer/FramerServerSDK';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();

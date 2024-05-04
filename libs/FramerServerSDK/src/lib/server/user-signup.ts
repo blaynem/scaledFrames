@@ -1,6 +1,13 @@
 import { SubscriptionType, IntentType, PrismaClient } from '@prisma/client';
 import { UserSignupRequestBody, UserSignupResponse } from '../client/types';
 import { convertToUrlSafe } from './utils';
+import {
+  LOG_ERROR_TYPES,
+  LOG_ACTIONS,
+  logActivity,
+  logError,
+  LOG_DESCRIPTIONS,
+} from './logging';
 
 /**
  * Signs up a user.
@@ -20,11 +27,11 @@ export const signupUser = async (
 ): Promise<UserSignupResponse | { error: string }> => {
   try {
     // NOTE: This is in a transaction. So these all must pass or none will.
-    return prismaClient.$transaction(async (_prisma) => {
+    const data = await prismaClient.$transaction(async (_prisma) => {
       const _displayName = convertToUrlSafe(body.displayName);
       const _teamName = `${_displayName}'s Team`;
       const _projectTitle = `${_displayName}'s Project`;
-      // If there
+      // If there is no subscriptionType, default to Free.
       const _subscriptionType = body.subscriptionType || SubscriptionType.Free;
 
       const freePlanId = await _prisma.subscriptionPlan.findFirst({
@@ -154,10 +161,20 @@ export const signupUser = async (
       };
       return returnedData;
     });
-    // TODO: Send log to analytics
+    logActivity(prismaClient, {
+      action: LOG_ACTIONS.UserCreated,
+      description: LOG_DESCRIPTIONS.UserCreated,
+      userId: data.userId,
+    });
+
+    return data;
   } catch (error) {
-    // TODO: Send error to analytics
     console.error('Signup User error: ', error);
+    logError({
+      prisma: prismaClient,
+      error,
+      errorType: LOG_ERROR_TYPES.USER_SIGNUP,
+    });
     return { error: 'Error signing up user.' };
   }
 };
