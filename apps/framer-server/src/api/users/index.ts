@@ -1,7 +1,10 @@
 import {
   GetUsersRequestQueries,
   GetUsersResponse,
-} from 'libs/FramerServerSDK/src/types';
+  UserSignupRequestBody,
+  signupUser,
+  UserSignupResponse,
+} from '@framer/FramerServerSDK';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
 
@@ -28,6 +31,18 @@ usersFrogInstance.get('/', async (c) => {
   } catch (error) {
     console.log('Get Users Error: ', error);
     return c.json<GetUsersResponse>({ error: 'Error fetching user' });
+  }
+});
+
+usersFrogInstance.post('/signup', async (c) => {
+  const body = await c.req.json<UserSignupRequestBody>();
+  try {
+    const returnedData = await signupUser(prisma, body);
+
+    return c.json<UserSignupResponse>(returnedData);
+  } catch (error) {
+    console.log('Create User Error: ', error);
+    return c.json<UserSignupResponse>({ error: 'Error creating user' });
   }
 });
 

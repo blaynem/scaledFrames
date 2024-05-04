@@ -100,7 +100,9 @@ model Project {
   /// If the custom path is "example", then the project will be shown at "https://www.framer.com/example"
   /// All frames will then be shown  at "https://www.framer.com/example/{frame.path}"
   /// If the user has custom subdomain, then it will be shown at "https://{subdomain}.framer.com/{customBasePath}/{frame.path}"
-  customBasePath String @default("")
+  ///
+  /// Defaults to the title of the project, minus any special characters.
+  customBasePath String @unique
 
   /// If a user tries to visit this projects url on something that doesn't support frames, then they will be redirected to this page.
   /// Example should be the full url: "https://www.example.com/unsupported-browser"
@@ -213,35 +215,33 @@ model Intents {
 
 /// Holds the subscription information for a team.
 model TeamSubscription {
-  id              String                @id @default(cuid())
+  id        String                @id @default(cuid())
   /// The team that the subscription is associated with.
-  team            Team?
+  team      Team?
   /// The plan that the team is subscribed to.
-  plan            SubscriptionPlan      @relation(fields: [planId], references: [id])
-  planId          String
+  plan      SubscriptionPlan      @relation(fields: [planId], references: [id])
+  planId    String
   /// The payments that have been made for the subscription.
-  payments        SubscriptionPayment[]
+  payments  SubscriptionPayment[]
   /// The start date of the subscription.
-  startDate       DateTime              @default(now())
+  startDate DateTime              @default(now())
   /// The end date of the subscription.
-  endDate         DateTime
+  endDate   DateTime
   /// If true, the subscription will auto renew.
-  autoRenew       Boolean               @default(true)
+  autoRenew Boolean               @default(true)
   /// The status of the subscription.
-  status          SubscriptionStatus    @default(Active)
-  /// The date that the next payment is due.
-  nextPaymentDate DateTime
+  status    SubscriptionStatus    @default(Active)
   /// The date the Team Subscription was created.
-  createdAt       DateTime              @default(now())
+  createdAt DateTime              @default(now())
   /// The date that the Team Subscription was last updated.
-  updatedAt       DateTime              @updatedAt
+  updatedAt DateTime              @updatedAt
 }
 
 /// Holds the different plans that we offer.
 model SubscriptionPlan {
   id               String             @id @default(cuid())
   /// The type of subscription that the plan is.
-  subscriptionType SubscriptionType
+  subscriptionType SubscriptionType   @unique
   /// The price of the plan.
   price            Float
   /// The name of the plan.
@@ -379,9 +379,8 @@ model IntentClickTracking {
   intentTextContext String?
   /// Time the intent was interacted with
   interactedTime    DateTime             @default(now())
-  /// Think of a "tweet" on twitter, we want to track where the click is coming from.
-  // TODO: Change this variable name.
-  urlInteractedWith String
+  /// Think of a tweets source url on twitter, we want to track where the click is coming from.
+  sourceUrl         String
   /// The type of conversion that this click was.
   /// None - if buttons were clicked
   /// ExternalLink - if an external link was clicked

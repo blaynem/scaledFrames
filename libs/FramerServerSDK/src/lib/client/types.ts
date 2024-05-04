@@ -1,9 +1,9 @@
-import { Project, User } from '@prisma/client';
+import { Project, SubscriptionType, User } from '@prisma/client';
 
 /**
  * All available API endpoints for the Framer Server
  */
-export type FramerServerAPI = {
+export type FramerClientSDKType = {
   /**
    * API endpoints for users
    */
@@ -14,6 +14,14 @@ export type FramerServerAPI = {
      * @returns User | { error: string}
      */
     get: (queries: GetUsersRequestQueries) => Promise<GetUsersResponse>;
+    /**
+     * Signup a user. Creates a user, team, and project.
+     *
+     * This login should only be called from the Supabase auth client I believe...
+     * @param body
+     * @returns UserSignupResponse | { error: string}
+     */
+    signup: (body: UserSignupRequestBody) => Promise<UserSignupResponse>;
   };
   /**
    * API endpoints for projects
@@ -49,6 +57,31 @@ export type FramerServerAPI = {
     ) => Promise<CreateProjectResponse>;
   };
 };
+
+/**
+ * Required fields for a user signup
+ */
+export type UserSignupRequestBody = {
+  displayName: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  /**
+   * Defaults to SubscriptionType.Free
+   */
+  subscriptionType?: SubscriptionType;
+};
+
+/**
+ * On a user signup, we want to return everything that was created.
+ */
+export type UserSignupResponse =
+  | {
+      userId: string;
+      teamId: string;
+      projectId: string;
+    }
+  | { error: string };
 
 export type GetUsersRequestQueries = {
   id?: string;
@@ -88,11 +121,15 @@ export type CreateProjectRequestBody = {
   /**
    * Description of the project.
    */
-  description: string;
+  description?: string;
   /**
    * Notes for the project.
    */
-  notes: string;
+  notes?: string;
+  /**
+   * What URL should be fallen back to if the project is viewed on an unsupported device.
+   */
+  customFallbackUrl?: string;
 };
 export type CreateProjectResponse = Project | { error: string };
 export type EditProjectRequestBody = {

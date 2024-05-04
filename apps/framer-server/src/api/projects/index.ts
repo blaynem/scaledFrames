@@ -1,14 +1,14 @@
-import prisma from '../../prismaClient';
-import { Frog } from 'frog';
-import { createProject } from './createProject';
 import {
   GetProjectsRequestQueries,
   GetProjectsResponse,
   GetProjectResponse,
   CreateProjectRequestBody,
+  createProject,
   CreateProjectResponse,
   EditProjectRequestBody,
-} from 'libs/FramerServerSDK/src/types';
+} from '@framer/FramerServerSDK';
+import prisma from '../../prismaClient';
+import { Frog } from 'frog';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const projectsFrogInstance = new Frog();
@@ -64,7 +64,7 @@ projectsFrogInstance.get('/:id', async (c) => {
 projectsFrogInstance.post('/create', async (c) => {
   const body = await c.req.json<CreateProjectRequestBody>();
   try {
-    const project = await createProject(body);
+    const project = await createProject(prisma, body);
 
     return c.json<CreateProjectResponse>(project);
   } catch (error) {
