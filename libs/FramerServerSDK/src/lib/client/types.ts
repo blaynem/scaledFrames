@@ -1,4 +1,4 @@
-import { Project, SubscriptionType, User } from '@prisma/client';
+import { Frame, Project, SubscriptionType, User } from '@prisma/client';
 
 /**
  * All available API endpoints for the Framer Server
@@ -56,6 +56,39 @@ export type FramerClientSDKType = {
       body: EditProjectRequestBody
     ) => Promise<CreateProjectResponse>;
   };
+  /**
+   * API endpoints for frames
+   */
+  frames: {
+    /**
+     * Get all frames for a project
+     * @param queries projectId, title
+     * @returns FrameResponseType[] | { error: string}
+     */
+    get: (queries: GetFrameRequestQueries) => Promise<GetFramesResponse>;
+    /**
+     * Get a frame by id
+     * @param id Frame id
+     * @returns FrameResponseType | { error: string}
+     */
+    getById: (id: string) => Promise<GetFrameResponse>;
+    /**
+     * Create a frame
+     * @param body userId, teamId, projectId, path, title, imageUrl, aspectRatio, imageLinkUrl, imageType
+     * @returns FrameResponseType | { error: string}
+     */
+    create: (body: CreateFrameRequestBody) => Promise<CreateFrameResponse>;
+    /**
+     * Edit a frame
+     * @param id Frame id
+     * @param body userId, teamId, projectId, path, title, imageUrl, aspectRatio, imageLinkUrl, imageType
+     * @returns FrameResponseType | { error: string}
+     */
+    edit: (
+      id: string,
+      body: EditFrameRequestBody
+    ) => Promise<EditFrameResponse>;
+  };
 };
 
 /**
@@ -101,6 +134,50 @@ export type GetProjectsRequestQueries = {
 };
 export type GetProjectResponse = Project | { error: string };
 export type GetProjectsResponse = Project[] | { error: string };
+
+export type FrameEditableType = {
+  /**
+   * Id of User who is editing the project.
+   */
+  userId: string;
+  /**
+   * Id of Team the project belongs to.
+   */
+  teamId: string;
+  /**
+   * Id of the Project this belongs to.
+   */
+  projectId: string;
+} & Pick<
+  Frame,
+  'path' | 'title' | 'imageUrl' | 'aspectRatio' | 'imageLinkUrl' | 'imageType'
+>;
+
+export type FrameResponseType = Pick<
+  Frame,
+  | 'id'
+  | 'path'
+  | 'title'
+  | 'imageUrl'
+  | 'aspectRatio'
+  | 'imageLinkUrl'
+  | 'imageType'
+  | 'lastUpdatedById'
+  | 'projectId'
+  | 'teamId'
+>;
+
+export type GetFrameRequestQueries = {
+  projectId: string;
+  title?: string;
+};
+export type GetFrameResponse = FrameResponseType | { error: string };
+export type GetFramesResponse = FrameResponseType[] | { error: string };
+
+export type CreateFrameRequestBody = FrameEditableType;
+export type CreateFrameResponse = FrameResponseType | { error: string };
+export type EditFrameRequestBody = FrameEditableType;
+export type EditFrameResponse = FrameResponseType | { error: string };
 
 /**
  * Create a project

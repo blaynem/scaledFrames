@@ -9,6 +9,14 @@ import {
 } from '@framer/FramerServerSDK';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
+import frameFrogInstance from './frame';
+import {
+  logActivity,
+  LOG_ACTIONS,
+  LOG_DESCRIPTIONS,
+  logError,
+  LOG_ERROR_TYPES,
+} from 'libs/FramerServerSDK/src/lib/server/logging';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const projectsFrogInstance = new Frog();
@@ -69,6 +77,11 @@ projectsFrogInstance.post('/create', async (c) => {
     return c.json<CreateProjectResponse>(project);
   } catch (error) {
     console.log('Create a project Error: ', error);
+    logError({
+      prisma,
+      error,
+      errorType: LOG_ERROR_TYPES.PROJECT_CREATE,
+    });
     return c.json<CreateProjectResponse>({ error: 'Error creating project' });
   }
 });
@@ -98,11 +111,24 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
       },
     });
 
+    logActivity(prisma, {
+      action: LOG_ACTIONS.ProjectUpdated,
+      description: LOG_DESCRIPTIONS.ProjectUpdated,
+      userId: body.userId,
+    });
+
     return c.json<CreateProjectResponse>(project);
   } catch (error) {
     console.log('Edit a project Error: ', error);
+    logError({
+      prisma,
+      error,
+      errorType: LOG_ERROR_TYPES.PROJECT_UPDATE,
+    });
     return c.json<CreateProjectResponse>({ error: 'Error editing project' });
   }
 });
+
+projectsFrogInstance.route('/frames', frameFrogInstance);
 
 export default projectsFrogInstance;

@@ -71,5 +71,45 @@ export const FramerClientSDK = (
         }).then((res) => res.json());
       },
     },
+    frames: {
+      get: async (queries) => {
+        const url = new URL(baseUrl);
+        url.pathname += '/frames';
+        if (queries.projectId) {
+          url.searchParams.append('projectId', queries.projectId);
+        }
+        if (queries.title) {
+          url.searchParams.append('title', queries.title);
+        }
+        return fetch(url.toString()).then((res) => res.json());
+      },
+      getById: async (id) => {
+        const url = new URL(baseUrl);
+        url.pathname += `/frames/${id}`;
+        return fetch(url.toString()).then((res) => res.json());
+      },
+      create: async (body) => {
+        const url = new URL(baseUrl);
+        url.pathname += '/frames/create';
+        return fetch(url.toString(), {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }).then((res) => res.json());
+      },
+      edit: async (id, body) => {
+        const url = new URL(baseUrl);
+        url.pathname += `/frames/edit/${id}`;
+        return fetch(url.toString(), {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }).then((res) => res.json());
+      },
+    },
   };
 };

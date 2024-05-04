@@ -37,12 +37,16 @@ export enum LOG_ERROR_TYPES {
 export const LOG_ACTIONS = {
   UserCreated: 'User created',
   ProjectCreated: 'Project created',
+  ProjectUpdated: 'Project updated',
   FrameCreated: 'Frame created',
+  FrameUpdated: 'Frame updated',
 };
 export const LOG_DESCRIPTIONS = {
   UserCreated: 'User created their account',
   ProjectCreated: 'User created a project',
+  ProjectUpdated: 'User updated a project',
   FrameCreated: 'User created a frame',
+  FrameUpdated: 'User updated a frame',
 };
 
 /**
