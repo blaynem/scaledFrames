@@ -133,7 +133,8 @@ frameFrogInstance.post('/edit/:id', async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json<EditFrameRequestBody>();
 
-  // Create a dynamic update object based on provided body fields
+  // Create a dynamic update object based on provided body fields.
+  // This allows us to gate the fields that can be updated, rather than spreading the body object directly.
   const updateData = {} as EditFrameRequestBody;
   if (body.title) updateData.title = body.title;
   if (body.path) updateData.path = body.path;
