@@ -41,22 +41,22 @@ model User {
 
 /// Team that a user can be a part of
 model Team {
-  id               String           @id @default(cuid())
-  name             String
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  /// Depending on the Subscription type, the team will have different limits.
-  subscriptionType SubscriptionType
+  id              String           @id @default(cuid())
+  name            String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  subscription    TeamSubscription @relation(fields: [subscriptionId], references: [id])
+  subscriptionId  String           @unique
   /// The custom subdomain that the team has for their frames.
   /// "https://{subdomain}.framer.com" is the format.
   /// This is so if an advertiser is linking to a frame, they can have a custom domain that will be shown.
   ///
   /// We should likely lock this to a subscription type.
-  customSubDomain  String
+  customSubDomain String
   /// If true, the Team has been deleted and should not be shown to the user.
   /// This is a soft delete, since we have a bunch of relations.
   /// If there are no relations, then we can fully delete the team.
-  isDeleted        Boolean          @default(false)
+  isDeleted       Boolean          @default(false)
 
   /// Owner of the team
   owner   User   @relation("TeamOwner", fields: [ownerId], references: [id])
@@ -207,6 +207,100 @@ model Intents {
   frame               Frame                 @relation(fields: [framesId], references: [id])
   framesId            String
   IntentClickTracking IntentClickTracking[]
+}
+
+// =============== SUBSCRIPTIONS ===============
+
+/// Holds the subscription information for a team.
+model TeamSubscription {
+  id              String                @id @default(cuid())
+  /// The team that the subscription is associated with.
+  team            Team?
+  /// The plan that the team is subscribed to.
+  plan            SubscriptionPlan      @relation(fields: [planId], references: [id])
+  planId          String
+  /// The payments that have been made for the subscription.
+  payments        SubscriptionPayment[]
+  /// The start date of the subscription.
+  startDate       DateTime              @default(now())
+  /// The end date of the subscription.
+  endDate         DateTime
+  /// If true, the subscription will auto renew.
+  autoRenew       Boolean               @default(true)
+  /// The status of the subscription.
+  status          SubscriptionStatus    @default(Active)
+  /// The date that the next payment is due.
+  nextPaymentDate DateTime
+  /// The date the Team Subscription was created.
+  createdAt       DateTime              @default(now())
+  /// The date that the Team Subscription was last updated.
+  updatedAt       DateTime              @updatedAt
+}
+
+/// Holds the different plans that we offer.
+model SubscriptionPlan {
+  id               String             @id @default(cuid())
+  /// The type of subscription that the plan is.
+  subscriptionType SubscriptionType
+  /// The price of the plan.
+  price            Float
+  /// The name of the plan.
+  name             String
+  /// The description of the plan.
+  description      String
+  /// Teams that are subscribed to this plan.
+  teamsSubscribed  TeamSubscription[]
+}
+
+/// Holds the payment information for a subscription.
+/// Though we will likely be relying on a 3rd party for actual payments, we will store the payment information here.
+model SubscriptionPayment {
+  id                 String           @id @default(cuid())
+  /// The amount that was paid.
+  amount             Float
+  /// The currency that the payment was made in.
+  currency           String
+  /// The payment method that was used.
+  paymentMethod      String
+  /// The status of the payment.
+  status             PaymentStatus
+  /// The subscription that the payment is associated with.
+  teamSubscription   TeamSubscription @relation(fields: [teamSubscriptionId], references: [id])
+  /// The transaction id of the payment in the payment processor.
+  transactionId      String
+  /// The date that the payment was made.
+  paymentDate        DateTime
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  teamSubscriptionId String
+}
+
+enum SubscriptionStatus {
+  Active
+  Cancelled
+  Suspended
+}
+
+/// The type of subscription that a team can have.
+/// Is directly applied to all of the projects of a given team.
+enum SubscriptionType {
+  /// Free subscription type
+  /// Limits - 1 team, 1 project, 5 frames (example)
+  Free
+  /// Pro subscription type
+  /// Limits - 5 teams, 5 projects, 25 frames (example)
+  /// Unlock - Custom subdomain, Custom Fallback Url etc
+  Pro
+  /// Enterprise subscription type
+  /// Limits - Unlimited teams, projects, and frames
+  /// Unlock - Custom subdomain, Custom Fallback Url etc
+  Enterprise
+}
+
+enum PaymentStatus {
+  Success
+  Failed
+  Pending
 }
 
 // ================= LOGGING =================
@@ -375,20 +469,4 @@ enum IntentConversionType {
   ExternalLink
   /// If a purchase was confirmed
   Purchase
-}
-
-/// The type of subscription that a team can have.
-/// Is directly applied to all of the projects of a given team.
-enum SubscriptionType {
-  /// Free subscription type
-  /// Limits - 1 team, 1 project, 5 frames (example)
-  Free
-  /// Pro subscription type
-  /// Limits - 5 teams, 5 projects, 25 frames (example)
-  /// Unlock - Custom subdomain, Custom Fallback Url etc
-  Pro
-  /// Enterprise subscription type
-  /// Limits - Unlimited teams, projects, and frames
-  /// Unlock - Custom subdomain, Custom Fallback Url etc
-  Enterprise
 }
