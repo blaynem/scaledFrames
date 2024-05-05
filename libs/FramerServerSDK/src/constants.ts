@@ -4,3 +4,4 @@
 
 export const FRAMES_SERVER_BASE_PATH = '/frames';
 export const API_SERVER_BASE_PATH = '/api';
+export const AUTH_SERVER_BASE_PATH = '/auth';

@@ -37,6 +37,8 @@ npx supabase start # Start the docker container
 npx supabase stop # Stop the docker container
 ```
 
+To get the Supabase login OTP on localhost, you can visit `http://localhost:54324/` in your browser when the container is running. There you will get your Magic Link to login.
+
 # NX Things
 
 - [Integrate with editors](#integrate-with-editors)

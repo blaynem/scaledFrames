@@ -9,9 +9,9 @@ import prisma from '../../prismaClient';
 import { Frog } from 'frog';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
-const usersFrogInstance = new Frog();
+const usersInstance = new Frog();
 
-usersFrogInstance.get('/', async (c) => {
+usersInstance.get('/', async (c) => {
   const id = c.req.query('id');
   const email = c.req.query('email');
   const queries: GetUsersRequestQueries = { id, email };
@@ -34,7 +34,7 @@ usersFrogInstance.get('/', async (c) => {
   }
 });
 
-usersFrogInstance.post('/signup', async (c) => {
+usersInstance.post('/signup', async (c) => {
   const body = await c.req.json<UserSignupRequestBody>();
   try {
     const returnedData = await signupUser(prisma, body);
@@ -46,4 +46,4 @@ usersFrogInstance.post('/signup', async (c) => {
   }
 });
 
-export default usersFrogInstance;
+export default usersInstance;

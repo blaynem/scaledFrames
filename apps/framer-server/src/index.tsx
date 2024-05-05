@@ -5,8 +5,10 @@ import { devtools } from 'frog/dev';
 import { pinata } from 'frog/hubs';
 import apiRoutes from './api';
 import framesRoute from './frames';
+import authRoutes from './auth';
 import {
   API_SERVER_BASE_PATH,
+  AUTH_SERVER_BASE_PATH,
   FRAMES_SERVER_BASE_PATH,
 } from '@framer/FramerServerSDK';
 
@@ -23,6 +25,7 @@ export const frogApp = new Frog({
 // This is how we add routes to our Frog instance./
 frogApp.route(API_SERVER_BASE_PATH, apiRoutes);
 frogApp.route(FRAMES_SERVER_BASE_PATH, framesRoute);
+frogApp.route(AUTH_SERVER_BASE_PATH, authRoutes);
 // TODO: Fallback route for when a frame is unsupported.
 
 devtools(frogApp, { serveStatic });
@@ -31,3 +34,5 @@ serve({
   fetch: frogApp.fetch,
   port: PORT,
 });
+
+console.log(`Server running on port: ${PORT}`);
