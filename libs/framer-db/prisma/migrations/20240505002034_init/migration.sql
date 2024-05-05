@@ -11,7 +11,7 @@ CREATE TYPE "PaymentStatus" AS ENUM ('Success', 'Failed', 'Pending');
 CREATE TYPE "ImageType" AS ENUM ('Dynamic', 'Static');
 
 -- CreateEnum
-CREATE TYPE "IntentType" AS ENUM ('Post', 'Redirect', 'ExternalLink', 'InternalLink', 'Transaction', 'Reset', 'TextInput');
+CREATE TYPE "IntentType" AS ENUM ('Post', 'ExternalLink', 'InternalLink', 'Transaction', 'Reset', 'TextInput');
 
 -- CreateEnum
 CREATE TYPE "IntentConversionType" AS ENUM ('None', 'ExternalLink', 'Purchase');
@@ -181,7 +181,6 @@ CREATE TABLE "ProjectAnalytics" (
 -- CreateTable
 CREATE TABLE "Session" (
     "id" TEXT NOT NULL,
-    "isSinglePage" BOOLEAN NOT NULL DEFAULT true,
     "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "lastActiveAt" TIMESTAMP(3) NOT NULL,
     "projectId" TEXT NOT NULL,
@@ -196,7 +195,9 @@ CREATE TABLE "IntentClickTracking" (
     "intentTextValue" TEXT,
     "intentTextContext" TEXT,
     "interactedTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "sourceUrl" TEXT NOT NULL,
+    "sourceUrl" TEXT,
+    "farcasterCastHash" TEXT,
+    "farcasterUserId" TEXT,
     "conversionType" "IntentConversionType" NOT NULL DEFAULT 'None',
     "intentId" TEXT NOT NULL,
     "frameId" TEXT NOT NULL,
@@ -230,6 +231,9 @@ CREATE UNIQUE INDEX "User_displayName_key" ON "User"("displayName");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Team_subscriptionId_key" ON "Team"("subscriptionId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Team_customSubDomain_key" ON "Team"("customSubDomain");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Project_customBasePath_key" ON "Project"("customBasePath");

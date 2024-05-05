@@ -9,9 +9,7 @@ import framesRoute from './frames';
 const PORT = 3000;
 
 export const frogApp = new Frog({
-  assetsPath: '/',
   basePath: '/',
-  browserLocation: '/',
   // Supply a Hub to enable frame verification.
   hub: pinata(),
   // If silent we will not throw an error if verification fails. We will still return `verified` as false though
@@ -21,6 +19,7 @@ export const frogApp = new Frog({
 // This is how we add routes to our Frog instance./
 frogApp.route('/api', apiRoutes);
 frogApp.route('/frames', framesRoute);
+// TODO: Fallback route for when a frame is unsupported.
 
 console.log('Serving on port', PORT);
 devtools(frogApp, { serveStatic });

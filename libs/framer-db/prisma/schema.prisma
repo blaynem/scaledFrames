@@ -52,7 +52,7 @@ model Team {
   /// This is so if an advertiser is linking to a frame, they can have a custom domain that will be shown.
   ///
   /// We should likely lock this to a subscription type.
-  customSubDomain String
+  customSubDomain String           @unique
   /// If true, the Team has been deleted and should not be shown to the user.
   /// This is a soft delete, since we have a bunch of relations.
   /// If there are no relations, then we can fully delete the team.
@@ -136,6 +136,8 @@ model Project {
 model Frame {
   id           String    @id @default(cuid())
   /// The API path that the frame will be shown at.
+  ///
+  /// Should have a unique path for each frame in a project.
   path         String
   /// Title of the frame that will be displayed to the Project User, not to consumers.
   title        String
@@ -350,10 +352,6 @@ model ProjectAnalytics {
 /// This allows us to get a Bounce Rate, and other metrics.
 model Session {
   id                  String                @id @default(cuid())
-  /// True on session initialization, as the user has not visited any pages yet.
-  /// If the user interacts with an intent, then this will be set to false.
-  /// We can calculate the bounce rate by counting the number of sessions that are single page.
-  isSinglePage        Boolean               @default(true)
   /// The time the session was started
   startedAt           DateTime              @default(now())
   /// The time the session was last active.
@@ -380,7 +378,17 @@ model IntentClickTracking {
   /// Time the intent was interacted with
   interactedTime    DateTime             @default(now())
   /// Think of a tweets source url on twitter, we want to track where the click is coming from.
-  sourceUrl         String
+  sourceUrl         String?
+  /// If the click was on farcaster, we store the hash to the farcaster cast here.
+  /// A "cast" is like a "tweet"
+  /// This is the long hash that is unique to each cast.
+  ///
+  /// If the farcasterCastHash is saved, the farcasterId should also be saved.
+  farcasterCastHash String?
+  /// If the click was on farcaster, we store the id of the farcaster cast here.
+  ///
+  /// If the farcasterId is saved, the farcasterCastHash should also be saved.
+  farcasterUserId   String?
   /// The type of conversion that this click was.
   /// None - if buttons were clicked
   /// ExternalLink - if an external link was clicked
@@ -446,9 +454,6 @@ enum IntentType {
   /// Sends a POST request to the current frame, or target frame.
   /// This is the default button type.
   Post
-  /// The post_redirect action sends an HTTP POST request to the frame or button post_url.
-  /// You can use this action to redirect to a URL based on frame state or user input.
-  Redirect
   /// Links to an external site
   ExternalLink
   /// This links to another frame

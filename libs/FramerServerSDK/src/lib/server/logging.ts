@@ -26,27 +26,28 @@ export const logError = async ({
 };
 
 export enum LOG_ERROR_TYPES {
-  USER_SIGNUP = 'User Signup Error',
-  USER_CREATE = 'User Create Error',
-  PROJECT_CREATE = 'Project Create Error',
-  PROJECT_UPDATE = 'Project Update Error',
+  CONSUMER_FETCH_FRAME = 'Consumer Fetch Frame Error',
   FRAME_CREATE = 'Frame Create Error',
   FRAME_UPDATE = 'Frame Update Error',
+  PROJECT_CREATE = 'Project Create Error',
+  PROJECT_UPDATE = 'Project Update Error',
+  USER_SIGNUP = 'User Signup Error',
+  USER_CREATE = 'User Create Error',
 }
 
 export const LOG_ACTIONS = {
-  UserCreated: 'User created',
-  ProjectCreated: 'Project created',
-  ProjectUpdated: 'Project updated',
   FrameCreated: 'Frame created',
   FrameUpdated: 'Frame updated',
+  ProjectCreated: 'Project created',
+  ProjectUpdated: 'Project updated',
+  UserCreated: 'User created',
 };
 export const LOG_DESCRIPTIONS = {
-  UserCreated: 'User created their account',
-  ProjectCreated: 'User created a project',
-  ProjectUpdated: 'User updated a project',
   FrameCreated: 'User created a frame',
   FrameUpdated: 'User updated a frame',
+  ProjectCreated: 'User created a project',
+  ProjectUpdated: 'User updated a project',
+  UserCreated: 'User created their account',
 };
 
 /**
