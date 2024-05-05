@@ -1,10 +1,11 @@
+import { FRAMES_SERVER_BASE_PATH } from '../../constants';
 import { ParsedFrameUrl, parseFramerUrl } from './utils';
 
 describe('parseFramerUrl', () => {
   it('should parse a Framer URL correctly', () => {
     // Example Usage
     const testUrl1 = parseFramerUrl(
-      'https://nike.framer.com/frames/epic-project/some-frame'
+      `https://nike.framer.com${FRAMES_SERVER_BASE_PATH}/epic-project/some-frame`
     );
     const expectedTest1: ParsedFrameUrl = {
       teamSubdomain: 'nike',
@@ -14,7 +15,7 @@ describe('parseFramerUrl', () => {
     };
 
     const testUrl2 = parseFramerUrl(
-      'https://adidas.framer.com/frames/project-x/new-launch/2024/model-z'
+      `https://adidas.framer.com${FRAMES_SERVER_BASE_PATH}/project-x/new-launch/2024/model-z`
     );
     const expectedTest2: ParsedFrameUrl = {
       teamSubdomain: 'adidas',
@@ -24,7 +25,7 @@ describe('parseFramerUrl', () => {
     };
 
     const testUrl3 = parseFramerUrl(
-      'http://localhost:3000/frames/demo-project/sample-frame'
+      `http://localhost:3000${FRAMES_SERVER_BASE_PATH}/demo-project/sample-frame`
     );
     const expectedTest3: ParsedFrameUrl = {
       teamSubdomain: 'localhost',
@@ -34,7 +35,7 @@ describe('parseFramerUrl', () => {
     };
 
     const testUrl4 = parseFramerUrl(
-      'https://reebok.framer.com/frames/alpha-release/beta-version?version=1.2'
+      `https://reebok.framer.com${FRAMES_SERVER_BASE_PATH}/alpha-release/beta-version?version=1.2`
     );
     const expectedTest4: ParsedFrameUrl = {
       teamSubdomain: 'reebok',
@@ -44,7 +45,7 @@ describe('parseFramerUrl', () => {
     };
 
     const testUrl5 = parseFramerUrl(
-      'https://www.framer.com/frames/myProject/myFrame'
+      `https://www.framer.com${FRAMES_SERVER_BASE_PATH}/myProject/myFrame`
     );
     const expectedTest5: ParsedFrameUrl = {
       teamSubdomain: 'www',
@@ -54,7 +55,7 @@ describe('parseFramerUrl', () => {
     };
 
     const testUrl6 = parseFramerUrl(
-      'https://framer.com/frames/myProject/myFrame'
+      `https://framer.com${FRAMES_SERVER_BASE_PATH}/myProject/myFrame`
     );
     const expectedTest6: ParsedFrameUrl = {
       teamSubdomain: 'framer',

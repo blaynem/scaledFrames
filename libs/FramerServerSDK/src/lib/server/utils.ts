@@ -1,3 +1,5 @@
+import { FRAMES_SERVER_BASE_PATH } from '../../constants';
+
 /**
  * Returns a URL-safe version of the provided string.
  *
@@ -74,14 +76,13 @@ export const parseFramerUrl = (inputUrl: string): ParsedFrameUrl | null => {
       return null; // Not enough parts in the URL
     }
 
-    // path[0] should be 'frames'. Otherwise we shouldn't parse this.
-    if (paths[0] !== 'frames') {
-      throw new Error(
-        `URL is not a '/frames' endpoint. Input URL: ${inputUrl}`
-      );
+    // Since we split off the first slash, we need to prepend it back.
+    if (`/${paths[0]}` !== FRAMES_SERVER_BASE_PATH) {
+      throw new Error(`URL is not for frames endpoint. Input URL: ${inputUrl}`);
     }
 
-    // Project base path is the first path after 'frames'
+    // The first path segment is the `frames` base path.
+    // Project base path is the second path segment.
     const projectBasePath = '/' + paths[1];
     // Frame path is the remaining paths after base path
     const framePath = '/' + paths.slice(2).join('/');
