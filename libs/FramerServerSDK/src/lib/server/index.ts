@@ -1,5 +1,5 @@
 export * from './user-signup';
 export * from './utils';
 export * from './create-project';
-export * from './create-subscription-plan';
+export * from './seed-subscription-plan';
 export * from './intent-tracking';

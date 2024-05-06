@@ -32,6 +32,7 @@ export const createProject = async (
           description,
           notes,
           isProjectLive: false,
+          // TODO: Need to ensure this is unique.
           customBasePath: `/${convertToUrlSafe(title)}`,
           customFallbackUrl: '',
           unusedWebhooks: '',

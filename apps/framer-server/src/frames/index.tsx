@@ -67,10 +67,15 @@ routeApp.frame('/*', async (frameContext) => {
       frameData.project.team.subscription.plan.subscriptionType;
     // If the interaction is from farcaster.
     const interactionFromFarcaster = frameContext.frameData;
-    // If the team is using a custom subdomain, we need to check their subscription type.
-    // This is done as a gating mechanism, as well as security.
-    // Since we are accepting a wildcard essentially, we want to ensure that links can't be "faked".
-    // So someone couldn't do a link for "nike" and have it redirect to "adidas", etc.
+
+    // If a link is using a custom subdomain, we need to ensure it's validity.
+    // We do this both as a gating mechanism, as well as security.
+    // We accept a wildcard subdomain, so we want to ensure that if a subdomain IS being used, it's valid.
+    //
+    // For example, let's say some random user creates a link: `nike.framer.com/frames/project/frameid`
+    // That link will correctly redirect to the frame, regarldess of the subdomain (nike).
+    // So we want to ensure that if a subdomain is being used, it's valid.
+    // The simplest this is by checking the subscription type of the team.
     if (isUsingCustomSubdomain(frameParams.teamSubdomain)) {
       if (!canUseCustomSubdomain(subscriptionType)) {
         const messages = [

@@ -7,7 +7,7 @@ import { PrismaClient, SubscriptionType } from '@prisma/client';
  * @param prisma
  * @returns
  */
-export const createSubscriptionPlans = async (prisma: PrismaClient) => {
+export const seedSubscriptionPlans = async (prisma: PrismaClient) => {
   const freePlan = await prisma.subscriptionPlan.create({
     data: {
       name: 'Free',

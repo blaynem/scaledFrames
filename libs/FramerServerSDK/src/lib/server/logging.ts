@@ -14,8 +14,8 @@ export const logError = async ({
   error: any;
   errorType: LOG_ERROR_TYPES;
 }) => {
-  const message = (error as Error)?.message || 'Error signing up user.';
-  const stackTrace = (error as Error)?.stack || '';
+  const message = (error as Error)?.message || '_message not available_';
+  const stackTrace = (error as Error)?.stack || '_stack trace not available_';
   return await prisma.errorLog.create({
     data: {
       errorType,
@@ -26,6 +26,7 @@ export const logError = async ({
 };
 
 export enum LOG_ERROR_TYPES {
+  INTENT_TRACKING = 'Intent Tracking Error',
   CONSUMER_FETCH_FRAME = 'Consumer Fetch Frame Error',
   FRAME_CREATE = 'Frame Create Error',
   FRAME_UPDATE = 'Frame Update Error',

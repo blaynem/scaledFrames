@@ -1,10 +1,10 @@
-import { createSubscriptionPlans, signupUser } from '@framer/FramerServerSDK';
+import { seedSubscriptionPlans, signupUser } from '@framer/FramerServerSDK';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const createSubscriptionPlansData = await createSubscriptionPlans(prisma);
+  const createSubscriptionPlansData = await seedSubscriptionPlans(prisma);
   console.log('Created subscription plans:', createSubscriptionPlansData);
 
   const createdUser = await signupUser(prisma, {

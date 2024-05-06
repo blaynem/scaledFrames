@@ -1,4 +1,5 @@
 import { IntentClickTracking, IntentType, PrismaClient } from '@prisma/client';
+import { LOG_ERROR_TYPES, logError } from './logging';
 
 /**
  * Logs an intent tracking interaction to the database from a Farcaster app.
@@ -51,21 +52,20 @@ export const logIntentTrackingFarcaster = async ({
         },
       });
 
-      let activeSession = consumerData.sessions[0];
-
+      const activeSession = consumerData.sessions[0];
       const THIRTY_MINUTES_AGO = Date.now() - 30 * 60 * 1000;
-      const FIVE_SECONDS_AGO = Date.now() - 5 * 1000;
 
-      // If the session was active within the last 30 minutes,
-      // AND the session was not created within the last 5 seconds,
-      // we consider the session active, and update the "lastActiveAt" field.
-      // Otherwise, we should create a new session.
+      // We consider a session to be active if the lastActiveAt time is within the last 30 minutes.
       const sessionIsActive =
-        activeSession?.lastActiveAt.getTime() > THIRTY_MINUTES_AGO &&
-        activeSession?.startedAt.getTime() < FIVE_SECONDS_AGO;
+        activeSession?.lastActiveAt.getTime() > THIRTY_MINUTES_AGO;
 
+      // In order to keep track of how Sessions are being used, we need to keep track of the last active time.
+      // If the session is active, we update the lastActiveAt time.
+      // If the session is not active, we create a new session.
+      //
+      // NOTE: Should we a do a check to not update a session that was just created in the CreateConsumerKnownData? Does it matter?
       if (sessionIsActive) {
-        activeSession = await _prisma.session.update({
+        await _prisma.session.update({
           where: {
             id: activeSession.id,
           },
@@ -74,7 +74,7 @@ export const logIntentTrackingFarcaster = async ({
           },
         });
       } else {
-        activeSession = await _prisma.session.create({
+        await _prisma.session.create({
           data: {
             consumerId: consumerData.id,
             projectId: intentData.projectId,
@@ -99,6 +99,7 @@ export const logIntentTrackingFarcaster = async ({
           },
         });
 
+        // Will need to revisit this if we ever have multiple input intents.
         inputDisplayText = inputIntent.intents[0].displayText;
       }
 
@@ -121,12 +122,17 @@ export const logIntentTrackingFarcaster = async ({
         },
       });
 
-      return { intentTracking, activeSession };
+      return { intentTracking };
     });
     console.log('Intent tracking data: ', intentTrackingData);
     return { success: true };
   } catch (error) {
-    console.error(error);
-    return { success: false };
+    console.error('Intent tracking failued: ', error);
+    logError({
+      prisma,
+      error,
+      errorType: LOG_ERROR_TYPES.INTENT_TRACKING,
+    });
+    return { error: 'Failed to submit' };
   }
 };

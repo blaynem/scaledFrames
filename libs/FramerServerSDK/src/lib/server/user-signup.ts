@@ -34,6 +34,7 @@ export const signupUser = async (
       // If there is no subscriptionType, default to Free.
       const _subscriptionType = body.subscriptionType || SubscriptionType.Free;
 
+      // TODO: This should be cached somewhere, as it should never change.
       const freePlanId = await _prisma.subscriptionPlan.findFirst({
         where: {
           subscriptionType: _subscriptionType,
@@ -91,6 +92,7 @@ export const signupUser = async (
           description: 'Placeholder description.',
           notes: 'This is where you can add notes about your project.',
           isProjectLive: false,
+          // TODO: Need to ensure this is unique.
           customBasePath: `/${convertToUrlSafe(_projectTitle)}`,
           customFallbackUrl: '',
           unusedWebhooks: '',
