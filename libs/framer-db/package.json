@@ -1,6 +1,6 @@
 {
     "type": "module",
     "prisma": {
-        "seed": "tsx prisma/seed.ts"
+        "seed": "tsx src/seed.ts"
     }
 }
