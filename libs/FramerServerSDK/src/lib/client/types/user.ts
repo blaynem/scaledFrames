@@ -4,6 +4,12 @@ import { SubscriptionType, User } from '@prisma/client';
  * Required fields for a user signup
  */
 export type UserSignupRequestBody = {
+  /**
+   * This maps directly to the id in the Auth Users table.
+   *
+   * Required as it will be used to create the user in our public table as well.
+   */
+  id: string;
   displayName: string;
   email: string;
   firstName?: string;

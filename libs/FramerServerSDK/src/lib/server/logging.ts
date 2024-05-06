@@ -11,6 +11,7 @@ export const logError = async ({
   errorType,
 }: {
   prisma: PrismaClient;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error: any;
   errorType: LOG_ERROR_TYPES;
 }) => {
@@ -34,6 +35,8 @@ export enum LOG_ERROR_TYPES {
   PROJECT_UPDATE = 'Project Update Error',
   USER_SIGNUP = 'User Signup Error',
   USER_CREATE = 'User Create Error',
+  OTP_REQUEST = 'OTP Request Error',
+  OTP_VERIFY = 'OTP Verify Error',
 }
 
 export const LOG_ACTIONS = {

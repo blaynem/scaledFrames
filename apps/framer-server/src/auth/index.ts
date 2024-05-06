@@ -1,29 +1,18 @@
 import { Frog } from 'frog';
 import { createClient } from '../supabaseClient';
 import {
-  Session as AuthSession,
-  User as AuthUser,
-} from '@supabase/supabase-js';
+  LOG_ERROR_TYPES,
+  logError,
+} from 'libs/FramerServerSDK/src/lib/server/logging';
+import prisma from '../prismaClient';
+import {
+  RequestOTPRequestBody,
+  RequestOTPResponseBody,
+  VerifyOTPRequestBody,
+  VerifyOTPResponseBody,
+} from '@framer/FramerServerSDK';
 
 const authApi = new Frog();
-
-type RequestOTPRequestBody = {
-  email: string;
-};
-
-type VerifyOTPRequestBody = {
-  email: string;
-  otp: string;
-};
-
-type RequestOTPResponseBody = { message: string } | { error: string };
-//  TODO: Determine what should actually be returned here.
-type VerifyOTPResponseBody =
-  | {
-      session: AuthSession | null;
-      user: AuthUser | null;
-    }
-  | { error: string };
 
 authApi.post('/request-otp', async (c) => {
   try {
@@ -38,6 +27,11 @@ authApi.post('/request-otp', async (c) => {
     return c.json<RequestOTPResponseBody>({ message: 'Request OTP' });
   } catch (error) {
     console.log('Error requesting OTP: ', error);
+    logError({
+      prisma,
+      error,
+      errorType: LOG_ERROR_TYPES.OTP_REQUEST,
+    });
     return c.json<RequestOTPResponseBody>({ error: 'Error requesting OTP' });
   }
 });
@@ -52,18 +46,29 @@ authApi.post('/verify-otp', async (c) => {
       type: 'magiclink',
     });
 
-    // TODO: Run through Create user flow if they don't exist.
-    console.log('---data', data);
-
-    if (error) {
+    if (error || !data.session || !data.user) {
       throw new Error('Error verifying OTP');
     }
-    return c.json<VerifyOTPResponseBody>({
-      session: data.session,
-      user: data.user,
-    });
+
+    const response: VerifyOTPResponseBody = {
+      session: {
+        accessToken: data.session.access_token,
+        expiresIn: data.session.expires_in,
+        refreshToken: data.session.refresh_token,
+      },
+      user: {
+        id: data.user.id,
+        email: data.user.email ?? body.email,
+      },
+    };
+    return c.json<VerifyOTPResponseBody>(response);
   } catch (error) {
     console.log('Error verifying OTP: ', error);
+    logError({
+      prisma,
+      error,
+      errorType: LOG_ERROR_TYPES.OTP_VERIFY,
+    });
     return c.json<VerifyOTPResponseBody>({ error: 'Error verifying OTP' });
   }
 });

@@ -1,3 +1,4 @@
+import { AuthSDKType } from './auth';
 import { FrameSDKType } from './frames';
 import { ProjectSDKType } from './project';
 import { UsersSDKType } from './user';
@@ -16,15 +17,19 @@ export type FramerClientSDKConfig = {
  */
 export type FramerClientSDKType = {
   /**
-   * API endpoints for users
+   * API endpoints for authentication
    */
-  users: UsersSDKType;
+  auth: AuthSDKType;
+  /**
+   * API endpoints for frames
+   */
+  frames: FrameSDKType;
   /**
    * API endpoints for projects
    */
   projects: ProjectSDKType;
   /**
-   * API endpoints for frames
+   * API endpoints for users
    */
-  frames: FrameSDKType;
+  users: UsersSDKType;
 };

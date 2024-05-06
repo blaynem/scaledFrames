@@ -28,11 +28,16 @@ export const signupUser = async (
   try {
     // NOTE: This is in a transaction. So these all must pass or none will.
     const data = await prismaClient.$transaction(async (_prisma) => {
+      const _userId = body.id;
       const _displayName = convertToUrlSafe(body.displayName);
       const _teamName = `${_displayName}'s Team`;
       const _projectTitle = `${_displayName}'s Project`;
       // If there is no subscriptionType, default to Free.
       const _subscriptionType = body.subscriptionType || SubscriptionType.Free;
+
+      if (!_userId) {
+        throw new Error('No id provided.');
+      }
 
       // TODO: This should be cached somewhere, as it should never change.
       const freePlanId = await _prisma.subscriptionPlan.findFirst({
@@ -40,12 +45,14 @@ export const signupUser = async (
           subscriptionType: _subscriptionType,
         },
       });
+
       if (!freePlanId) {
         throw new Error('No free plan found.');
       }
 
       const createdUserData = await _prisma.user.create({
         data: {
+          id: _userId,
           email: body.email,
           firstName: body.firstName || '',
           lastName: body.lastName || '',
