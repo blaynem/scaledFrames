@@ -8,6 +8,7 @@ import {
   logError,
   LOG_DESCRIPTIONS,
 } from './logging';
+import { User } from '@supabase/supabase-js';
 
 /**
  * Signs up a user.
@@ -23,17 +24,19 @@ import {
  */
 export const signupUser = async (
   prismaClient: PrismaClient,
-  body: UserSignupRequestBody
+  reqBody: UserSignupRequestBody,
+  authUser: { id: string; email: string }
 ): Promise<UserSignupResponse | { error: string }> => {
   try {
     // NOTE: This is in a transaction. So these all must pass or none will.
     const data = await prismaClient.$transaction(async (_prisma) => {
-      const _userId = body.id;
-      const _displayName = convertToUrlSafe(body.displayName);
+      const _userId = authUser.id;
+      const _displayName = convertToUrlSafe(reqBody.displayName);
       const _teamName = `${_displayName}'s Team`;
       const _projectTitle = `${_displayName}'s Project`;
       // If there is no subscriptionType, default to Free.
-      const _subscriptionType = body.subscriptionType || SubscriptionType.Free;
+      const _subscriptionType =
+        reqBody.subscriptionType || SubscriptionType.Free;
 
       if (!_userId) {
         throw new Error('No id provided.');
@@ -53,9 +56,9 @@ export const signupUser = async (
       const createdUserData = await _prisma.user.create({
         data: {
           id: _userId,
-          email: body.email,
-          firstName: body.firstName || '',
-          lastName: body.lastName || '',
+          email: authUser.email,
+          firstName: reqBody.firstName || '',
+          lastName: reqBody.lastName || '',
           displayName: _displayName,
         },
       });

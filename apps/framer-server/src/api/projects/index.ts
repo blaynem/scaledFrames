@@ -42,7 +42,7 @@ projectsFrogInstance.get('/', async (c) => {
 
     return c.json<GetProjectsResponse>(projects);
   } catch (error) {
-    console.log('Fetch All Projects Error: ', error);
+    console.error('Fetch All Projects Error: ', error);
     return c.json<GetProjectsResponse>({ error: 'Error fetching projects' });
   }
 });
@@ -63,7 +63,7 @@ projectsFrogInstance.get('/:id', async (c) => {
 
     return c.json<GetProjectResponse>(project);
   } catch (error) {
-    console.log('Fetch Project by Id Error : ', error);
+    console.error('Fetch Project by Id Error : ', error);
     return c.json<GetProjectResponse>({ error: 'Error fetching project' });
   }
 });
@@ -76,7 +76,7 @@ projectsFrogInstance.post('/create', async (c) => {
 
     return c.json<CreateProjectResponse>(project);
   } catch (error) {
-    console.log('Create a project Error: ', error);
+    console.error('Create a project Error: ', error);
     logError({
       prisma,
       error,
@@ -119,7 +119,7 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
 
     return c.json<CreateProjectResponse>(project);
   } catch (error) {
-    console.log('Edit a project Error: ', error);
+    console.error('Edit a project Error: ', error);
     logError({
       prisma,
       error,

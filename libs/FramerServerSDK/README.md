@@ -25,13 +25,10 @@ import { FrameServerSDK } from './libs/FramerServerSDK/src';
 
 const test = FrameServerSDK();
 const usersDataGet = await test.users.get({ id: 'clvot3cwo0000k91qkbwyp536' });
-console.log('---usersDataGet', usersDataGet);
 
 const projectsDataGet = await test.projects.get({ isProjectLive: false });
-console.log('---projectsDataGet', projectsDataGet);
 
 const projectDataGet = await test.projects.getById('clvotpod30002cojiyt3955dt');
-console.log('---projectDataGet', projectDataGet);
 
 const projectDataCreate = await test.projects.create({
   teamId: 'clvot3cwy0001k91qdk921sao',
@@ -40,7 +37,6 @@ const projectDataCreate = await test.projects.create({
   notes: 'Wowie notes',
   description: 'Noep',
 });
-console.log('---projectDataCreate', projectDataCreate);
 
 const projectDataEdit = await test.projects.edit('clvotpod30002cojiyt3955dt', {
   teamId: 'clvot3cwy0001k91qdk921sao',
@@ -50,7 +46,6 @@ const projectDataEdit = await test.projects.edit('clvotpod30002cojiyt3955dt', {
   description: 'Test Description Edited2',
   isProjectLive: true,
 });
-console.log('---projectDataEdit', projectDataEdit);
 ```
 
 ## Building

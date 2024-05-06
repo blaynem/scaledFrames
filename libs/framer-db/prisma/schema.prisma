@@ -17,7 +17,8 @@ generator client {
 
 /// Individual User that have signed up.
 model User {
-  id          String   @id @default(cuid())
+  /// Maps directly to the Users ID in Auth Table
+  id          String   @id
   email       String   @unique
   displayName String   @unique
   firstName   String

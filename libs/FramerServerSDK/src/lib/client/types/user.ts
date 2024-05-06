@@ -1,17 +1,12 @@
 import { SubscriptionType, User } from '@prisma/client';
 
 /**
- * Required fields for a user signup
+ * Required fields for a user signup.
+ *
+ * Id and email are not required as they are grabbed via the Supabase auth client.
  */
 export type UserSignupRequestBody = {
-  /**
-   * This maps directly to the id in the Auth Users table.
-   *
-   * Required as it will be used to create the user in our public table as well.
-   */
-  id: string;
   displayName: string;
-  email: string;
   firstName?: string;
   lastName?: string;
   /**
@@ -51,8 +46,9 @@ export type UsersSDKType = {
   /**
    * Signup a user. Creates a user, team, and project.
    *
-   * This login should only be called from the Supabase auth client I believe...
-   * @param body
+   * Notes: Signup can only happen after a user has been authenticated via Supabase.
+   *       On verify-otp, supabase saves cookies that are used to authenticate the user.
+   *
    * @returns UserSignupResponse | { error: string}
    */
   signup: (body: UserSignupRequestBody) => Promise<UserSignupResponse>;

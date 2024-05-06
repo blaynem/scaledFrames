@@ -49,7 +49,7 @@ frameFrogInstance.get('/', async (c) => {
 
     return c.json<GetFramesResponse>(frame);
   } catch (error) {
-    console.log('Fetch All Frames Error: ', error);
+    console.error('Fetch All Frames Error: ', error);
     return c.json<GetFramesResponse>({ error: 'Error fetching frames' });
   }
 });
@@ -70,7 +70,7 @@ frameFrogInstance.get('/:id', async (c) => {
 
     return c.json<GetFrameResponse>(frame);
   } catch (error) {
-    console.log('Fetch Frame by Id Error : ', error);
+    console.error('Fetch Frame by Id Error : ', error);
     return c.json<GetFrameResponse>({ error: 'Error fetching frame' });
   }
 });
@@ -118,7 +118,7 @@ frameFrogInstance.post('/create', async (c) => {
 
     return c.json<CreateFrameResponse>(frame);
   } catch (error) {
-    console.log('Create a frame Error: ', error);
+    console.error('Create a frame Error: ', error);
     logError({
       prisma,
       error,
@@ -160,7 +160,7 @@ frameFrogInstance.post('/edit/:id', async (c) => {
 
     return c.json<EditFrameResponse>(frame);
   } catch (error) {
-    console.log('Edit a frame Error: ', error);
+    console.error('Edit a frame Error: ', error);
     logError({
       prisma,
       error,

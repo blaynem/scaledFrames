@@ -17,7 +17,6 @@ export const createClient = (context: any) => {
           return decodeURIComponent(cookie);
         },
         set: (key: any, value: any, options: any) => {
-          console.log('Setting cookie', { key, value, options });
           const _maxAge = 34560000;
           if (!context.res) return;
           setCookie(context, key, encodeURIComponent(value), {

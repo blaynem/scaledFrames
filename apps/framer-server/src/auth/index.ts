@@ -26,7 +26,7 @@ authApi.post('/request-otp', async (c) => {
     }
     return c.json<RequestOTPResponseBody>({ message: 'Request OTP' });
   } catch (error) {
-    console.log('Error requesting OTP: ', error);
+    console.error('Error requesting OTP: ', error);
     logError({
       prisma,
       error,
@@ -63,7 +63,7 @@ authApi.post('/verify-otp', async (c) => {
     };
     return c.json<VerifyOTPResponseBody>(response);
   } catch (error) {
-    console.log('Error verifying OTP: ', error);
+    console.error('Error verifying OTP: ', error);
     logError({
       prisma,
       error,

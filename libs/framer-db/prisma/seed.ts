@@ -7,12 +7,18 @@ async function main() {
   const createSubscriptionPlansData = await seedSubscriptionPlans(prisma);
   console.log('Created subscription plans:', createSubscriptionPlansData);
 
-  const createdUser = await signupUser(prisma, {
-    email: 'blayne.marjama@gmail.com',
-    firstName: 'Blayne',
-    lastName: 'Marjama',
-    displayName: 'blayne.marjama',
-  });
+  const createdUser = await signupUser(
+    prisma,
+    {
+      firstName: 'Blayne',
+      lastName: 'Marjama',
+      displayName: 'blayne.marjama',
+    },
+    {
+      id: '123',
+      email: 'blayne.marjama@gmail.com',
+    }
+  );
   if ('error' in createdUser) {
     console.error('Error creating user:', createdUser.error);
     return;
