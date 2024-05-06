@@ -2,12 +2,20 @@ import { seedSubscriptionPlans, signupUser } from '@framer/FramerServerSDK';
 import prisma from './prismaClient';
 import supabase from './supabaseClient';
 
-const userToCreate = {
-  firstName: 'Blayne',
-  lastName: 'Marjama',
-  displayName: 'blayne.marjama',
-  email: 'blayne.marjama@gmail.com',
-};
+const usersToCreate = [
+  {
+    firstName: 'Blayne',
+    lastName: 'Marjama',
+    displayName: 'blayne.marjama',
+    email: 'blayne.marjama@gmail.com',
+  },
+  {
+    firstName: 'Alex',
+    lastName: 'Bergvall',
+    displayName: 'bergvall95',
+    email: 'alex.bergvall@gmail.com',
+  },
+];
 
 const getOrCreateUser = async (email: string) => {
   const supabaseUser = await supabase.auth.admin.createUser({
@@ -32,23 +40,24 @@ const getOrCreateUser = async (email: string) => {
 };
 
 async function main() {
-  // We need to create the user in Supabase Auth, or get it if it already exists so we can map the id.
-  const authUser = await getOrCreateUser(userToCreate.email);
-  console.log('Created user:', authUser);
-
   const createSubscriptionPlansData = await seedSubscriptionPlans(prisma);
   console.log('Created subscription plans:', createSubscriptionPlansData);
+  for (const user of usersToCreate) {
+    // We need to create the user in Supabase Auth, or get it if it already exists so we can map the id.
+    const authUser = await getOrCreateUser(user.email);
+    console.log('Created user:', authUser);
 
-  // This creates a user in the public database, and maps it to the one in the supabase auth.
-  const createdUser = await signupUser(prisma, userToCreate, {
-    id: authUser.id,
-    email: userToCreate.email,
-  });
-  if ('error' in createdUser) {
-    console.error('Error creating user:', createdUser.error);
-    return;
+    // This creates a user in the public database, and maps it to the one in the supabase auth.
+    const createdUser = await signupUser(prisma, user, {
+      id: authUser.id,
+      email: user.email,
+    });
+    if ('error' in createdUser) {
+      console.error('Error creating user:', createdUser.error);
+      return;
+    }
+    console.log('Created user:', createdUser);
   }
-  console.log('Created user:', createdUser);
 }
 main()
   .then(async () => {
