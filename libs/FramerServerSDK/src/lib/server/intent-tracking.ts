@@ -65,7 +65,7 @@ export const logIntentTrackingFarcaster = async ({
       //
       // NOTE: Should we a do a check to not update a session that was just created in the CreateConsumerKnownData? Does it matter?
       if (sessionIsActive) {
-        await _prisma.session.update({
+        await _prisma.consumerSession.update({
           where: {
             id: activeSession.id,
           },
@@ -74,7 +74,7 @@ export const logIntentTrackingFarcaster = async ({
           },
         });
       } else {
-        await _prisma.session.create({
+        await _prisma.consumerSession.create({
           data: {
             consumerId: consumerData.id,
             projectId: intentData.projectId,

@@ -16,6 +16,7 @@ import {
   logActivity,
   logError,
 } from 'libs/FramerServerSDK/src/lib/server/logging';
+import { getAuthUser } from '../../supabaseClient';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const frameFrogInstance = new Frog();
@@ -35,15 +36,18 @@ frameFrogInstance.get('/', async (c) => {
   };
 
   try {
+    const authUser = await getAuthUser(c);
     // Filtering by the projectId and title if it is defined
     const frame = await prisma.frame.findMany({
       where: {
-        projectId: queries.projectId,
-        ...(queries.title !== undefined && {
-          title: {
-            contains: queries.title,
+        ...queries,
+        team: {
+          users: {
+            some: {
+              userId: authUser.id,
+            },
           },
-        }),
+        },
       },
     });
 
@@ -58,9 +62,17 @@ frameFrogInstance.get('/', async (c) => {
 frameFrogInstance.get('/:id', async (c) => {
   const id = c.req.param('id');
   try {
+    const authUser = await getAuthUser(c);
     const frame = await prisma.frame.findUnique({
       where: {
         id,
+        team: {
+          users: {
+            some: {
+              userId: authUser.id,
+            },
+          },
+        },
       },
     });
 
@@ -79,6 +91,7 @@ frameFrogInstance.get('/:id', async (c) => {
 frameFrogInstance.post('/create', async (c) => {
   const body = await c.req.json<CreateFrameRequestBody>();
   try {
+    const authUser = await getAuthUser(c);
     const frame = await prisma.frame.create({
       data: {
         path: body.path,
@@ -94,12 +107,12 @@ frameFrogInstance.post('/create', async (c) => {
         },
         lastUpdatedBy: {
           connect: {
-            id: body.userId,
+            id: authUser.id,
           },
         },
         createdBy: {
           connect: {
-            id: body.userId,
+            id: authUser.id,
           },
         },
         team: {
@@ -113,7 +126,7 @@ frameFrogInstance.post('/create', async (c) => {
     logActivity(prisma, {
       action: LOG_ACTIONS.FrameCreated,
       description: LOG_DESCRIPTIONS.FrameCreated,
-      userId: body.userId,
+      userId: authUser.id,
     });
 
     return c.json<CreateFrameResponse>(frame);
@@ -144,10 +157,18 @@ frameFrogInstance.post('/edit/:id', async (c) => {
   if (body.aspectRatio) updateData.aspectRatio = body.aspectRatio;
 
   try {
+    const authUser = await getAuthUser(c);
     const frame = await prisma.frame.update({
       where: {
         id,
         teamId: body.teamId,
+        team: {
+          users: {
+            some: {
+              userId: authUser.id,
+            },
+          },
+        },
       },
       data: updateData,
     });
@@ -155,7 +176,7 @@ frameFrogInstance.post('/edit/:id', async (c) => {
     logActivity(prisma, {
       action: LOG_ACTIONS.FrameUpdated,
       description: LOG_DESCRIPTIONS.FrameUpdated,
-      userId: body.userId,
+      userId: authUser.id,
     });
 
     return c.json<EditFrameResponse>(frame);

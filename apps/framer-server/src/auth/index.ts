@@ -1,5 +1,5 @@
 import { Frog } from 'frog';
-import { createClient } from '../supabaseClient';
+import { signInWithOtp, verifyOtp } from '../supabaseClient';
 import {
   LOG_ERROR_TYPES,
   logError,
@@ -16,11 +16,8 @@ const authApi = new Frog();
 
 authApi.post('/request-otp', async (c) => {
   try {
-    const supabase = createClient(c);
     const { email } = await c.req.json<RequestOTPRequestBody>();
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-    });
+    const { error } = await signInWithOtp(c, email);
     if (error) {
       throw new Error('Error requesting OTP');
     }
@@ -39,12 +36,7 @@ authApi.post('/request-otp', async (c) => {
 authApi.post('/verify-otp', async (c) => {
   try {
     const body = await c.req.json<VerifyOTPRequestBody>();
-    const supabase = createClient(c);
-    const { data, error } = await supabase.auth.verifyOtp({
-      email: body.email,
-      token: body.otp,
-      type: 'magiclink',
-    });
+    const { data, error } = await verifyOtp(c, body.email, body.otp);
 
     if (error || !data.session || !data.user) {
       throw new Error('Error verifying OTP');

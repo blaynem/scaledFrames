@@ -38,10 +38,6 @@ export type EditFrameResponse = FrameResponseType | { error: string };
  */
 export type CreateFrameRequestBody = {
   /**
-   * Id of User who is editing the project.
-   */
-  userId: string;
-  /**
    * Id of Team the project belongs to.
    */
   teamId: string;
@@ -56,10 +52,6 @@ export type CreateFrameRequestBody = {
  * Required fields: userId, teamId, projectId
  */
 export type EditFrameRequestBody = {
-  /**
-   * Id of User who is editing the project.
-   */
-  userId: string;
   /**
    * Id of Team the project belongs to.
    */

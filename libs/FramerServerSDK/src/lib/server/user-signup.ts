@@ -8,7 +8,7 @@ import {
   logError,
   LOG_DESCRIPTIONS,
 } from './logging';
-import { User } from '@supabase/supabase-js';
+import { AuthUser } from './types';
 
 /**
  * Signs up a user.
@@ -25,9 +25,19 @@ import { User } from '@supabase/supabase-js';
 export const signupUser = async (
   prismaClient: PrismaClient,
   reqBody: UserSignupRequestBody,
-  authUser: { id: string; email: string }
+  authUser: AuthUser
 ): Promise<UserSignupResponse | { error: string }> => {
   try {
+    const userAlreadyExists = await prismaClient.user.findUnique({
+      where: {
+        id: authUser.id,
+        email: authUser.email,
+      },
+    });
+    if (userAlreadyExists) {
+      throw new Error('User already exists, signup flow not needed.');
+    }
+
     // NOTE: This is in a transaction. So these all must pass or none will.
     const data = await prismaClient.$transaction(async (_prisma) => {
       const _userId = authUser.id;

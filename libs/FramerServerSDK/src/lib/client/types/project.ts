@@ -17,10 +17,6 @@ export type GetProjectsResponse = Project[] | { error: string };
  */
 export type CreateProjectRequestBody = {
   /**
-   * Id of User who is creating the project.
-   */
-  userId: string;
-  /**
    * Id of Team that this Project belongs to.
    */
   teamId: string;
@@ -43,10 +39,6 @@ export type CreateProjectRequestBody = {
 };
 export type CreateProjectResponse = Project | { error: string };
 export type EditProjectRequestBody = {
-  /**
-   * Id of User who is editing the project.
-   */
-  userId: string;
   /**
    * Id of Team the project belongs to.
    */

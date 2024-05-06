@@ -31,7 +31,9 @@ export type GetUsersRequestQueries = {
   email?: string;
 };
 
-export type GetUsersResponse = User | { error: string };
+type GetUsersResponseType = Pick<User, 'id' | 'email' | 'displayName'>;
+
+export type GetUsersResponse = GetUsersResponseType[] | { error: string };
 
 /**
  * Exposed methods for the users SDK.

@@ -11,6 +11,7 @@ import {
   LOG_ERROR_TYPES,
   LOG_DESCRIPTIONS,
 } from './logging';
+import { AuthUser } from './types';
 
 /**
  * Creates a Project and Frame for the user.
@@ -22,7 +23,8 @@ import {
  */
 export const createProject = async (
   prismaClient: PrismaClient,
-  { teamId, userId, title, notes, description }: CreateProjectRequestBody
+  { teamId, title, notes, description }: CreateProjectRequestBody,
+  authUser: AuthUser
 ): Promise<CreateProjectResponse | { error: string }> => {
   try {
     const createdProject = await prismaClient.$transaction(async (_prisma) => {
@@ -43,7 +45,7 @@ export const createProject = async (
           },
           lastUpdatedBy: {
             connect: {
-              id: userId,
+              id: authUser.id,
             },
           },
         },
@@ -83,12 +85,12 @@ export const createProject = async (
           },
           createdBy: {
             connect: {
-              id: userId,
+              id: authUser.id,
             },
           },
           lastUpdatedBy: {
             connect: {
-              id: userId,
+              id: authUser.id,
             },
           },
         },

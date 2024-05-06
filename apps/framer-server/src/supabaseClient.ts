@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { createServerClient } from '@supabase/ssr';
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
+import { AuthUser } from '@framer/FramerServerSDK';
 
 dotenv.config();
 
@@ -33,4 +34,53 @@ export const createClient = (context: any) => {
       },
     }
   );
+};
+
+/**
+ * If there is an active auth session, this function will return the user object from Auth.
+ *
+ * Otherwise it will throw an error.
+ *
+ * @param context - The context from the Hono / Frog instance request.
+ * @returns - { id: string, email: string }
+ */
+export const getAuthUser = async (context: any): Promise<AuthUser> => {
+  const supabase = createClient(context);
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data || !data.user) {
+    throw new Error('User not authenticated.');
+  }
+  return {
+    id: data.user.id,
+    email: data.user.email!,
+  };
+};
+
+/**
+ * If the email is valid, this function will send an OTP to the email.
+ * @param context - The context from the Hono / Frog instance request.
+ * @param email
+ * @returns
+ */
+export const signInWithOtp = async (context: any, email: string) => {
+  const supabase = createClient(context);
+  return await supabase.auth.signInWithOtp({
+    email,
+  });
+};
+
+/**
+ * If the OTP is valid, this function will return the session and user object from Auth.
+ * @param context - The context from the Hono / Frog instance request.
+ * @param email
+ * @param otp
+ * @returns
+ */
+export const verifyOtp = async (context: any, email: string, otp: string) => {
+  const supabase = createClient(context);
+  return await supabase.auth.verifyOtp({
+    email,
+    token: otp,
+    type: 'magiclink',
+  });
 };
