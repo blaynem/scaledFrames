@@ -7,11 +7,7 @@ nx run framer-server:serve:dev
 
 Want to verify the frame is working as expected? Run ngrok then visit https://warpcast.com/~/developers/frames.
 Pass in the url like so `https://53c3-50-39-160-155.ngrok-free.app/frames/{projectName}/{frameName}`.
-You'll also need to 
 
-
-Verify:
-- That frames work as expected when interacted with in the local frog dev env.
 
 Needed DB things
 

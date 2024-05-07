@@ -10,7 +10,7 @@
             "executor": "nx:run-commands",
             "options": {
                 "cwd": "apps/framer-server",
-                "command": "tsx watch src/index.tsx"
+                "command": "NODE_ENV=development tsx watch src/index.tsx"
             }
         },
         "serve:prod": {
