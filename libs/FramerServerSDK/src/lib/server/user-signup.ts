@@ -157,7 +157,58 @@ export const signupUser = async (
         data: {
           path: '/home',
           title: 'Home',
-          imageUrl: 'https://placehold.co/600x400',
+          imageUrl: 'https://i.imgur.com/CtgycuI.jpeg',
+          intents: {
+            createMany: {
+              data: [
+                {
+                  type: IntentType.InternalLink,
+                  linkUrl: '/home',
+                  displayText: 'Go home',
+                  displayOrder: 0,
+                },
+                {
+                  type: IntentType.InternalLink,
+                  linkUrl: '/frame2',
+                  displayText: 'Frame 2',
+                  displayOrder: 1,
+                },
+              ],
+            },
+          },
+          rootFrameOfProjects: {
+            connect: {
+              id: createdProject.id,
+            },
+          },
+          project: {
+            connect: {
+              id: createdProject.id,
+            },
+          },
+          team: {
+            connect: {
+              id: createUserTeam.teamId,
+            },
+          },
+          createdBy: {
+            connect: {
+              id: createUserTeam.userId,
+            },
+          },
+          lastUpdatedBy: {
+            connect: {
+              id: createUserTeam.userId,
+            },
+          },
+        },
+      });
+      // Create another frame
+      await _prisma.frame.create({
+        data: {
+          path: '/frame2',
+          title: 'Frame 2',
+          imageUrl: 'https://i.imgur.com/KDRXumd.jpeg',
           intents: {
             createMany: {
               data: [
@@ -195,9 +246,6 @@ export const signupUser = async (
               id: createUserTeam.userId,
             },
           },
-        },
-        select: {
-          project: true,
         },
       });
       const returnedData: UserSignupResponse = {

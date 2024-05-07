@@ -26,11 +26,11 @@ export const logIntentTrackingFarcaster = async ({
   >;
 }) => {
   try {
-    const intentTrackingData = await prisma.$transaction(async (_prisma) => {
+    await prisma.$transaction(async (_prisma) => {
       // Fetch the consumer data and the active session, or create the data.
       const consumerData = await _prisma.consumerKnownData.upsert({
         where: {
-          id: farcasterUserId,
+          farcasterId: farcasterUserId,
         },
         // We don't need to update anything. Just fetching the session.
         update: {},
@@ -124,7 +124,6 @@ export const logIntentTrackingFarcaster = async ({
 
       return { intentTracking };
     });
-    console.log('Intent tracking data: ', intentTrackingData);
     return { success: true };
   } catch (error) {
     console.error('Intent tracking failued: ', error);

@@ -82,17 +82,8 @@ projectsFrogInstance.get('/:id', async (c) => {
     if (!project) {
       return c.json<GetProjectByIdResponse>({ error: 'Project not found' });
     }
-    const response = {
-      ...project,
-      frames: project.frames.map(({ ...frame }) => ({
-        ...frame,
-        intents: frame.intents.map(({ ...intent }) => ({
-          ...intent,
-        })),
-      })),
-    } satisfies GetProjectByIdResponse;
 
-    return c.json<GetProjectByIdResponse>(response);
+    return c.json<GetProjectByIdResponse>(project);
   } catch (error) {
     console.error('Fetch Project by Id Error : ', error);
     return c.json<GetProjectByIdResponse>({ error: 'Error fetching project' });
