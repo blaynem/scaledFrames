@@ -1,7 +1,7 @@
 import {
   GetProjectsRequestQueries,
   GetProjectsResponse,
-  GetProjectResponse,
+  GetProjectByIdResponse,
   CreateProjectRequestBody,
   createProject,
   CreateProjectResponse,
@@ -53,7 +53,7 @@ projectsFrogInstance.get('/', async (c) => {
   }
 });
 
-// Fetch a project by id
+// Fetch all data for a project with a given id.
 projectsFrogInstance.get('/:id', async (c) => {
   const id = c.req.param('id');
   try {
@@ -61,6 +61,7 @@ projectsFrogInstance.get('/:id', async (c) => {
     const project = await prisma.project.findUnique({
       where: {
         id,
+        isDeleted: false,
         team: {
           users: {
             some: {
@@ -69,16 +70,32 @@ projectsFrogInstance.get('/:id', async (c) => {
           },
         },
       },
+      include: {
+        frames: {
+          include: {
+            intents: true,
+          },
+        },
+      },
     });
 
     if (!project) {
-      return c.json<GetProjectResponse>({ error: 'Project not found' });
+      return c.json<GetProjectByIdResponse>({ error: 'Project not found' });
     }
+    const response = {
+      ...project,
+      frames: project.frames.map(({ ...frame }) => ({
+        ...frame,
+        intents: frame.intents.map(({ ...intent }) => ({
+          ...intent,
+        })),
+      })),
+    } satisfies GetProjectByIdResponse;
 
-    return c.json<GetProjectResponse>(project);
+    return c.json<GetProjectByIdResponse>(response);
   } catch (error) {
     console.error('Fetch Project by Id Error : ', error);
-    return c.json<GetProjectResponse>({ error: 'Error fetching project' });
+    return c.json<GetProjectByIdResponse>({ error: 'Error fetching project' });
   }
 });
 
@@ -124,6 +141,13 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
         description: body.description,
         notes: body.notes,
         isProjectLive: body.isProjectLive,
+      },
+      include: {
+        frames: {
+          include: {
+            intents: true,
+          },
+        },
       },
     });
 
