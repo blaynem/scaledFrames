@@ -21,6 +21,10 @@ export const convertToUrlSafe = (val: string): string =>
  */
 export type ParsedFrameUrl = {
   /**
+   * The full URL.
+   */
+  url: string;
+  /**
    * The base path of the `Project` in the Framer URL.
    * Includes prepended slashes.
    */
@@ -88,6 +92,7 @@ export const parseFramerUrl = (inputUrl: string): ParsedFrameUrl | null => {
     const framePath = '/' + paths.slice(2).join('/');
 
     return {
+      url: inputUrl,
       teamSubdomain,
       projectBasePath,
       framePath,

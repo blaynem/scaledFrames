@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nx start framer"
+    "dev": "nx start framer",
+    "ngrok": "ngrok http 3000"
   },
   "private": true,
   "dependencies": {

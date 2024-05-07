@@ -77,7 +77,7 @@ routeApp.frame('/*', async (frameContext) => {
     // That link will correctly redirect to the frame, regarldess of the subdomain (nike).
     // So we want to ensure that if a subdomain is being used, it's valid.
     // The simplest this is by checking the subscription type of the team.
-    if (isUsingCustomSubdomain(frameParams.teamSubdomain)) {
+    if (isUsingCustomSubdomain(frameParams)) {
       if (!canUseCustomSubdomain(subscriptionType)) {
         const messages = [
           'Link to custom subdomain, but team does not have a Pro or Enterprise subscription.',
