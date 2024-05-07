@@ -6,6 +6,8 @@ import {
   createProject,
   CreateProjectResponse,
   EditProjectRequestBody,
+  decodeJwt,
+  getUserFromEmail,
 } from '@framer/FramerServerSDK';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
@@ -16,7 +18,6 @@ import {
   logError,
   LOG_ERROR_TYPES,
 } from 'libs/FramerServerSDK/src/lib/server/logging';
-import { getAuthUser } from '../../supabaseClient';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const projectsFrogInstance = new Frog();
@@ -31,7 +32,9 @@ projectsFrogInstance.get('/', async (c) => {
   }
 
   try {
-    const authUser = await getAuthUser(c);
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+    const authUser = await getUserFromEmail(prisma, email);
     // only check isProjectLive if it is defined
     const projects = await prisma.project.findMany({
       where: {
@@ -57,7 +60,9 @@ projectsFrogInstance.get('/', async (c) => {
 projectsFrogInstance.get('/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    const authUser = await getAuthUser(c);
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+    const authUser = await getUserFromEmail(prisma, email);
     const project = await prisma.project.findUnique({
       where: {
         id,
@@ -94,7 +99,9 @@ projectsFrogInstance.get('/:id', async (c) => {
 projectsFrogInstance.post('/create', async (c) => {
   const body = await c.req.json<CreateProjectRequestBody>();
   try {
-    const authUser = await getAuthUser(c);
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+    const authUser = await getUserFromEmail(prisma, email);
     const project = await createProject(prisma, body, authUser);
 
     return c.json<CreateProjectResponse>(project);
@@ -114,7 +121,9 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json<EditProjectRequestBody>();
   try {
-    const authUser = await getAuthUser(c);
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+    const authUser = await getUserFromEmail(prisma, email);
     const project = await prisma.project.update({
       where: {
         id,

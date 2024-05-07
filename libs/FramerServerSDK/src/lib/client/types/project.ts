@@ -73,7 +73,7 @@ export type ProjectSDKType = {
    * @param queries isProjectLive
    * @returns Project[] | { error: string}
    */
-  get: (queries: GetProjectsRequestQueries) => Promise<GetProjectsResponse>;
+  get: (queries?: GetProjectsRequestQueries) => Promise<GetProjectsResponse>;
   /**
    * Get a project by id
    * @param id project id
