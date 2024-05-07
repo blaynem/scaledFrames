@@ -1,4 +1,4 @@
-import FrameDebugger from './components/FrameDebugger/frameDebugger';
+import FrameDebugger from '../components/FrameDebugger/frameDebugger';
 import './page.module.css';
 
 export default function Index() {
@@ -15,16 +15,13 @@ export default function Index() {
             className="flex-item column1"
             style={{ padding: '20px', flex: '0 0 20%' }}
           >
-            <h1> this is where the project preview will go </h1>
+            <h1> Welcome to Framer! </h1>
           </div>
           <div
             className="flex-item column2"
             style={{ padding: '20px', flex: '0 0 30%' }}
           >
-            <h1>
-              {' '}
-              this is where all of the buttons and inputs for the frame will go{' '}
-            </h1>
+            <h1> Welcome to Framer! </h1>
           </div>
           <div
             id="welcome"

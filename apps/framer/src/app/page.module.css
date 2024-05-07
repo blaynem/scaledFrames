@@ -1,2 +1,11 @@
-.page {
+.flex-container {
+    display: flex;
+    height: 100vh; /* Adjust the height as needed */
+  }
+.flex-item {
+    padding: 20px;
+    color: white;
 }
+.column1 { background-color: #8FAADC; flex: 0 0 20%; }
+.column2 { background-color: #6C8EAD; flex: 0 0 30%; }
+.column3 { background-color: #2F4550; flex: 0 0 50%; }

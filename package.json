@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nx start framer"
+    "dev": "nx dev framer",
+    "gc": "nx g @nx/next:component $1 --directory=apps/framer/src/app/components/$2",
+    "gp": "nx g @nx/next:page $1 --directory=apps/framer/src/app/$2"
   },
   "private": true,
   "dependencies": {
