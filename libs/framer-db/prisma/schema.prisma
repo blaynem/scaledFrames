@@ -17,7 +17,8 @@ generator client {
 
 /// Individual User that have signed up.
 model User {
-  id          String   @id @default(cuid())
+  /// Maps directly to the Users ID in Auth Table
+  id          String   @id @db.Uuid
   email       String   @unique
   displayName String   @unique
   firstName   String
@@ -41,26 +42,26 @@ model User {
 
 /// Team that a user can be a part of
 model Team {
-  id               String           @id @default(cuid())
-  name             String
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  /// Depending on the Subscription type, the team will have different limits.
-  subscriptionType SubscriptionType
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  subscription    TeamSubscription @relation(fields: [subscriptionId], references: [id])
+  subscriptionId  String           @unique @db.Uuid
   /// The custom subdomain that the team has for their frames.
   /// "https://{subdomain}.framer.com" is the format.
   /// This is so if an advertiser is linking to a frame, they can have a custom domain that will be shown.
   ///
   /// We should likely lock this to a subscription type.
-  customSubDomain  String
+  customSubDomain String           @unique
   /// If true, the Team has been deleted and should not be shown to the user.
   /// This is a soft delete, since we have a bunch of relations.
   /// If there are no relations, then we can fully delete the team.
-  isDeleted        Boolean          @default(false)
+  isDeleted       Boolean          @default(false)
 
   /// Owner of the team
   owner   User   @relation("TeamOwner", fields: [ownerId], references: [id])
-  ownerId String
+  ownerId String @db.Uuid
 
   // Users that are part of the team
   users    UserTeam[]
@@ -72,16 +73,18 @@ model Team {
 /// UserTeam is the join table between User and Team
 model UserTeam {
   user   User   @relation(fields: [userId], references: [id])
-  userId String
+  userId String @db.Uuid
   team   Team   @relation(fields: [teamId], references: [id])
-  teamId String
+  teamId String @db.Uuid
 
   @@id([userId, teamId])
+  @@index([teamId])
+  @@index([userId])
 }
 
 /// Projects are the construct of a collection of "frames" to be displayed to an end user.
 model Project {
-  id            String   @id @default(cuid())
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// The title of the project to be displayed to the end user.
   title         String
   /// A description of the project
@@ -100,7 +103,9 @@ model Project {
   /// If the custom path is "example", then the project will be shown at "https://www.framer.com/example"
   /// All frames will then be shown  at "https://www.framer.com/example/{frame.path}"
   /// If the user has custom subdomain, then it will be shown at "https://{subdomain}.framer.com/{customBasePath}/{frame.path}"
-  customBasePath String @default("")
+  ///
+  /// Defaults to the title of the project, minus any special characters.
+  customBasePath String @unique
 
   /// If a user tries to visit this projects url on something that doesn't support frames, then they will be redirected to this page.
   /// Example should be the full url: "https://www.example.com/unsupported-browser"
@@ -114,26 +119,28 @@ model Project {
 
   /// The team that owns this project
   team   Team   @relation("ProjectOwner", fields: [teamId], references: [id])
-  teamId String
+  teamId String @db.Uuid
 
   lastUpdatedBy   User   @relation("ProjectLastUpdatedBy", fields: [lastUpdatedById], references: [id])
-  lastUpdatedById String
+  lastUpdatedById String @db.Uuid
 
   /// The initial frame that will be shown as the root page of the project
   rootFrame   Frame?  @relation("ProjectRootFrame", fields: [rootFrameId], references: [id])
-  rootFrameId String?
+  rootFrameId String? @db.Uuid
 
   /// The frames that are part of this project
   frames              Frame[]
   projectAnalytics    ProjectAnalytics[]
-  sessions            Session[]
+  consumerSessions    ConsumerSession[]
   IntentClickTracking IntentClickTracking[]
 }
 
 /// The Frame, or Page, that we are displaying to the end user.
 model Frame {
-  id           String    @id @default(cuid())
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// The API path that the frame will be shown at.
+  ///
+  /// Should have a unique path for each frame in a project.
   path         String
   /// Title of the frame that will be displayed to the Project User, not to consumers.
   title        String
@@ -165,19 +172,19 @@ model Frame {
 
   /// The user who created the frame
   createdBy       User   @relation("FrameCreatedBy", fields: [createdById], references: [id])
-  createdById     String
+  createdById     String @db.Uuid
   /// The team that owns this frame
   team            Team   @relation("FrameOwner", fields: [teamId], references: [id])
-  teamId          String
+  teamId          String @db.Uuid
   /// The user who last updated the frame
   lastUpdatedBy   User   @relation("FrameLastUpdatedBy", fields: [lastUpdatedById], references: [id])
-  lastUpdatedById String
+  lastUpdatedById String @db.Uuid
 
   /// Intents that are part of this frame
   intents             Intents[]
   /// The project that this frame is part of
   project             Project               @relation(fields: [projectId], references: [id])
-  projectId           String
+  projectId           String                @db.Uuid
   /// What project this frame is the root of
   rootFrameOfProjects Project[]             @relation("ProjectRootFrame")
   IntentClickTracking IntentClickTracking[]
@@ -185,7 +192,7 @@ model Frame {
 
 /// Intents are the actions that a user can take on a frame.
 model Intents {
-  id           String     @id @default(cuid())
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   type         IntentType
   /// The URL that the intent will redirect to.
   /// If it's a local link it will be the frame path - ex: "/about"
@@ -205,17 +212,109 @@ model Intents {
 
   // Frame that this intent is part of
   frame               Frame                 @relation(fields: [framesId], references: [id])
-  framesId            String
+  framesId            String                @db.Uuid
   IntentClickTracking IntentClickTracking[]
+}
+
+// =============== SUBSCRIPTIONS ===============
+
+/// Holds the subscription information for a team.
+model TeamSubscription {
+  id        String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// The team that the subscription is associated with.
+  team      Team?
+  /// The plan that the team is subscribed to.
+  plan      SubscriptionPlan      @relation(fields: [planId], references: [id])
+  planId    String                @db.Uuid
+  /// The payments that have been made for the subscription.
+  payments  SubscriptionPayment[]
+  /// The start date of the subscription.
+  startDate DateTime              @default(now())
+  /// The end date of the subscription.
+  endDate   DateTime
+  /// If true, the subscription will auto renew.
+  autoRenew Boolean               @default(true)
+  /// The status of the subscription.
+  status    SubscriptionStatus    @default(Active)
+  /// The date the Team Subscription was created.
+  createdAt DateTime              @default(now())
+  /// The date that the Team Subscription was last updated.
+  updatedAt DateTime              @updatedAt
+}
+
+/// Holds the different plans that we offer.
+model SubscriptionPlan {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// The type of subscription that the plan is.
+  subscriptionType SubscriptionType   @unique
+  /// The price of the plan.
+  price            Float
+  /// The name of the plan.
+  name             String
+  /// The description of the plan.
+  description      String
+  /// Teams that are subscribed to this plan.
+  teamsSubscribed  TeamSubscription[]
+}
+
+/// Holds the payment information for a subscription.
+/// Though we will likely be relying on a 3rd party for actual payments, we will store the payment information here.
+model SubscriptionPayment {
+  id                 String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// The amount that was paid.
+  amount             Float
+  /// The currency that the payment was made in.
+  currency           String
+  /// The payment method that was used.
+  paymentMethod      String
+  /// The status of the payment.
+  status             PaymentStatus
+  /// The subscription that the payment is associated with.
+  teamSubscription   TeamSubscription @relation(fields: [teamSubscriptionId], references: [id])
+  teamSubscriptionId String           @db.Uuid
+  /// The transaction id of the payment in the payment processor.
+  transactionId      String
+  /// The date that the payment was made.
+  paymentDate        DateTime
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+}
+
+enum SubscriptionStatus {
+  Active
+  Cancelled
+  Suspended
+}
+
+/// The type of subscription that a team can have.
+/// Is directly applied to all of the projects of a given team.
+enum SubscriptionType {
+  /// Free subscription type
+  /// Limits - 1 team, 1 project, 5 frames (example)
+  Free
+  /// Pro subscription type
+  /// Limits - 5 teams, 5 projects, 25 frames (example)
+  /// Unlock - Custom subdomain, Custom Fallback Url etc
+  Pro
+  /// Enterprise subscription type
+  /// Limits - Unlimited teams, projects, and frames
+  /// Unlock - Custom subdomain, Custom Fallback Url etc
+  Enterprise
+}
+
+enum PaymentStatus {
+  Success
+  Failed
+  Pending
 }
 
 // ================= LOGGING =================
 
 /// ActivityLog records actions performed by users to track usage patterns, debug issues, and to potentially revert changes.
 model ActivityLog {
-  id          String   @id @default(cuid())
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Reference to the user performing the action
-  userId      String
+  userId      String   @db.Uuid
   user        User     @relation(fields: [userId], references: [id])
   /// Type of action performed (e.g., login, update)
   action      String
@@ -227,7 +326,7 @@ model ActivityLog {
 
 /// ErrorLog keeps track of application errors and unexpected behavior for debugging and monitoring.
 model ErrorLog {
-  id         String   @id @default(cuid())
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Type of error (e.g., runtime, syntax)
   errorType  String
   /// Error message
@@ -242,33 +341,29 @@ model ErrorLog {
 
 /// ProjectAnalytics tracks the performance metrics of a project to help users understand how their projects are performing.
 model ProjectAnalytics {
-  id                     String   @id @default(cuid())
+  id                     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Times customFallbackUrl was redirect to
   customFallbackUrlCount Int
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
   /// Link to the associated project
-  projectId              String
+  projectId              String   @db.Uuid
   project                Project  @relation(fields: [projectId], references: [id])
 }
 
-/// The Session model is a way for us to keep track of how much a user interacted with a project.
+/// The ConsumerSession model is a way for us to keep track of how much a user interacted with a project.
 /// This allows us to get a Bounce Rate, and other metrics.
-model Session {
-  id                  String                @id @default(cuid())
-  /// True on session initialization, as the user has not visited any pages yet.
-  /// If the user interacts with an intent, then this will be set to false.
-  /// We can calculate the bounce rate by counting the number of sessions that are single page.
-  isSinglePage        Boolean               @default(true)
+model ConsumerSession {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// The time the session was started
   startedAt           DateTime              @default(now())
   /// The time the session was last active.
   lastActiveAt        DateTime              @updatedAt
   /// The project that the session is associated with
-  projectId           String
+  projectId           String                @db.Uuid
   project             Project               @relation(fields: [projectId], references: [id])
   /// The user who started the session
-  consumerId          String
+  consumerId          String                @db.Uuid
   consumer            ConsumerKnownData     @relation(fields: [consumerId], references: [id])
   IntentClickTracking IntentClickTracking[]
 }
@@ -276,7 +371,7 @@ model Session {
 /// IntentClickTracking records each click on intents by users, including contextual data like time and user.
 /// It will also store whether the intent was a conversion.
 model IntentClickTracking {
-  id                String               @id @default(cuid())
+  id                String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// The written text that was inputted by the user.
   /// Will only exist if the intent type is a TextInput
   intentTextValue   String?
@@ -285,9 +380,18 @@ model IntentClickTracking {
   intentTextContext String?
   /// Time the intent was interacted with
   interactedTime    DateTime             @default(now())
-  /// Think of a "tweet" on twitter, we want to track where the click is coming from.
-  // TODO: Change this variable name.
-  urlInteractedWith String
+  /// Think of a tweets source url on twitter, we want to track where the click is coming from.
+  sourceUrl         String?
+  /// If the click was on farcaster, we store the hash to the farcaster cast here.
+  /// A "cast" is like a "tweet"
+  /// This is the long hash that is unique to each cast.
+  ///
+  /// If the farcasterCastHash is saved, the farcasterId should also be saved.
+  farcasterCastHash String?
+  /// If the click was on farcaster, we store the id of the farcaster cast here.
+  ///
+  /// If the farcasterId is saved, the farcasterCastHash should also be saved.
+  farcasterUserId   String?
   /// The type of conversion that this click was.
   /// None - if buttons were clicked
   /// ExternalLink - if an external link was clicked
@@ -296,26 +400,26 @@ model IntentClickTracking {
   conversionType    IntentConversionType @default(None)
 
   /// Link to the clicked intent
-  intentId  String
+  intentId  String  @db.Uuid
   intent    Intents @relation(fields: [intentId], references: [id])
   /// Link to the frame containing the intent
-  frameId   String
+  frameId   String  @db.Uuid
   frame     Frame   @relation(fields: [frameId], references: [id])
   /// Link to the project containing the frame
-  projectId String
+  projectId String  @db.Uuid
   project   Project @relation(fields: [projectId], references: [id])
 
   /// User who clicked the intent
-  consumerId String
+  consumerId String            @db.Uuid
   consumer   ConsumerKnownData @relation(fields: [consumerId], references: [id])
   /// The session that the click was part of
-  sessionId  String
-  session    Session           @relation(fields: [sessionId], references: [id])
+  sessionId  String            @db.Uuid
+  session    ConsumerSession   @relation(fields: [sessionId], references: [id])
 }
 
 /// A table to store data about the users that have interacted with the project.
 model ConsumerKnownData {
-  id                     String                @id @default(cuid())
+  id                     String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// Verified farcaster ID
   farcasterId            String                @unique
   /// Farcaster bio
@@ -333,7 +437,7 @@ model ConsumerKnownData {
   /// User's email
   email                  String?
   IntentClickTracking    IntentClickTracking[]
-  sessions               Session[]
+  sessions               ConsumerSession[]
 }
 
 // =============== ENUMS ===============
@@ -353,9 +457,6 @@ enum IntentType {
   /// Sends a POST request to the current frame, or target frame.
   /// This is the default button type.
   Post
-  /// The post_redirect action sends an HTTP POST request to the frame or button post_url.
-  /// You can use this action to redirect to a URL based on frame state or user input.
-  Redirect
   /// Links to an external site
   ExternalLink
   /// This links to another frame
@@ -375,20 +476,4 @@ enum IntentConversionType {
   ExternalLink
   /// If a purchase was confirmed
   Purchase
-}
-
-/// The type of subscription that a team can have.
-/// Is directly applied to all of the projects of a given team.
-enum SubscriptionType {
-  /// Free subscription type
-  /// Limits - 1 team, 1 project, 5 frames (example)
-  Free
-  /// Pro subscription type
-  /// Limits - 5 teams, 5 projects, 25 frames (example)
-  /// Unlock - Custom subdomain, Custom Fallback Url etc
-  Pro
-  /// Enterprise subscription type
-  /// Limits - Unlimited teams, projects, and frames
-  /// Unlock - Custom subdomain, Custom Fallback Url etc
-  Enterprise
 }
