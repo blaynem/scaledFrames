@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-'use server';
 import { createServerClient, CookieOptions } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-export async function updateSession(request: NextRequest) {
+export const updateSession = async (request: NextRequest) => {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -60,7 +59,7 @@ export async function updateSession(request: NextRequest) {
   await supabase.auth.getUser();
 
   return response;
-}
+};
 
 /**
  * If there is an active auth session, this function will return the user object from Auth.

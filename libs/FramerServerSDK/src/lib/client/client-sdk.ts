@@ -111,8 +111,6 @@ export const FramerClientSDK = (
     },
     projects: {
       get: async (queries) => {
-        const session = await supabase.auth.getSession();
-        console.log('---session', session);
         const url = createUrl('/api/projects');
         if (queries?.isProjectLive) {
           url.searchParams.append(
