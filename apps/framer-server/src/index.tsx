@@ -6,13 +6,17 @@ import { pinata } from 'frog/hubs';
 import apiRoutes from './api';
 import framesRoute from './frames';
 import authRoutes from './auth';
+import { cors } from 'hono/cors';
 import {
   API_SERVER_BASE_PATH,
   AUTH_SERVER_BASE_PATH,
   FRAMES_SERVER_BASE_PATH,
 } from '@framer/FramerServerSDK';
 
-const PORT = 3000;
+const PORT = process.env.NEXT_PUBLIC_API_FRAMER_PORT;
+
+// Environment-specific CORS settings
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 export const frogApp = new Frog({
   basePath: '/',
@@ -21,6 +25,14 @@ export const frogApp = new Frog({
   // If silent we will not throw an error if verification fails. We will still return `verified` as false though
   verify: 'silent',
 });
+
+frogApp.use(
+  cors({
+    origin: isDevelopment ? '*' : 'https://your-production-site.com',
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 // This is how we add routes to our Frog instance./
 frogApp.route(API_SERVER_BASE_PATH, apiRoutes);

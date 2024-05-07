@@ -22,23 +22,22 @@ const postFetch = async <T>(url: string, body: any): Promise<T> => {
 // Returns a `URL` object.
 const makeCreateUrl =
   (baseUrl: string) =>
-  (path: string): URL => {
-    const url = new URL(baseUrl);
-    url.pathname += path;
-    return url;
-  };
+  (path: string): URL =>
+    new URL(path, baseUrl);
 
 /**
  * Framer Client SDK
  *
- * If no `config` is provided, it will default to `http://localhost:3000/api`.
+ * If no `config` is provided, it will default to whatever is in the `.env` file under `NEXT_PUBLIC_API_FRAMER_URL`.
  * @returns FramerClientSDK
  */
 export const FramerClientSDK = (
   config?: FramerClientSDKConfig
 ): FramerClientSDKType => {
   // Base URL for the Framer Server. `/api` is the path for the Client APIs.
-  const _baseUrl = config?.baseUrl || 'http://localhost:3000/api';
+  const _baseUrl =
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    config?.baseUrl || process.env['NEXT_PUBLIC_API_FRAMER_URL']!;
   // Create a URL object with the base URL.
   const createUrl = makeCreateUrl(_baseUrl);
 
@@ -55,7 +54,7 @@ export const FramerClientSDK = (
     },
     frames: {
       get: async (queries) => {
-        const url = createUrl('/frames');
+        const url = createUrl('/api/frames');
         if (queries.projectId) {
           url.searchParams.append('projectId', queries.projectId);
         }
@@ -65,21 +64,21 @@ export const FramerClientSDK = (
         return getFetch(url.toString());
       },
       getById: async (id) => {
-        const url = createUrl(`/frames/${id}`);
+        const url = createUrl(`/api/frames/${id}`);
         return getFetch(url.toString());
       },
       create: async (body) => {
-        const url = createUrl('/frames/create');
+        const url = createUrl('/api/frames/create');
         return postFetch(url.toString(), body);
       },
       edit: async (id, body) => {
-        const url = createUrl(`/frames/edit/${id}`);
+        const url = createUrl(`/api/frames/edit/${id}`);
         return postFetch(url.toString(), body);
       },
     },
     projects: {
       get: async (queries) => {
-        const url = createUrl('/projects');
+        const url = createUrl('/api/projects');
         if (queries.isProjectLive) {
           url.searchParams.append(
             'isProjectLive',
@@ -89,21 +88,21 @@ export const FramerClientSDK = (
         return getFetch(url.toString());
       },
       getById: async (id) => {
-        const url = createUrl(`/projects/${id}`);
+        const url = createUrl(`/api/projects/${id}`);
         return getFetch(url.toString());
       },
       create: async (body) => {
-        const url = createUrl('/projects/create');
+        const url = createUrl('/api/projects/create');
         return postFetch(url.toString(), body);
       },
       edit: async (id, body) => {
-        const url = createUrl(`/projects/edit/${id}`);
+        const url = createUrl(`/api/projects/edit/${id}`);
         return postFetch(url.toString(), body);
       },
     },
     users: {
       get: async (queries) => {
-        const url = createUrl('/users');
+        const url = createUrl('/api/users');
         if (queries.id) {
           url.searchParams.append('id', queries.id);
         }
@@ -113,7 +112,7 @@ export const FramerClientSDK = (
         return getFetch(url.toString());
       },
       signup: async (body) => {
-        const url = createUrl('/users/signup');
+        const url = createUrl('/api/users/signup');
         return postFetch(url.toString(), body);
       },
     },

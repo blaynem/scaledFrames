@@ -7,7 +7,7 @@ export type FramerClientSDKConfig = {
   /**
    * Base URL for the Framer Server
    *
-   * Defaults to 'http://localhost:3000/api'
+   * Defaults to what is in the .env.local NEXT_PUBLIC_API_FRAMER_URL
    */
   baseUrl?: string;
 };
