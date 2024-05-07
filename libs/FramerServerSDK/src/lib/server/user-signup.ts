@@ -11,7 +11,7 @@ import {
 import { AuthUser } from './types';
 
 /**
- * Signs up a user.
+ * Signs up a user. If a user already exists, it will return the first team and project they have.
  *
  * Goes through a flow of:
  * - Creating a user
@@ -33,9 +33,33 @@ export const signupUser = async (
         id: authUser.id,
         email: authUser.email,
       },
+      select: {
+        id: true,
+        teams: {
+          include: {
+            team: {
+              select: {
+                id: true,
+                Projects: {
+                  select: {
+                    id: true,
+                  },
+                  take: 1,
+                },
+              },
+            },
+          },
+          take: 1,
+        },
+      },
     });
+
     if (userAlreadyExists) {
-      throw new Error('User already exists, signup flow not needed.');
+      return {
+        teamId: userAlreadyExists.teams[0].team.id,
+        projectId: userAlreadyExists.teams[0].team.Projects[0].id,
+        userId: userAlreadyExists.id,
+      } satisfies UserSignupResponse;
     }
 
     // NOTE: This is in a transaction. So these all must pass or none will.

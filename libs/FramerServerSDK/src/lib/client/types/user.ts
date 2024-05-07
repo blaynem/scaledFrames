@@ -17,6 +17,8 @@ export type UserSignupRequestBody = {
 
 /**
  * On a user signup, we want to return everything that was created.
+ *
+ * If a user is already signed up, we will return the first team and project we find.
  */
 export type UserSignupResponse =
   | {
