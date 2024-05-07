@@ -49,6 +49,9 @@ frameFrogInstance.get('/', async (c) => {
           },
         },
       },
+      include: {
+        intents: true,
+      },
     });
 
     return c.json<GetFramesResponse>(frame);
@@ -73,6 +76,9 @@ frameFrogInstance.get('/:id', async (c) => {
             },
           },
         },
+      },
+      include: {
+        intents: true,
       },
     });
 
@@ -120,6 +126,9 @@ frameFrogInstance.post('/create', async (c) => {
             id: body.teamId,
           },
         },
+      },
+      include: {
+        intents: true,
       },
     });
 
@@ -171,6 +180,9 @@ frameFrogInstance.post('/edit/:id', async (c) => {
         },
       },
       data: updateData,
+      include: {
+        intents: true,
+      },
     });
 
     logActivity(prisma, {

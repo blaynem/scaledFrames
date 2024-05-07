@@ -1,4 +1,4 @@
-import { Frame } from '@prisma/client';
+import { Frame, Intents } from '@prisma/client';
 
 // Frame fields that are allowed to be edited by the user.
 type EditableFrameFields = Pick<
@@ -10,19 +10,9 @@ type EditableFrameFields = Pick<
  *
  * Removes fields that should not be returned to the user.
  */
-type FrameResponseType = Pick<
-  Frame,
-  | 'id'
-  | 'path'
-  | 'title'
-  | 'imageUrl'
-  | 'aspectRatio'
-  | 'imageLinkUrl'
-  | 'imageType'
-  | 'lastUpdatedById'
-  | 'projectId'
-  | 'teamId'
->;
+type FrameResponseType = Frame & {
+  intents: Intents[];
+};
 
 export type GetFrameRequestQueries = {
   projectId: string;
