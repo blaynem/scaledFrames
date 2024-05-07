@@ -1,17 +1,20 @@
 import { FramerClientSDKConfig, FramerClientSDKType } from './types';
 
-const getFetch = (url: string) => {
-  return fetch(url).then((res) => res.json());
+const getFetch = async <T>(url: string): Promise<T> => {
+  const res = await fetch(url);
+  return await res.json();
 };
 
-const postFetch = (url: string, body: any) => {
-  return fetch(url, {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const postFetch = async <T>(url: string, body: any): Promise<T> => {
+  const res = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
       'Content-Type': 'application/json',
     },
-  }).then((res) => res.json());
+  });
+  return await res.json();
 };
 
 // Reduce boilerplate by creating a function that takes a `baseUrl` and returns a `createUrl` function.
