@@ -34,13 +34,11 @@ _Install link here: [NX Console](https://marketplace.visualstudio.com/items?item
     First generate the prisma client, then deploy the schema.
 
     - NX Console:
-        - _[framer-db/**prisma:generate**](#prismagenerate)_
-        - _[framer-db/**prisma:deploy**](#prismadeploy)_
+        - _[framer-db/**prisma:create-migration**](#prismacreate-migration)_
 
     - Bash
         ```bash
-        npx nx prisma:generate framer-db
-        npx nx prisma:deploy framer-db
+        npx nx prisma:create-migration
         ```
 
 ## Common Terms
@@ -68,6 +66,7 @@ Create a migration based on updated schema values.
 #### When would I use this?
 
 - Locally:
+    - You are instantiating the database for the first time.
     - You made a change to the schema and want to create a migration that will then apply to the database.
 
 ### `prisma:generate`

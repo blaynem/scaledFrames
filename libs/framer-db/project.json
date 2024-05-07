@@ -7,7 +7,7 @@
   "// targets": "to see all targets run: nx show project framer-db --web",
   "targets": {
     "prisma:deploy": {
-      "_comment": "Deploy the prisma schema to the database.",
+      "_comment": "Deploy the prisma schema to the database. Used in production environments.",
       "executor": "nx:run-commands",
       "options": {
         "cwd": "libs/framer-db",
@@ -52,6 +52,14 @@
       "options": {
         "cwd": "libs/framer-db",
         "command": "npx supabase stop"
+      }
+    },
+    "supabase:reset--dev-only": {
+      "_comment": "Completely reset the local supabase server. Useful if you need to start from scratch to reset Auth, DB, and Storage. WARNING: This will delete all data in the database.",
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/framer-db",
+        "command": "npx supabase db reset && nx run framer-db:prisma:reset--dev-only --force"
       }
     }
   }
