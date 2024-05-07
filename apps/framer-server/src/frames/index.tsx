@@ -63,6 +63,7 @@ routeApp.frame('/*', async (frameContext) => {
         },
       },
     });
+
     const subscriptionType =
       frameData.project.team.subscription.plan.subscriptionType;
     // If the interaction is from farcaster.
@@ -86,7 +87,10 @@ routeApp.frame('/*', async (frameContext) => {
         throw new Error(messages.join('\n'));
       }
     }
-    const intents = getFrameIntents(frameData.intents);
+    const intents = getFrameIntents(
+      frameParams.projectBasePath,
+      frameData.intents
+    );
 
     // If intent is from farcaster, we should have all the needed data.
     if (interactionFromFarcaster) {
