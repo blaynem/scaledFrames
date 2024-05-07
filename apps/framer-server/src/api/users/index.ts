@@ -4,10 +4,11 @@ import {
   UserSignupRequestBody,
   signupUser,
   UserSignupResponse,
+  decodeJwt,
+  getUserFromEmail,
 } from '@framer/FramerServerSDK';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
-import { getAuthUser } from '../../supabaseClient';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const usersInstance = new Frog();
@@ -43,8 +44,9 @@ usersInstance.get('/', async (c) => {
 
 usersInstance.post('/signup', async (c) => {
   try {
-    // Gets the supabase auth user via headers on the request.
-    const authUser = await getAuthUser(c);
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+    const authUser = await getUserFromEmail(prisma, email);
 
     const body = await c.req.json<UserSignupRequestBody>();
     if (!body.displayName) {

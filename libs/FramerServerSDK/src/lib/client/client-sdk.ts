@@ -1,16 +1,44 @@
+import { createSupabaseClient, getSession } from './supabaseClient';
 import { FramerClientSDKConfig, FramerClientSDKType } from './types';
 
-const getFetch = async <T>(url: string): Promise<T> => {
-  const res = await fetch(url);
+const getAuthToken = async () => {
+  const session = await getSession();
+  if (!session) {
+    return null;
+  }
+  return `${session.token_type} ${session.access_token}`;
+};
+
+const getFetch = async <T>({
+  authToken,
+  url,
+}: {
+  authToken: string;
+  url: string;
+}): Promise<T> => {
+  const res = await fetch(url, {
+    headers: {
+      Authorization: authToken,
+    },
+  });
   return await res.json();
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const postFetch = async <T>(url: string, body: any): Promise<T> => {
+const postFetch = async <T>({
+  authToken,
+  url,
+  body,
+}: {
+  authToken: string;
+  url: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body: any;
+}): Promise<T> => {
   const res = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
+      Authorization: authToken,
       'Content-Type': 'application/json',
     },
   });
@@ -40,18 +68,9 @@ export const FramerClientSDK = (
     config?.baseUrl || process.env['NEXT_PUBLIC_API_FRAMER_URL']!;
   // Create a URL object with the base URL.
   const createUrl = makeCreateUrl(_baseUrl);
+  const supabase = createSupabaseClient();
 
   return {
-    auth: {
-      requestOTP: async (body) => {
-        const url = createUrl('/auth/request-otp');
-        return postFetch(url.toString(), body);
-      },
-      verifyOTP: async (body) => {
-        const url = createUrl('/auth/verify-otp');
-        return postFetch(url.toString(), body);
-      },
-    },
     frames: {
       get: async (queries) => {
         const url = createUrl('/api/frames');
@@ -61,43 +80,73 @@ export const FramerClientSDK = (
         if (queries.title) {
           url.searchParams.append('title', queries.title);
         }
-        return getFetch(url.toString());
+        return getFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+        });
       },
       getById: async (id) => {
         const url = createUrl(`/api/frames/${id}`);
-        return getFetch(url.toString());
+        return getFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+        });
       },
       create: async (body) => {
         const url = createUrl('/api/frames/create');
-        return postFetch(url.toString(), body);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body,
+        });
       },
       edit: async (id, body) => {
         const url = createUrl(`/api/frames/edit/${id}`);
-        return postFetch(url.toString(), body);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body,
+        });
       },
     },
     projects: {
       get: async (queries) => {
+        const session = await supabase.auth.getSession();
+        console.log('---session', session);
         const url = createUrl('/api/projects');
-        if (queries.isProjectLive) {
+        if (queries?.isProjectLive) {
           url.searchParams.append(
             'isProjectLive',
             queries.isProjectLive.toString()
           );
         }
-        return getFetch(url.toString());
+        return getFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+        });
       },
       getById: async (id) => {
         const url = createUrl(`/api/projects/${id}`);
-        return getFetch(url.toString());
+        return getFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+        });
       },
       create: async (body) => {
         const url = createUrl('/api/projects/create');
-        return postFetch(url.toString(), body);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body,
+        });
       },
       edit: async (id, body) => {
         const url = createUrl(`/api/projects/edit/${id}`);
-        return postFetch(url.toString(), body);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body,
+        });
       },
     },
     users: {
@@ -109,11 +158,18 @@ export const FramerClientSDK = (
         if (queries.email) {
           url.searchParams.append('email', queries.email);
         }
-        return getFetch(url.toString());
+        return getFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+        });
       },
       signup: async (body) => {
         const url = createUrl('/api/users/signup');
-        return postFetch(url.toString(), body);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body,
+        });
       },
     },
   };
