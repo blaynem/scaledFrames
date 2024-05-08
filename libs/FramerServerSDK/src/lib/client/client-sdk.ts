@@ -146,8 +146,25 @@ export const FramerClientSDK = (
         });
       },
     },
+    user: {
+      get: async () => {
+        const url = createUrl('/api/user');
+        return getFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+        });
+      },
+      signup: async (body) => {
+        const url = createUrl('/api/user/signup');
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body,
+        });
+      },
+    },
     users: {
-      get: async (queries) => {
+      find: async (queries) => {
         const url = createUrl('/api/users');
         if (queries.id) {
           url.searchParams.append('id', queries.id);
@@ -158,14 +175,6 @@ export const FramerClientSDK = (
         return getFetch({
           authToken: (await getAuthToken()) ?? '',
           url: url.toString(),
-        });
-      },
-      signup: async (body) => {
-        const url = createUrl('/api/users/signup');
-        return postFetch({
-          authToken: (await getAuthToken()) ?? '',
-          url: url.toString(),
-          body,
         });
       },
     },
