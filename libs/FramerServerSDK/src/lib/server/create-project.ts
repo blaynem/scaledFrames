@@ -95,7 +95,15 @@ export const createProject = async (
           },
         },
         select: {
-          project: true,
+          project: {
+            include: {
+              frames: {
+                include: {
+                  intents: true,
+                },
+              },
+            },
+          },
         },
       });
       return updatedProjectData.project;

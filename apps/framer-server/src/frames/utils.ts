@@ -1,3 +1,4 @@
+import { ParsedFrameUrl } from '@framer/FramerServerSDK';
 import { SubscriptionType } from '@prisma/client';
 
 /**
@@ -15,12 +16,21 @@ export const canUseCustomSubdomain = (
   );
 };
 
-export const isUsingCustomSubdomain = (teamSubdomain: string): boolean => {
+export const isUsingCustomSubdomain = (
+  parsedFrameUrl: ParsedFrameUrl
+): boolean => {
+  // If we're in development mode AND we're going through ngrok, we can ignore this check.
+  if (
+    process.env.NODE_ENV === 'development' &&
+    parsedFrameUrl.url.includes('ngrok-free')
+  ) {
+    return false;
+  }
   // TODO: is `framer` our subdomain?
   return (
-    teamSubdomain !== 'localhost' &&
-    teamSubdomain !== 'www' &&
-    teamSubdomain !== 'framer'
+    parsedFrameUrl.teamSubdomain !== 'localhost' &&
+    parsedFrameUrl.teamSubdomain !== 'www' &&
+    parsedFrameUrl.teamSubdomain !== 'framer'
   );
 };
 

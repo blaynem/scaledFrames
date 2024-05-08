@@ -3,9 +3,15 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+<<<<<<< HEAD
     "dev": "nx dev framer",
     "gc": "nx g @nx/next:component $1 --directory=apps/framer/src/app/components/$2",
     "gp": "nx g @nx/next:page $1 --directory=apps/framer/src/app/$2"
+=======
+    "dev:web": "nx dev framer -p 3001",
+    "dev:server": "nx serve:dev framer-server",
+    "ngrok": "ngrok http 3000"
+>>>>>>> b22ed183bf3cda496caf9cf98b115ff85a8d9fbf
   },
   "private": true,
   "dependencies": {
@@ -16,7 +22,8 @@
     "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.43.1",
     "dotenv": "^16.4.5",
-    "frog": "^0.8.7",
+    "frog": "^0.9.2",
+    "jsonwebtoken": "^9.0.2",
     "next": "^14.0.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",

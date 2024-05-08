@@ -1,5 +1,8 @@
-import { Project } from '@prisma/client';
+import { Frame, Intents, Project } from '@prisma/client';
 
+type ProjectIncludeFrames = Project & {
+  frames: (Frame & { intents: Intents[] })[];
+};
 /**
  * All methods act as a filter
  */
@@ -9,7 +12,7 @@ export type GetProjectsRequestQueries = {
    */
   isProjectLive?: boolean;
 };
-export type GetProjectResponse = Project | { error: string };
+export type GetProjectByIdResponse = ProjectIncludeFrames | { error: string };
 export type GetProjectsResponse = Project[] | { error: string };
 
 /**
@@ -37,7 +40,7 @@ export type CreateProjectRequestBody = {
    */
   customFallbackUrl?: string;
 };
-export type CreateProjectResponse = Project | { error: string };
+export type CreateProjectResponse = ProjectIncludeFrames | { error: string };
 export type EditProjectRequestBody = {
   /**
    * Id of Team the project belongs to.
@@ -70,13 +73,13 @@ export type ProjectSDKType = {
    * @param queries isProjectLive
    * @returns Project[] | { error: string}
    */
-  get: (queries: GetProjectsRequestQueries) => Promise<GetProjectsResponse>;
+  get: (queries?: GetProjectsRequestQueries) => Promise<GetProjectsResponse>;
   /**
    * Get a project by id
    * @param id project id
    * @returns Project | { error: string}
    */
-  getById: (id: string) => Promise<GetProjectResponse>;
+  getById: (id: string) => Promise<GetProjectByIdResponse>;
   /**
    * Create a project. Also creates an initial frame and intent for the project.
    * @param body userId, teamId, title, description, notes

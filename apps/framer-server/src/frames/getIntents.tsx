@@ -1,27 +1,28 @@
 import { IntentType, Intents } from '@prisma/client';
 import { Button, FrameIntent } from 'frog';
 
-export const getFrameIntents = (frameIntents: Intents[]): FrameIntent[] => {
+export const getFrameIntents = (
+  basePath: string,
+  frameIntents: Intents[]
+): FrameIntent[] => {
   const sorted = frameIntents.sort((a, b) => a.displayOrder - b.displayOrder);
-  const _returnIntents: FrameIntent[] = [];
 
-  for (const intent of sorted) {
+  const _returnIntents: FrameIntent[] = sorted.map((intent) => {
     if (intent.type === IntentType.InternalLink) {
-      _returnIntents.push(internalLink(intent));
-      break;
+      return internalLink(basePath, intent);
     }
     if (intent.type === IntentType.ExternalLink) {
-      _returnIntents.push(externalLink(intent));
-      break;
+      return externalLink(intent);
     }
-  }
+  });
 
   return _returnIntents;
 };
 
-const internalLink = (intent: Intents): FrameIntent => {
+const internalLink = (basePath: string, intent: Intents): FrameIntent => {
+  const path = `${basePath}${intent.linkUrl}`;
   return (
-    <Button action={intent.linkUrl} value={intent.id}>
+    <Button action={path} value={intent.id}>
       {intent.displayText}
     </Button>
   );

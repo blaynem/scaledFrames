@@ -6,6 +6,8 @@ import {
   GetFrameRequestQueries,
   GetFrameResponse,
   GetFramesResponse,
+  decodeJwt,
+  getUserFromEmail,
 } from '@framer/FramerServerSDK';
 import prisma from 'apps/framer-server/src/prismaClient';
 import { Frog } from 'frog';
@@ -16,7 +18,6 @@ import {
   logActivity,
   logError,
 } from 'libs/FramerServerSDK/src/lib/server/logging';
-import { getAuthUser } from '../../supabaseClient';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const frameFrogInstance = new Frog();
@@ -36,7 +37,9 @@ frameFrogInstance.get('/', async (c) => {
   };
 
   try {
-    const authUser = await getAuthUser(c);
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+    const authUser = await getUserFromEmail(prisma, email);
     // Filtering by the projectId and title if it is defined
     const frame = await prisma.frame.findMany({
       where: {
@@ -48,6 +51,9 @@ frameFrogInstance.get('/', async (c) => {
             },
           },
         },
+      },
+      include: {
+        intents: true,
       },
     });
 
@@ -62,7 +68,9 @@ frameFrogInstance.get('/', async (c) => {
 frameFrogInstance.get('/:id', async (c) => {
   const id = c.req.param('id');
   try {
-    const authUser = await getAuthUser(c);
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+    const authUser = await getUserFromEmail(prisma, email);
     const frame = await prisma.frame.findUnique({
       where: {
         id,
@@ -73,6 +81,9 @@ frameFrogInstance.get('/:id', async (c) => {
             },
           },
         },
+      },
+      include: {
+        intents: true,
       },
     });
 
@@ -91,7 +102,9 @@ frameFrogInstance.get('/:id', async (c) => {
 frameFrogInstance.post('/create', async (c) => {
   const body = await c.req.json<CreateFrameRequestBody>();
   try {
-    const authUser = await getAuthUser(c);
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+    const authUser = await getUserFromEmail(prisma, email);
     const frame = await prisma.frame.create({
       data: {
         path: body.path,
@@ -120,6 +133,9 @@ frameFrogInstance.post('/create', async (c) => {
             id: body.teamId,
           },
         },
+      },
+      include: {
+        intents: true,
       },
     });
 
@@ -157,7 +173,9 @@ frameFrogInstance.post('/edit/:id', async (c) => {
   if (body.aspectRatio) updateData.aspectRatio = body.aspectRatio;
 
   try {
-    const authUser = await getAuthUser(c);
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+    const authUser = await getUserFromEmail(prisma, email);
     const frame = await prisma.frame.update({
       where: {
         id,
@@ -171,6 +189,9 @@ frameFrogInstance.post('/edit/:id', async (c) => {
         },
       },
       data: updateData,
+      include: {
+        intents: true,
+      },
     });
 
     logActivity(prisma, {
