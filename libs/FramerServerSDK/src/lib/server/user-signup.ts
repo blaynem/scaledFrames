@@ -158,6 +158,7 @@ export const signupUser = async (
           path: '/home',
           title: 'Home',
           imageUrl: 'https://i.imgur.com/CtgycuI.jpeg',
+          aspectRatio: 'WIDE',
           intents: {
             createMany: {
               data: [
@@ -208,6 +209,7 @@ export const signupUser = async (
         data: {
           path: '/frame2',
           title: 'Frame 2',
+          aspectRatio: 'STANDARD',
           imageUrl: 'https://i.imgur.com/KDRXumd.jpeg',
           intents: {
             createMany: {

@@ -137,7 +137,7 @@ model Project {
 
 /// The Frame, or Page, that we are displaying to the end user.
 model Frame {
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   /// The API path that the frame will be shown at.
   ///
   /// Should have a unique path for each frame in a project.
@@ -159,16 +159,16 @@ model Frame {
   /// Will likely be Static for the short term future.
   /// Dynamic images will be images that change based on inputs.
   /// Static images do NOT need to be parsed, they can be stored in our DB for speed.
-  imageType    ImageType @default(Static)
-  /// Should typically only be 1:1 or 1.91:1 as these are the most common aspect ratios.
-  /// Defaults to 1:1
-  aspectRatio  String    @default("1:1")
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  imageType    ImageType   @default(Static)
+  /// Should typically only be STANDARD (1:1) or  WIDE (1.91:1) as these are the most common aspect ratios.
+  /// Defaults to STANDARD
+  aspectRatio  AspectRatio @default(STANDARD)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
   /// If true, the frame itself is soft deleted and should not be shown to the user.
   /// It is soft deleted since we have potential relations that we don't want to delete.
   /// If there are no relations, then we can fully delete the frame.
-  isDeleted    Boolean   @default(false)
+  isDeleted    Boolean     @default(false)
 
   /// The user who created the frame
   createdBy       User   @relation("FrameCreatedBy", fields: [createdById], references: [id])
@@ -476,4 +476,12 @@ enum IntentConversionType {
   ExternalLink
   /// If a purchase was confirmed
   Purchase
+}
+
+/// The Aspect Ratio options
+enum AspectRatio {
+  /// 1:1 Aspect Ratio
+  STANDARD
+  /// 1.91:1 Aspect Ratio
+  WIDE
 }
