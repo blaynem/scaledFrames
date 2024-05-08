@@ -1,4 +1,6 @@
 import FrameDebugger from './components/FrameDebugger/frameDebugger';
+import Hero from './components/Hero/Hero';
+import Layout from './components/Layout/Layout';
 import './page.module.css';
 
 export default function Index() {
@@ -10,30 +12,7 @@ export default function Index() {
   return (
     <div className="page">
       <div className="wrapper">
-        <div style={{ display: 'flex', height: '100vh' }}>
-          <div
-            className="flex-item column1"
-            style={{ padding: '20px', flex: '0 0 20%' }}
-          >
-            <h1> this is where the project preview will go </h1>
-          </div>
-          <div
-            className="flex-item column2"
-            style={{ padding: '20px', flex: '0 0 30%' }}
-          >
-            <h1>
-              {' '}
-              this is where all of the buttons and inputs for the frame will go{' '}
-            </h1>
-          </div>
-          <div
-            id="welcome"
-            className="flex-item column3"
-            style={{ padding: '20px', flex: '0 0 50%' }}
-          >
-            <FrameDebugger></FrameDebugger>
-          </div>
-        </div>
+        <Hero></Hero>
       </div>
     </div>
   );

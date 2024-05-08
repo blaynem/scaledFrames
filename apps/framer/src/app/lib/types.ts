@@ -12,8 +12,8 @@ export const IntentTypes = {
 export type IntentType = (typeof IntentTypes)[keyof typeof IntentTypes];
 
 export const FrameAspectRatios = {
-  standard: { width: 1.9, height: 1 },
-  square: { width: 1, height: 1 },
+  '1.91:1': '1.91',
+  '1:1': '1.0',
 } as const;
 
 export type FrameAspectRatio =

@@ -8,11 +8,7 @@ export interface IntentButtonProps
 }
 
 export function IntentButton(props: IntentButtonProps) {
-  return (
-    <div className={styles['container']}>
-      <button className={styles['button']}>{props.text}</button>
-    </div>
-  );
+  return <button className={styles['button']}>{props.text}</button>;
 }
 
 export default IntentButton;
