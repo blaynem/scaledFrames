@@ -3,12 +3,20 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+<<<<<<< HEAD
+    "dev": "nx dev framer",
+    "gc": "nx g @nx/next:component $1 --directory=apps/framer/src/app/components/$2",
+    "gp": "nx g @nx/next:page $1 --directory=apps/framer/src/app/$2"
+=======
     "dev:web": "nx dev framer -p 3001",
     "dev:server": "nx serve:dev framer-server",
     "ngrok": "ngrok http 3000"
+>>>>>>> b22ed183bf3cda496caf9cf98b115ff85a8d9fbf
   },
   "private": true,
   "dependencies": {
+    "@headlessui/react": "^2.0.1",
+    "@heroicons/react": "^2.1.3",
     "@hono/node-server": "^1.11.1",
     "@prisma/client": "^5.13.0",
     "@supabase/ssr": "^0.3.0",
