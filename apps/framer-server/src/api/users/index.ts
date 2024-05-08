@@ -15,6 +15,9 @@ const usersInstance = new Frog();
 
 usersInstance.get('/', async (c) => {
   try {
+    const token = c.req.header('Authorization') as string;
+    const _ = await decodeJwt(token);
+
     const id = c.req.query('id');
     const email = c.req.query('email');
     const queries: GetUsersRequestQueries = { id, email };
@@ -46,6 +49,7 @@ usersInstance.post('/signup', async (c) => {
   try {
     const token = c.req.header('Authorization') as string;
     const { email } = await decodeJwt(token);
+
     const authUser = await getUserFromEmail(prisma, email);
 
     const body = await c.req.json<UserSignupRequestBody>();

@@ -24,16 +24,17 @@ const projectsFrogInstance = new Frog();
 
 // Fetch all projects
 projectsFrogInstance.get('/', async (c) => {
-  const queries: GetProjectsRequestQueries = {};
-
-  const _isProjectLive = c.req.query('isProjectLive');
-  if (_isProjectLive) {
-    queries.isProjectLive = _isProjectLive === 'true';
-  }
-
   try {
     const token = c.req.header('Authorization') as string;
     const { email } = await decodeJwt(token);
+
+    const queries: GetProjectsRequestQueries = {};
+
+    const _isProjectLive = c.req.query('isProjectLive');
+    if (_isProjectLive) {
+      queries.isProjectLive = _isProjectLive === 'true';
+    }
+
     const authUser = await getUserFromEmail(prisma, email);
     // only check isProjectLive if it is defined
     const projects = await prisma.project.findMany({
@@ -58,10 +59,11 @@ projectsFrogInstance.get('/', async (c) => {
 
 // Fetch all data for a project with a given id.
 projectsFrogInstance.get('/:id', async (c) => {
-  const id = c.req.param('id');
   try {
     const token = c.req.header('Authorization') as string;
     const { email } = await decodeJwt(token);
+
+    const id = c.req.param('id');
     const authUser = await getUserFromEmail(prisma, email);
     const project = await prisma.project.findUnique({
       where: {
@@ -97,10 +99,11 @@ projectsFrogInstance.get('/:id', async (c) => {
 
 // Create a project
 projectsFrogInstance.post('/create', async (c) => {
-  const body = await c.req.json<CreateProjectRequestBody>();
   try {
     const token = c.req.header('Authorization') as string;
     const { email } = await decodeJwt(token);
+
+    const body = await c.req.json<CreateProjectRequestBody>();
     const authUser = await getUserFromEmail(prisma, email);
     const project = await createProject(prisma, body, authUser);
 
@@ -118,11 +121,12 @@ projectsFrogInstance.post('/create', async (c) => {
 
 // Edit a project
 projectsFrogInstance.post('/edit/:id', async (c) => {
-  const id = c.req.param('id');
-  const body = await c.req.json<EditProjectRequestBody>();
   try {
     const token = c.req.header('Authorization') as string;
     const { email } = await decodeJwt(token);
+
+    const id = c.req.param('id');
+    const body = await c.req.json<EditProjectRequestBody>();
     const authUser = await getUserFromEmail(prisma, email);
     const project = await prisma.project.update({
       where: {
