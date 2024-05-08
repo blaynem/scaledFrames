@@ -17,7 +17,12 @@ const usersToCreate = [
   },
 ];
 
-const getOrCreateUser = async (email: string) => {
+const getOrCreateUserSupabaseAuth = async (
+  email: string
+): Promise<{
+  id: string;
+  email: string;
+}> => {
   const supabaseUser = await supabase.auth.admin.createUser({
     email,
   });
@@ -25,38 +30,61 @@ const getOrCreateUser = async (email: string) => {
   if (supabaseUser.error?.code === 'email_exists') {
     const users = await supabase.auth.admin.listUsers();
     const existingUser = users.data.users.find((user) => user.email === email);
-    if (!existingUser) {
+    if (!existingUser || !existingUser.email) {
       throw new Error(`Could not find user with email ${email}`);
     }
-    return existingUser;
+    return {
+      id: existingUser.id,
+      email: existingUser.email,
+    };
   }
 
-  const user = supabaseUser.data.user;
-  if (!user) {
+  const newUser = supabaseUser.data.user;
+  if (!newUser || !newUser.email) {
     throw new Error('No user returned from Supabase');
   }
 
-  return user;
+  return {
+    id: newUser.id,
+    email: newUser.email,
+  };
+};
+
+const createPublicBucket = async () => {
+  // TODO: If it already exists dont create it again
+  // Note: The `frames` bucket NEEDS to match up directly with what we have in the migrations.sql files.
+  // otherwise the RLS won't work.
+  const { data, error } = await supabase.storage.createBucket('frames', {
+    public: true,
+    fileSizeLimit: 10 * 1024 * 1024, // 10MB
+    allowedMimeTypes: ['image/*'],
+  });
+  if (error) {
+    console.error('Error creating bucket:', error);
+    return;
+  }
+  return data;
 };
 
 async function main() {
+  // Create a supabase bucket if it doesn't exist
+  await createPublicBucket();
+
   const createSubscriptionPlansData = await seedSubscriptionPlans(prisma);
   console.log('Created subscription plans:', createSubscriptionPlansData);
   for (const user of usersToCreate) {
     // We need to create the user in Supabase Auth, or get it if it already exists so we can map the id.
-    const authUser = await getOrCreateUser(user.email);
-    console.log('Created user:', authUser);
+    const supabaseAuth = await getOrCreateUserSupabaseAuth(user.email);
 
     // This creates a user in the public database, and maps it to the one in the supabase auth.
     const createdUser = await signupUser(prisma, user, {
-      id: authUser.id,
-      email: user.email,
+      id: supabaseAuth.id,
+      email: supabaseAuth.email,
     });
     if ('error' in createdUser) {
       console.error('Error creating user:', createdUser.error);
       return;
     }
-    console.log('Created user:', createdUser);
   }
 }
 main()

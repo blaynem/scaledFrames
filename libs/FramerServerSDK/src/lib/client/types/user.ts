@@ -28,8 +28,9 @@ export type UserSignupResponse =
     }
   | { error: string };
 
+type TeamAndProject = Team & { Projects: Project[] };
 export type GetUserResponseType = User & {
-  teams: Team[];
+  teams: TeamAndProject[];
   projects: Project[];
 };
 

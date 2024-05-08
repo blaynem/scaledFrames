@@ -33,3 +33,4 @@ COMMIT;
 
 -- Set default value
 ALTER TABLE "Frame" ALTER COLUMN "aspectRatio" SET DEFAULT 'STANDARD';
+ALTER TABLE "Frame" ALTER COLUMN "aspectRatio" SET NOT NULL;

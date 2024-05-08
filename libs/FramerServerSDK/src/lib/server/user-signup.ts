@@ -25,7 +25,7 @@ import { AuthUser } from './types';
 export const signupUser = async (
   prismaClient: PrismaClient,
   reqBody: UserSignupRequestBody,
-  authUser: AuthUser
+  authUser: Pick<AuthUser, 'id' | 'email'>
 ): Promise<UserSignupResponse | { error: string }> => {
   try {
     const userAlreadyExists = await prismaClient.user.findUnique({
