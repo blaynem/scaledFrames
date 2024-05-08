@@ -3,6 +3,7 @@ import { type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   // Updates the supabase session
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = await updateSession(request as any);
   return data;
 }

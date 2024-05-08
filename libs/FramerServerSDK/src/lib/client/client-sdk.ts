@@ -1,4 +1,4 @@
-import { createSupabaseClient, getSession } from './supabaseClient';
+import { getSession } from './supabaseClient';
 import { FramerClientSDKConfig, FramerClientSDKType } from './types';
 
 const getAuthToken = async () => {
@@ -68,7 +68,6 @@ export const FramerClientSDK = (
     config?.baseUrl || process.env['NEXT_PUBLIC_API_FRAMER_URL']!;
   // Create a URL object with the base URL.
   const createUrl = makeCreateUrl(_baseUrl);
-  const supabase = createSupabaseClient();
 
   return {
     frames: {
