@@ -4,27 +4,10 @@ import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { BoltIcon } from '@heroicons/react/20/solid';
 import LoginModal from '../Login/LoginModal';
-import useSession from '../../lib/supabase-use-session';
-import { createSupabaseClient } from '@framer/FramerServerSDK/client';
-
-const navigation = [
-  { name: 'Product', href: '#' },
-  { name: 'Features', href: '#' },
-  { name: 'Marketplace', href: '#' },
-  { name: 'Company', href: '#' },
-];
 
 export default function Hero() {
-  const session = useSession();
-  const supabase = createSupabaseClient();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
-
-  const logOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    location.reload();
-    if (error) console.error('Error logging out:', error.message);
-  };
 
   return (
     <>
@@ -57,33 +40,13 @@ export default function Hero() {
                 <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               </button>
             </div>
-            <div className="hidden lg:flex lg:gap-x-12">
-              {navigation.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="text-sm font-semibold leading-6 text-gray-900"
-                >
-                  {item.name}
-                </a>
-              ))}
-            </div>
             <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-              {session?.user ? (
-                <button
-                  onClick={logOut}
-                  className="text-sm font-semibold leading-6 text-gray-900"
-                >
-                  Log out
-                </button>
-              ) : (
-                <button
-                  onClick={() => setLoginModalOpen(true)}
-                  className="text-sm font-semibold leading-6 text-gray-900"
-                >
-                  Log in <span aria-hidden="true">&rarr;</span>
-                </button>
-              )}
+              <button
+                onClick={() => setLoginModalOpen(true)}
+                className="text-sm font-semibold leading-6 text-gray-900"
+              >
+                Log in <span aria-hidden="true">&rarr;</span>
+              </button>
             </div>
           </nav>
           <Dialog
@@ -113,36 +76,16 @@ export default function Hero() {
               </div>
               <div className="mt-6 flow-root">
                 <div className="-my-6 divide-y divide-gray-500/10">
-                  <div className="space-y-2 py-6">
-                    {navigation.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                      >
-                        {item.name}
-                      </a>
-                    ))}
-                  </div>
                   <div className="py-6">
-                    {session?.user ? (
-                      <button
-                        onClick={logOut}
-                        className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                      >
-                        Log Out
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          setLoginModalOpen(true);
-                        }}
-                        className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                      >
-                        Log in ham
-                      </button>
-                    )}
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setLoginModalOpen(true);
+                      }}
+                      className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                    >
+                      Log in
+                    </button>
                   </div>
                 </div>
               </div>
