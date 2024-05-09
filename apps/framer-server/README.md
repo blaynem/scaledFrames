@@ -11,13 +11,6 @@ Pass in the url like so `https://53c3-50-39-160-155.ngrok-free.app/frames/{proje
 
 Needed DB things
 
-- Add RLS so supabase client can't touch anything it's not supposed to.
-
-- a way to save images for frames
-    - Need 2 sub folders, one for the public images, and one for the private images.
-    - the public image folder will be used for the frame preview.
-    - the private image folder will be used for the frame editor, when the user uploads an image.
-    - it will get switched to the public folder when the frame is published.
 - callback for payment processing for analytics (for consumers of frames)
 
 User Endpoints
