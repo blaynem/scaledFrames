@@ -1,4 +1,6 @@
+import { faker } from '@faker-js/faker';
 import { FRAMES_SERVER_BASE_PATH } from '../../constants';
+import { PrismaClient } from '@prisma/client';
 
 /**
  * Returns a URL-safe version of the provided string.
@@ -102,4 +104,44 @@ export const parseFramerUrl = (inputUrl: string): ParsedFrameUrl | null => {
     console.error('Error parsing URL:', error);
     return null;
   }
+};
+
+const formatPart = (part: string) => {
+  // Remove all non-alphanumeric characters and capitalize the first letter of each word
+  return part
+    .split(/[^a-zA-Z0-9]+/) // Split on non-alphanumeric characters
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) // Capitalize first letter of each part
+    .join(''); // Join parts back together without any non-alphanumeric characters
+};
+
+/**
+ * Creates a random name based on {catchPhraseDescriptor} and {buzzNoun} from faker.
+ * @returns Randomized name ex: FaultTolerantMaximize
+ */
+export const createRandomizedName = () => {
+  const firstPart = faker.company.catchPhraseDescriptor();
+  const secondPart = faker.company.buzzNoun();
+  return formatPart(firstPart) + formatPart(secondPart);
+};
+
+export const createUniqueName = async (prisma: PrismaClient) => {
+  let count = 0;
+  while (count <= 100) {
+    const randomizedName = createRandomizedName();
+    const urlSafeName = convertToUrlSafe(randomizedName);
+    const subDomainExists = await prisma.team.findFirst({
+      where: { customSubDomain: urlSafeName },
+    });
+    const basePathExists = await prisma.project.findFirst({
+      where: { customBasePath: `/${urlSafeName}` },
+    });
+
+    if (!subDomainExists && !basePathExists) {
+      return randomizedName;
+    }
+
+    count++;
+  }
+
+  return null;
 };

@@ -30,7 +30,7 @@ usersInstance.get('/', async (c) => {
     });
 
     if (!users) {
-      return c.json<FindUsersResponse>({ error: 'No Users not found' });
+      return c.json<FindUsersResponse>({ error: 'No Users found' });
     }
 
     const response: FindUsersResponseType[] = users.map((u) => ({

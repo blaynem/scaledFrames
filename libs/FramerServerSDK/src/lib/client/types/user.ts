@@ -6,7 +6,7 @@ import { Project, SubscriptionType, Team, User } from '@prisma/client';
  * Id and email are not required as they are grabbed via the Supabase auth client.
  */
 export type UserSignupRequestBody = {
-  displayName: string;
+  displayName?: string;
   firstName?: string;
   lastName?: string;
   /**

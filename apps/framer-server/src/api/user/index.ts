@@ -60,9 +60,6 @@ usersInstance.post('/signup', async (c) => {
     const authUser = await getUserFromEmail(prisma, email);
 
     const body = await c.req.json<UserSignupRequestBody>();
-    if (!body.displayName) {
-      throw new Error('Missing displayName in request body.');
-    }
 
     const returnedData = await signupUser(prisma, body, authUser);
     return c.json<UserSignupResponse>(returnedData);
