@@ -17,6 +17,12 @@
     "baseUrl": ".",
     "paths": {
       "@framer/FramerServerSDK": ["libs/FramerServerSDK/src/index.ts"],
+      "@framer/FramerServerSDK/client": [
+        "libs/FramerServerSDK/src/lib/client/index.ts"
+      ],
+      "@framer/FramerServerSDK/server": [
+        "libs/FramerServerSDK/src/lib/server/index.ts"
+      ],
       "@framer/framer-db": ["libs/framer-db/src/index.ts"],
       "@framer/framer-db/server": ["libs/framer-db/src/server.ts"]
     }

@@ -1,5 +1,8 @@
 'use client';
-import { FramerClientSDK, createSupabaseClient } from '@framer/FramerServerSDK';
+import {
+  FramerClientSDK,
+  createSupabaseClient,
+} from '@framer/FramerServerSDK/client';
 import { Project } from '@prisma/client';
 import { CSSProperties, useState } from 'react';
 

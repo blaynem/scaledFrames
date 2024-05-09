@@ -20,11 +20,11 @@ model User {
   /// Maps directly to the Users ID in Auth Table
   id          String   @id @db.Uuid
   email       String   @unique
-  displayName String   @unique
-  firstName   String
-  lastName    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  displayName String?  @unique
+  firstName   String?
+  lastName    String?
 
   // Teams the user belongs to
   teams               UserTeam[]

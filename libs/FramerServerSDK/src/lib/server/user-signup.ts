@@ -1,6 +1,6 @@
 import { SubscriptionType, IntentType, PrismaClient } from '@prisma/client';
 import { UserSignupRequestBody, UserSignupResponse } from '../client/types';
-import { convertToUrlSafe } from './utils';
+import { convertToUrlSafe, createUniqueName } from './utils';
 import {
   LOG_ERROR_TYPES,
   LOG_ACTIONS,
@@ -64,15 +64,22 @@ export const signupUser = async (
 
     // NOTE: This is in a transaction. So these all must pass or none will.
     const data = await prismaClient.$transaction(async (_prisma) => {
-      const _userId = authUser.id;
-      const _displayName = convertToUrlSafe(reqBody.displayName);
-      const _teamName = `${_displayName}'s Team`;
-      const _projectTitle = `${_displayName}'s Project`;
+      const userId = authUser.id;
+
+      const uniqueName = await createUniqueName(_prisma as PrismaClient);
+      if (!uniqueName) {
+        throw new Error('Could not create unique name.');
+      }
+      const teamName = `Team ${uniqueName}`;
+      const projectTitle = `${uniqueName}'s Project`;
+
+      const customSubDomain = convertToUrlSafe(uniqueName);
+      const customBasePath = `/${convertToUrlSafe(uniqueName)}`;
       // If there is no subscriptionType, default to Free.
       const _subscriptionType =
         reqBody.subscriptionType || SubscriptionType.Free;
 
-      if (!_userId) {
+      if (!userId) {
         throw new Error('No id provided.');
       }
 
@@ -89,11 +96,11 @@ export const signupUser = async (
 
       const createdUserData = await _prisma.user.create({
         data: {
-          id: _userId,
+          id: userId,
           email: authUser.email,
-          firstName: reqBody.firstName || '',
-          lastName: reqBody.lastName || '',
-          displayName: _displayName,
+          firstName: reqBody.firstName,
+          lastName: reqBody.lastName,
+          displayName: reqBody.displayName,
         },
       });
 
@@ -122,9 +129,9 @@ export const signupUser = async (
                   },
                 },
               },
-              name: _teamName,
+              name: teamName,
               // We can set this, but we don't display it unless they have a subscription.
-              customSubDomain: _displayName,
+              customSubDomain,
             },
           },
         },
@@ -132,12 +139,11 @@ export const signupUser = async (
 
       const createdProject = await _prisma.project.create({
         data: {
-          title: _projectTitle,
+          title: projectTitle,
           description: 'Placeholder description.',
           notes: 'This is where you can add notes about your project.',
           isProjectLive: false,
-          // TODO: Need to ensure this is unique.
-          customBasePath: `/${convertToUrlSafe(_projectTitle)}`,
+          customBasePath,
           customFallbackUrl: '',
           unusedWebhooks: '',
           team: {

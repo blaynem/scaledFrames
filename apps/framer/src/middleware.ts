@@ -1,11 +1,29 @@
-import { updateSession } from '@framer/FramerServerSDK';
-import { type NextRequest } from 'next/server';
+import { createSupabaseReqResClient } from '@framer/FramerServerSDK/server';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  // Updates the supabase session
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const data = await updateSession(request as any);
-  return data;
+  const response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
+
+  const supabase = createSupabaseReqResClient(request, response);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // protects the "/account" route and its sub-routes
+  if (!user && request.nextUrl.pathname.startsWith('/account')) {
+    // TODO: Choose the correct redirect URL
+    console.log(
+      '==========FALLING BACK CUZ ILLEGAL /account ACCESS============='
+    );
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  return response;
 }
 
 export const config = {

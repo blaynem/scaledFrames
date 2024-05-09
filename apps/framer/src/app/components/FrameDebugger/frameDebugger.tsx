@@ -2,7 +2,10 @@ import { FrameAspectRatios, IntentTypes } from '../../lib/types';
 import FrameImage from '../FrameImage/FrameImage';
 import IntentContainer from '../IntentButton/IntentContainer';
 import styles from './frameDebugger.module.css';
-import { FramerClientSDK, GetFrameResponse } from '@framer/FramerServerSDK';
+import {
+  FramerClientSDK,
+  GetFrameResponse,
+} from '@framer/FramerServerSDK/client';
 /* eslint-disable-next-line */
 export interface FrameDebuggerProps {
   frameId: string;
@@ -12,7 +15,7 @@ export async function FrameDebugger({ frameId }: FrameDebuggerProps) {
   const framerClientSDK = FramerClientSDK();
   let frame = {} as GetFrameResponse;
   try {
-    const frame = await framerClientSDK.frames.getById(frameId);
+    frame = await framerClientSDK.frames.getById(frameId);
   } catch {
     console.error('Failed to get frame');
   }

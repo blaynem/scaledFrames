@@ -8,16 +8,14 @@ import {
   EditProjectRequestBody,
   decodeJwt,
   getUserFromEmail,
+  LOG_ACTIONS,
+  LOG_DESCRIPTIONS,
+  LOG_ERROR_TYPES,
+  logActivity,
+  logError,
 } from '@framer/FramerServerSDK';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
-import {
-  logActivity,
-  LOG_ACTIONS,
-  LOG_DESCRIPTIONS,
-  logError,
-  LOG_ERROR_TYPES,
-} from 'libs/FramerServerSDK/src/lib/server/logging';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const projectsFrogInstance = new Frog();

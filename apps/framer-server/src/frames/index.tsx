@@ -1,5 +1,7 @@
 import { Frog } from 'frog';
 import {
+  LOG_ERROR_TYPES,
+  logError,
   logIntentTrackingFarcaster,
   parseFramerUrl,
 } from '@framer/FramerServerSDK';
@@ -11,10 +13,6 @@ import {
   getCustomFallbackUrl,
 } from './utils';
 import { getFrameIntents } from './getIntents';
-import {
-  LOG_ERROR_TYPES,
-  logError,
-} from 'libs/FramerServerSDK/src/lib/server/logging';
 import { IntentConversionType } from '@prisma/client';
 
 const routeApp = new Frog();

@@ -6,3 +6,4 @@ export * from './intent-tracking';
 export * from './types';
 export * from './supabaseServer';
 export * from './get-user';
+export * from './logging';
