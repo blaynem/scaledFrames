@@ -1,65 +1,62 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { createServerClient, CookieOptions } from '@supabase/ssr';
-import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { type NextRequest, type NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { deleteCookie, getCookie, setCookie } from 'cookies-next';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
-export const updateSession = async (request: NextRequest) => {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-
-  const supabase = createServerClient(
+// server component can only get cookies and not set them, hence the "component" check
+export function createSupabaseServerClient(component = false) {
+  cookies().getAll();
+  return createServerClient(
     process.env['NEXT_PUBLIC_SUPABASE_URL']!,
     process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']!,
     {
       cookies: {
         get(name: string) {
-          return request.cookies.get(name)?.value;
+          return getCookie(name, { cookies });
         },
         set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
+          if (component) return;
+          setCookie(name, value, { cookies, ...options });
         },
         remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
+          if (component) return;
+          deleteCookie(name, { cookies, ...options });
         },
       },
     }
   );
+}
 
-  await supabase.auth.getUser();
+export function createSupabaseServerComponentClient() {
+  cookies().getAll();
+  return createSupabaseServerClient(true);
+}
 
-  return response;
-};
+export function createSupabaseReqResClient(
+  req: NextRequest,
+  res: NextResponse
+) {
+  cookies().getAll();
+  return createServerClient(
+    process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+    process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']!,
+    {
+      cookies: {
+        get(name: string) {
+          return getCookie(name, { req, res });
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          setCookie(name, value, { req, res, ...options });
+        },
+        remove(name: string, options: CookieOptions) {
+          setCookie(name, '', { req, res, ...options });
+        },
+      },
+    }
+  );
+}
 
 /**
  * If there is an active auth session, this function will return the user object from Auth.

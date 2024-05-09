@@ -1,6 +1,4 @@
-import FrameDebugger from './components/FrameDebugger/frameDebugger';
 import Hero from './components/Hero/Hero';
-import Layout from './components/Layout/Layout';
 import './page.module.css';
 
 export default function Index() {
@@ -12,7 +10,7 @@ export default function Index() {
   return (
     <div className="page">
       <div className="wrapper">
-        <Hero></Hero>
+        <Hero />
       </div>
     </div>
   );

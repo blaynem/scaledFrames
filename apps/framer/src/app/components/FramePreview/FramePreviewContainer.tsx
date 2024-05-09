@@ -1,6 +1,9 @@
 import React from 'react';
 import './FramePreviewContainer.css';
-import { FramerClientSDK, GetFramesResponse } from '@framer/FramerServerSDK';
+import {
+  FramerClientSDK,
+  GetFramesResponse,
+} from '@framer/FramerServerSDK/client';
 import FramePreview, { FramePreviewProps } from './FramePreview';
 const FramePreviewContainer = async () => {
   const framerSDK = FramerClientSDK();
@@ -26,7 +29,11 @@ const FramePreviewContainer = async () => {
     <div className="frame-preview-container">
       <div className="frame-preview-wrapper">
         {framesTemp.map((frame) => (
-          <FramePreview imageUrl={frame.imageUrl} title={frame.title} />
+          <FramePreview
+            key={frame.title}
+            imageUrl={frame.imageUrl}
+            title={frame.title}
+          />
         ))}
       </div>
     </div>
