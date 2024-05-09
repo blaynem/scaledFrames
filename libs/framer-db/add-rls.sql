@@ -1,6 +1,6 @@
 --- Hack to allow us to alter the default privileges on the public schema. We remove it at the end.
 GRANT supabase_storage_admin TO postgres;
--- PRISMA LOVES DELETING ALL THE GRANTS. REEE
+-- START: PRISMA LOVES DELETING ALL THE GRANTS. REEE
 grant usage on schema public to postgres, anon, authenticated, service_role;
 
 grant all privileges on all tables in schema public to postgres, anon, authenticated, service_role;
@@ -10,6 +10,8 @@ grant all privileges on all sequences in schema public to postgres, anon, authen
 alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role;
 alter default privileges in schema public grant all on functions to postgres, anon, authenticated, service_role;
 alter default privileges in schema public grant all on sequences to postgres, anon, authenticated, service_role;
+---- END: PRISMA DELETING GRANTS
+
 
 -- Allow read access to frames buckets
 DO $$
