@@ -25,7 +25,7 @@ import { AuthUser } from './types';
 export const signupUser = async (
   prismaClient: PrismaClient,
   reqBody: UserSignupRequestBody,
-  authUser: AuthUser
+  authUser: Pick<AuthUser, 'id' | 'email'>
 ): Promise<UserSignupResponse | { error: string }> => {
   try {
     const userAlreadyExists = await prismaClient.user.findUnique({
@@ -158,6 +158,7 @@ export const signupUser = async (
           path: '/home',
           title: 'Home',
           imageUrl: 'https://i.imgur.com/CtgycuI.jpeg',
+          aspectRatio: 'WIDE',
           intents: {
             createMany: {
               data: [
@@ -208,6 +209,7 @@ export const signupUser = async (
         data: {
           path: '/frame2',
           title: 'Frame 2',
+          aspectRatio: 'STANDARD',
           imageUrl: 'https://i.imgur.com/KDRXumd.jpeg',
           intents: {
             createMany: {

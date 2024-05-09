@@ -16,25 +16,15 @@
         "name": "next"
       }
     ],
-    "types": [
-      "jest",
-      "node"
-    ]
+    "types": ["jest", "node"]
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     "**/*.js",
     "**/*.jsx",
-    "../../apps/framer/.next/types/**/*.ts",
-    "../../dist/apps/framer/.next/types/**/*.ts",
     "next-env.d.ts",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "jest.config.ts",
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ]
+  "exclude": ["node_modules", "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
 }

@@ -4,6 +4,13 @@
 - [Common Terms](#common-terms)
 - [Commands](#commands)
 
+# RLS - PAIN.
+
+Why is there an `add-rls.sql` file that is run after we reset the database, and what does it do?
+We need to apply RLS. The issue is that we are using Prisma for our `Public` schema, and Supabase for the Auth / Storage buckets, etc.
+
+When we go to run a migration or a dev migration to update a schema, prisma will complain about `storage.buckets` not existing. So to get around this we run the RLS after the database is reset to apply the RLS to the `storage` schema.
+
 ## Setup
 
 You likely have the `.env.local` file already set up as it's the local environment variables for the supabase instance itself. If not, when you run the `npx supabase:start` command, it will print out all of the necessary environment variables you need to set up.

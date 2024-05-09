@@ -1,4 +1,4 @@
-import { SubscriptionType, User } from '@prisma/client';
+import { Project, SubscriptionType, Team, User } from '@prisma/client';
 
 /**
  * Required fields for a user signup.
@@ -28,25 +28,22 @@ export type UserSignupResponse =
     }
   | { error: string };
 
-export type GetUsersRequestQueries = {
-  id?: string;
-  email?: string;
+type TeamAndProject = Team & { Projects: Project[] };
+export type GetUserResponseType = User & {
+  teams: TeamAndProject[];
+  projects: Project[];
 };
 
-type GetUsersResponseType = Pick<User, 'id' | 'email' | 'displayName'>;
-
-export type GetUsersResponse = GetUsersResponseType[] | { error: string };
+export type GetUserResponse = GetUserResponseType | { error: string };
 
 /**
- * Exposed methods for the users SDK.
+ * Exposed methods for the user SDK.
  */
-export type UsersSDKType = {
+export type UserSDKType = {
   /**
-   * Get a user by either the id or email. One must be supplied.
-   * @param queries id, email
-   * @returns User | { error: string}
+   * Get all user data for the signed in user.
    */
-  get: (queries: GetUsersRequestQueries) => Promise<GetUsersResponse>;
+  get: () => Promise<GetUserResponse>;
   /**
    * Signup a user. Creates a user, team, and project.
    *

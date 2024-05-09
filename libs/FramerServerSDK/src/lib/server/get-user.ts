@@ -1,5 +1,8 @@
 import { PrismaClient, User } from '@prisma/client';
 
+/**
+ * Returns the User object from our database, given the user's email.
+ */
 export const getUserFromEmail = async (
   prisma: PrismaClient,
   userEmail: string

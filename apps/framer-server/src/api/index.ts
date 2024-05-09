@@ -1,4 +1,5 @@
 import { Frog } from 'frog';
+import userInstance from './user';
 import usersInstance from './users';
 import projectsFrogInstance from './projects';
 import frameFrogInstance from './frame';
@@ -8,6 +9,7 @@ import frameFrogInstance from './frame';
 // This will then set the api route to be /api and the handler to be the blahRoute handler, which in this case makes `/api/home`
 const api = new Frog();
 
+api.route('/user', userInstance);
 api.route('/users', usersInstance);
 api.route('/projects', projectsFrogInstance);
 api.route('/frames', frameFrogInstance);

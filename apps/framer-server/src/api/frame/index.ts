@@ -24,21 +24,22 @@ const frameFrogInstance = new Frog();
 
 // Fetch all Frames
 frameFrogInstance.get('/', async (c) => {
-  const projectId = c.req.query('projectId');
-  const title = c.req.query('title');
-
-  if (!projectId) {
-    return c.json<GetFrameResponse>({ error: 'projectId is required' });
-  }
-
-  const queries: GetFrameRequestQueries = {
-    projectId,
-    title,
-  };
-
   try {
     const token = c.req.header('Authorization') as string;
     const { email } = await decodeJwt(token);
+
+    const projectId = c.req.query('projectId');
+    const title = c.req.query('title');
+
+    if (!projectId) {
+      return c.json<GetFrameResponse>({ error: 'projectId is required' });
+    }
+
+    const queries: GetFrameRequestQueries = {
+      projectId,
+      title,
+    };
+
     const authUser = await getUserFromEmail(prisma, email);
     // Filtering by the projectId and title if it is defined
     const frame = await prisma.frame.findMany({
@@ -66,10 +67,11 @@ frameFrogInstance.get('/', async (c) => {
 
 // Fetch a frame by id
 frameFrogInstance.get('/:id', async (c) => {
-  const id = c.req.param('id');
   try {
     const token = c.req.header('Authorization') as string;
     const { email } = await decodeJwt(token);
+
+    const id = c.req.param('id');
     const authUser = await getUserFromEmail(prisma, email);
     const frame = await prisma.frame.findUnique({
       where: {
@@ -100,10 +102,11 @@ frameFrogInstance.get('/:id', async (c) => {
 
 // Create a frame
 frameFrogInstance.post('/create', async (c) => {
-  const body = await c.req.json<CreateFrameRequestBody>();
   try {
     const token = c.req.header('Authorization') as string;
     const { email } = await decodeJwt(token);
+
+    const body = await c.req.json<CreateFrameRequestBody>();
     const authUser = await getUserFromEmail(prisma, email);
     const frame = await prisma.frame.create({
       data: {
@@ -159,22 +162,23 @@ frameFrogInstance.post('/create', async (c) => {
 
 // Edit a frame
 frameFrogInstance.post('/edit/:id', async (c) => {
-  const id = c.req.param('id');
-  const body = await c.req.json<EditFrameRequestBody>();
-
-  // Create a dynamic update object based on provided body fields.
-  // This allows us to gate the fields that can be updated, rather than spreading the body object directly.
-  const updateData = {} as EditFrameRequestBody;
-  if (body.title) updateData.title = body.title;
-  if (body.path) updateData.path = body.path;
-  if (body.imageUrl) updateData.imageUrl = body.imageUrl;
-  if (body.imageLinkUrl) updateData.imageLinkUrl = body.imageLinkUrl;
-  if (body.imageType) updateData.imageType = body.imageType;
-  if (body.aspectRatio) updateData.aspectRatio = body.aspectRatio;
-
   try {
     const token = c.req.header('Authorization') as string;
     const { email } = await decodeJwt(token);
+
+    const id = c.req.param('id');
+    const body = await c.req.json<EditFrameRequestBody>();
+
+    // Create a dynamic update object based on provided body fields.
+    // This allows us to gate the fields that can be updated, rather than spreading the body object directly.
+    const updateData = {} as EditFrameRequestBody;
+    if (body.title) updateData.title = body.title;
+    if (body.path) updateData.path = body.path;
+    if (body.imageUrl) updateData.imageUrl = body.imageUrl;
+    if (body.imageLinkUrl) updateData.imageLinkUrl = body.imageLinkUrl;
+    if (body.imageType) updateData.imageType = body.imageType;
+    if (body.aspectRatio) updateData.aspectRatio = body.aspectRatio;
+
     const authUser = await getUserFromEmail(prisma, email);
     const frame = await prisma.frame.update({
       where: {

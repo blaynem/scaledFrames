@@ -11,7 +11,6 @@ Pass in the url like so `https://53c3-50-39-160-155.ngrok-free.app/frames/{proje
 
 Needed DB things
 
-- a way to save images for frames
 - callback for payment processing for analytics (for consumers of frames)
 
 User Endpoints

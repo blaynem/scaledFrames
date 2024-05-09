@@ -1,4 +1,4 @@
-import { IntentType, PrismaClient } from '@prisma/client';
+import { AspectRatio, IntentType, PrismaClient } from '@prisma/client';
 import {
   CreateProjectRequestBody,
   CreateProjectResponse,
@@ -56,6 +56,7 @@ export const createProject = async (
           path: '/home',
           title: 'Home',
           imageUrl: 'https://placehold.co/600x400',
+          aspectRatio: AspectRatio.STANDARD,
           intents: {
             createMany: {
               data: [

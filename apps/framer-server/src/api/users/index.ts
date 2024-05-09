@@ -1,11 +1,8 @@
 import {
-  GetUsersRequestQueries,
-  GetUsersResponse,
-  UserSignupRequestBody,
-  signupUser,
-  UserSignupResponse,
+  FindUsersRequestQueries,
+  FindUsersResponse,
+  FindUsersResponseType,
   decodeJwt,
-  getUserFromEmail,
 } from '@framer/FramerServerSDK';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
@@ -15,49 +12,37 @@ const usersInstance = new Frog();
 
 usersInstance.get('/', async (c) => {
   try {
+    const token = c.req.header('Authorization') as string;
+    const _ = await decodeJwt(token);
+
     const id = c.req.query('id');
     const email = c.req.query('email');
-    const queries: GetUsersRequestQueries = { id, email };
+    const queries: FindUsersRequestQueries = { id, email };
+    // throw if no queries
+    if (!id && !email) {
+      return c.json<FindUsersResponse>({ error: 'No query provided' });
+    }
 
-    const user = await prisma.user.findMany({
+    const users = await prisma.user.findMany({
       where: {
         ...queries,
       },
     });
 
-    if (!user) {
-      return c.json<GetUsersResponse>({ error: 'User not found' });
+    if (!users) {
+      return c.json<FindUsersResponse>({ error: 'No Users not found' });
     }
 
-    const response: GetUsersResponse = user.map((u) => ({
+    const response: FindUsersResponseType[] = users.map((u) => ({
       id: u.id,
       email: u.email,
       displayName: u.displayName,
     }));
 
-    return c.json<GetUsersResponse>(response);
+    return c.json<FindUsersResponse>(response);
   } catch (error) {
     console.error('Get Users Error: ', error);
-    return c.json<GetUsersResponse>({ error: 'Error fetching user' });
-  }
-});
-
-usersInstance.post('/signup', async (c) => {
-  try {
-    const token = c.req.header('Authorization') as string;
-    const { email } = await decodeJwt(token);
-    const authUser = await getUserFromEmail(prisma, email);
-
-    const body = await c.req.json<UserSignupRequestBody>();
-    if (!body.displayName) {
-      throw new Error('Missing displayName in request body.');
-    }
-
-    const returnedData = await signupUser(prisma, body, authUser);
-    return c.json<UserSignupResponse>(returnedData);
-  } catch (error) {
-    console.error('Create User Error: ', error);
-    return c.json<UserSignupResponse>({ error: 'Error creating user' });
+    return c.json<FindUsersResponse>({ error: 'Error fetching user' });
   }
 });
 
