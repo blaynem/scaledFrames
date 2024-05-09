@@ -35,7 +35,15 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "libs/framer-db",
-        "command": "npx prisma migrate reset"
+        "command": "npx prisma migrate reset --force && nx run framer-db:prisma:add-rls"
+      }
+    },
+    "prisma:add-rls": {
+      "_comment": "We run this after the reset to add the row level security policies back to the database.",
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/framer-db",
+        "command": "npx prisma db execute --file ./add-rls.sql"
       }
     },
     "supabase:start": {
@@ -59,7 +67,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "libs/framer-db",
-        "command": "npx supabase db reset && nx run framer-db:prisma:reset--dev-only --force"
+        "command": "npx supabase db reset && nx run framer-db:prisma:reset--dev-only"
       }
     }
   }
