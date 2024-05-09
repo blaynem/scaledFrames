@@ -124,9 +124,13 @@ export const createRandomizedName = () => {
   return formatPart(firstPart) + formatPart(secondPart);
 };
 
+/**
+ * Attempts to create a unique name that matches no subdomain or project base path.
+ * Will attempt to create a unique name 25 times before returning null.
+ */
 export const createUniqueName = async (prisma: PrismaClient) => {
   let count = 0;
-  while (count <= 100) {
+  while (count <= 25) {
     const randomizedName = createRandomizedName();
     const urlSafeName = convertToUrlSafe(randomizedName);
     const subDomainExists = await prisma.team.findFirst({

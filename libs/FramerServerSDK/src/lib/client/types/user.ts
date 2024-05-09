@@ -1,9 +1,9 @@
 import { Project, SubscriptionType, Team, User } from '@prisma/client';
 
 /**
- * Required fields for a user signup.
+ * No fields are required for a user signup, as we can create a user with just an email.
  *
- * Id and email are not required as they are grabbed via the Supabase auth client.
+ * However any fields that are provided will be used to create the user.
  */
 export type UserSignupRequestBody = {
   displayName?: string;
