@@ -1,4 +1,5 @@
-import { Project, SubscriptionType, Team, User } from '@prisma/client';
+import { SubscriptionType, Team, User } from '@prisma/client';
+import { ProjectIncludeRootFrame } from './project';
 
 /**
  * No fields are required for a user signup, as we can create a user with just an email.
@@ -28,10 +29,16 @@ export type UserSignupResponse =
     }
   | { error: string };
 
-type TeamAndProject = Team & { Projects: Project[] };
+export type TeamAndProject = Team & {
+  /**
+   * The number of users in the team.
+   */
+  userCount: number;
+  projects: ProjectIncludeRootFrame[];
+};
 export type GetUserResponseType = User & {
   teams: TeamAndProject[];
-  projects: Project[];
+  projects: ProjectIncludeRootFrame[];
 };
 
 export type GetUserResponse = GetUserResponseType | { error: string };
@@ -41,7 +48,7 @@ export type GetUserResponse = GetUserResponseType | { error: string };
  */
 export type UserSDKType = {
   /**
-   * Get all user data for the signed in user.
+   * Get all user data for the signed in user. Everything you need for the dashboard.
    */
   get: () => Promise<GetUserResponse>;
   /**

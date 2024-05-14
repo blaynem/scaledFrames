@@ -19,7 +19,7 @@ export default function MyModal({
 }) {
   const router = useRouter();
   const supabase = createSupabaseClient();
-  const [showLogin, setShowLogin] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // If the user is already logged in, we're just going to push them to the FrameEditor page.
   useEffect(() => {
@@ -27,9 +27,13 @@ export default function MyModal({
       // Will refresh a session if necessary.
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        return router.push(PAGES.FRAME_EDITOR);
+        return router.push(PAGES.DASHBOARD);
       }
-      setShowLogin(true);
+      setShowLoginModal(true);
+    }
+
+    if (!isOpen) {
+      setShowLoginModal(false);
     }
 
     if (isOpen) {
@@ -70,9 +74,9 @@ export default function MyModal({
       // TODO: Show error mesage
       return;
     }
-    setShowLogin(false);
-    // We push them to the FrameEditor page.
-    router.push(PAGES.FRAME_EDITOR);
+    setShowLoginModal(false);
+    // We push them to the Dashboard page.
+    router.push(PAGES.DASHBOARD);
   };
 
   const handleEnterPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -81,7 +85,12 @@ export default function MyModal({
     }
   };
   return (
-    <Dialog open={showLogin} onClose={handleClose} className="relative z-50">
+    <Dialog
+      open={showLoginModal}
+      // We only allow the user to close the modal by clicking the cancel button.
+      onClose={() => null}
+      className="relative z-50"
+    >
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
       <div className="fixed inset-0 flex w-screen items-center justify-center p-4">

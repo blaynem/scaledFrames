@@ -32,6 +32,10 @@ projectsFrogInstance.get('/', async (c) => {
     if (_isProjectLive) {
       queries.isProjectLive = _isProjectLive === 'true';
     }
+    const _teamId = c.req.query('teamId');
+    if (_teamId) {
+      queries.teamId = _teamId;
+    }
 
     const authUser = await getUserFromEmail(prisma, email);
     // only check isProjectLive if it is defined
@@ -46,9 +50,23 @@ projectsFrogInstance.get('/', async (c) => {
           },
         },
       },
+      include: {
+        rootFrame: {
+          include: {
+            intents: true,
+          },
+        },
+      },
     });
 
-    return c.json<GetProjectsResponse>(projects);
+    const response: GetProjectsResponse = projects.map((project) => {
+      return {
+        ...project,
+        rootFrame: project.rootFrame,
+      };
+    });
+
+    return c.json<GetProjectsResponse>(response);
   } catch (error) {
     console.error('Fetch All Projects Error: ', error);
     return c.json<GetProjectsResponse>({ error: 'Error fetching projects' });
@@ -81,6 +99,11 @@ projectsFrogInstance.get('/:id', async (c) => {
             intents: true,
           },
         },
+        rootFrame: {
+          include: {
+            intents: true,
+          },
+        },
       },
     });
 
@@ -88,7 +111,12 @@ projectsFrogInstance.get('/:id', async (c) => {
       return c.json<GetProjectByIdResponse>({ error: 'Project not found' });
     }
 
-    return c.json<GetProjectByIdResponse>(project);
+    const resposne: GetProjectByIdResponse = {
+      ...project,
+      rootFrame: project.rootFrame,
+    };
+
+    return c.json<GetProjectByIdResponse>(resposne);
   } catch (error) {
     console.error('Fetch Project by Id Error : ', error);
     return c.json<GetProjectByIdResponse>({ error: 'Error fetching project' });
@@ -150,6 +178,11 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
             intents: true,
           },
         },
+        rootFrame: {
+          include: {
+            intents: true,
+          },
+        },
       },
     });
 
@@ -159,7 +192,12 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
       userId: authUser.id,
     });
 
-    return c.json<CreateProjectResponse>(project);
+    const response: CreateProjectResponse = {
+      ...project,
+      rootFrame: project.rootFrame,
+    };
+
+    return c.json<CreateProjectResponse>(response);
   } catch (error) {
     console.error('Edit a project Error: ', error);
     logError({

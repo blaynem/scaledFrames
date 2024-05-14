@@ -86,6 +86,60 @@ async function main() {
       return;
     }
   }
+
+  const assignToTeam = async () => {
+    // Assign Blayne to Alex's team
+    const alex = await prisma.user.findUnique({
+      where: {
+        email: usersToCreate[1].email,
+      },
+      include: {
+        teams: true,
+      },
+    });
+    const blayne = await prisma.user.findUnique({
+      where: {
+        email: usersToCreate[0].email,
+      },
+      include: {
+        teams: true,
+      },
+    });
+    if (!alex || !blayne) {
+      throw new Error('Could not find users');
+    }
+    const updatedTeam = await prisma.userTeam.upsert({
+      where: {
+        userId_teamId: {
+          userId: blayne.id,
+          teamId: alex.teams[0].teamId,
+        },
+      },
+      create: {
+        userId: blayne.id,
+        teamId: alex.teams[0].teamId,
+      },
+      update: {},
+    });
+    console.log('--- updatedTeam', updatedTeam);
+
+    const updatedTeam2 = await prisma.userTeam.upsert({
+      where: {
+        userId_teamId: {
+          userId: alex.id,
+          teamId: blayne.teams[0].teamId,
+        },
+      },
+      create: {
+        userId: alex.id,
+        teamId: blayne.teams[0].teamId,
+      },
+      update: {},
+    });
+    console.log('--- updatedTeam2', updatedTeam2);
+  };
+
+  await assignToTeam();
 }
 main()
   .then(async () => {
