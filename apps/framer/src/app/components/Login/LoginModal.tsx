@@ -1,4 +1,7 @@
-import { createSupabaseClient } from '@framer/FramerServerSDK/client';
+import {
+  FramerClientSDK,
+  createSupabaseClient,
+} from '@framer/FramerServerSDK/client';
 import {
   Description,
   Dialog,
@@ -19,6 +22,7 @@ export default function MyModal({
 }) {
   const router = useRouter();
   const supabase = createSupabaseClient();
+  const clientSdk = FramerClientSDK();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // If the user is already logged in, we're just going to push them to the FrameEditor page.
@@ -55,7 +59,6 @@ export default function MyModal({
     const response = await supabase.auth.signInWithOtp({
       email,
     });
-    console.log('---otp request', response);
     if ('erorr' in response) {
       // TODO: Display error
       return;
@@ -69,9 +72,15 @@ export default function MyModal({
       token: enteredOtp,
       type: 'magiclink',
     });
-    console.log('---otp response', { data, error });
     if (error || !data.session || !data.user) {
       // TODO: Show error mesage
+      return;
+    }
+    // Attempt to sign up the user. This is safe to call even if the user already exists.
+    const signup = await clientSdk.user.signup({});
+    if ('error' in signup) {
+      // TODO: If there was an error signing up the user, we should display an error message.
+      console.error('Error signing up user: ', signup.error);
       return;
     }
     setShowLoginModal(false);

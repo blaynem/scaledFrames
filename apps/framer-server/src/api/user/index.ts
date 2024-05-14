@@ -74,13 +74,11 @@ usersInstance.get('/', async (c) => {
 usersInstance.post('/signup', async (c) => {
   try {
     const token = c.req.header('Authorization') as string;
-    const { email } = await decodeJwt(token);
-
-    const authUser = await getUserFromEmail(prisma, email);
+    const { email, id } = await decodeJwt(token);
 
     const body = await c.req.json<UserSignupRequestBody>();
 
-    const returnedData = await signupUser(prisma, body, authUser);
+    const returnedData = await signupUser(prisma, body, { email, id });
     return c.json<UserSignupResponse>(returnedData);
   } catch (error) {
     console.error('Create User Error: ', error);
