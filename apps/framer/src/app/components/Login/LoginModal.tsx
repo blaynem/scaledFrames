@@ -12,6 +12,8 @@ import {
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { PAGES } from '../../lib/constants';
+import { useToast } from '../Toasts/ToastProvider';
+import { ToastTypes } from '../Toasts/GenericToast';
 
 export default function MyModal({
   isOpen,
@@ -23,6 +25,8 @@ export default function MyModal({
   const router = useRouter();
   const supabase = createSupabaseClient();
   const clientSdk = FramerClientSDK();
+  const { addToast } = useToast();
+
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // If the user is already logged in, we're just going to push them to the FrameEditor page.
@@ -56,33 +60,53 @@ export default function MyModal({
   };
 
   const onGetOTP = async () => {
+    const loadingToast = addToast(
+      ToastTypes.LOADING,
+      'Sending OTP...',
+      'infinite'
+    );
     const response = await supabase.auth.signInWithOtp({
       email,
     });
     if ('erorr' in response) {
-      // TODO: Display error
+      addToast(ToastTypes.ERROR, 'There was an error sending the OTP.', 5000);
       return;
     }
+    loadingToast.clearToast();
     setSentOtp(true);
   };
 
   const onVerifyOTP = async () => {
+    const loadingToast = addToast(
+      ToastTypes.LOADING,
+      'Verifying OTP...',
+      'infinite'
+    );
     const { data, error } = await supabase.auth.verifyOtp({
       email,
       token: enteredOtp,
       type: 'magiclink',
     });
-    if (error || !data.session || !data.user) {
-      // TODO: Show error mesage
+    if (error) {
+      loadingToast.clearToast();
+      addToast(ToastTypes.ERROR, error?.message ?? 'Error verifying OTP', 5000);
+      return;
+    }
+    if (!data.session || !data.user) {
+      loadingToast.clearToast();
+      addToast(ToastTypes.ERROR, 'Unable to get session or user.', 5000);
       return;
     }
     // Attempt to sign up the user. This is safe to call even if the user already exists.
     const signup = await clientSdk.user.signup({});
     if ('error' in signup) {
-      // TODO: If there was an error signing up the user, we should display an error message.
+      loadingToast.clearToast();
       console.error('Error signing up user: ', signup.error);
+      addToast(ToastTypes.ERROR, 'Error when signing up.', 'infinite');
       return;
     }
+    loadingToast.clearToast();
+
     setShowLoginModal(false);
     // We push them to the Dashboard page.
     router.push(PAGES.DASHBOARD);

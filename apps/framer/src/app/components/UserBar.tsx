@@ -54,11 +54,11 @@ export default function UserBar() {
         >
           <MenuItems
             anchor="bottom end"
-            className="w-36 origin-top-right rounded-xl border border-black/5 bg-black/5 p-1 text-sm/6 [--anchor-gap:var(--spacing-1)] focus:outline-none"
+            className="origin-top-right rounded-xl border border-black/5 bg-black/5 p-1 text-sm/6 [--anchor-gap:var(--spacing-1)] focus:outline-none"
           >
             {email && (
               <MenuItem>
-                <p className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 cursor-default">
+                <p className="w-full truncate group flex items-center gap-2 rounded-lg py-1.5 px-3 cursor-default">
                   {email}
                 </p>
               </MenuItem>
