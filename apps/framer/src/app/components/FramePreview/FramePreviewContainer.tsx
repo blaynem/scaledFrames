@@ -2,7 +2,7 @@ import React from 'react';
 import './FramePreviewContainer.css';
 import FramePreview from './FramePreview';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
-const FramePreviewContainer = async () => {
+const FramePreviewContainer = () => {
   const { frames, selectedFrame, setFrameEditorContext } =
     React.useContext(FrameEditorContext);
 

@@ -5,10 +5,8 @@ import FrameDebugger from '../../components/FrameDebugger/frameDebugger';
 import FrameInputs from '../../components/FrameInputs/FrameInputs';
 import FramePreviewContainer from '../../components/FramePreview/FramePreviewContainer';
 import Layout from '../../components/Layout/Layout';
-import './page.module.css';
 import { TFrameEditorContext } from '../../lib/types';
 import { getFrames } from '../../utils/utils';
-import { createSupabaseClient } from '@framer/FramerServerSDK';
 
 const initialState: TFrameEditorContext = {
   frames: [],
@@ -19,11 +17,7 @@ const initialState: TFrameEditorContext = {
 export const FrameEditorContext =
   createContext<TFrameEditorContext>(initialState);
 
-export default async function Index({
-  params,
-}: {
-  params: { projectId: string };
-}) {
+export default function Index({ params }: { params: { projectId: string } }) {
   const [frames, setFrames] = useState(initialState.frames);
   const [selectedFrame, setSelectedFrame] = useState(
     initialState.selectedFrame

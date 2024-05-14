@@ -1,14 +1,17 @@
+import { Intents } from '@prisma/client';
 import styles from './IntentButton.module.css';
 
 /* eslint-disable-next-line */
 export interface IntentButtonProps
   extends React.HTMLAttributes<HTMLButtonElement> {
-  intentType: string;
-  text: string;
+  intent: Intents;
 }
-
-export function IntentButton(props: IntentButtonProps) {
-  return <button className={styles['button']}>{props.text}</button>;
+export function IntentButton({ intent, ...props }: IntentButtonProps) {
+  return (
+    <button className={styles['button']}>
+      {intent ? intent.displayText : 'l bozo'}
+    </button>
+  );
 }
 
 export default IntentButton;
