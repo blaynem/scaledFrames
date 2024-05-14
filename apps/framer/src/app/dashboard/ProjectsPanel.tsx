@@ -36,7 +36,8 @@ export const ProjectsPanel = (props: {
     });
     if ('error' in newProject) {
       clearToast();
-      addToast(ToastTypes.ERROR, 'Error creating project');
+      console.error('Error creating new project: ', newProject.error);
+      addToast(ToastTypes.ERROR, newProject.error, 5000);
       return;
     }
     clearToast();

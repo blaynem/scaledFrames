@@ -1,4 +1,4 @@
-import { AspectRatio, IntentType, PrismaClient } from '@prisma/client';
+import { AspectRatio, IntentType, Prisma, PrismaClient } from '@prisma/client';
 import {
   CreateProjectRequestBody,
   CreateProjectResponse,
@@ -98,6 +98,11 @@ export const createProject = async (
         select: {
           project: {
             include: {
+              rootFrame: {
+                include: {
+                  intents: true,
+                },
+              },
               frames: {
                 include: {
                   intents: true,
@@ -110,17 +115,24 @@ export const createProject = async (
       return updatedProjectData.project;
     });
     logActivity(prismaClient, {
-      action: LOG_ACTIONS.UserCreated,
-      description: LOG_DESCRIPTIONS.UserCreated,
+      action: LOG_ACTIONS.ProjectCreated,
+      description: LOG_DESCRIPTIONS.ProjectCreated,
       userId: createdProject.lastUpdatedById,
     });
     return createdProject;
   } catch (error) {
-    console.error('Create Project Error: ', error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // The .code property can be accessed in a type-safe manner
+      if (error.code === 'P2002') {
+        const fields = ((error.meta?.['target'] as string[]) ?? []).join(', ');
+        return { error: `Project needs unique fields: ${fields}` };
+      }
+    }
+    console.error('server Create Project Error: ', error);
     logError({
       prisma: prismaClient,
       error,
-      errorType: LOG_ERROR_TYPES.USER_SIGNUP,
+      errorType: LOG_ERROR_TYPES.PROJECT_CREATE,
     });
     return { error: 'Error creating project' };
   }
