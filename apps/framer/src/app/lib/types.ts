@@ -1,3 +1,6 @@
+import { Frame } from '@prisma/client';
+import { FrameResponseType } from 'libs/FramerServerSDK/src/lib/client/types/frames';
+
 export const IntentTypes = {
   REDIRECT: 'REDIRECT',
   RESET: 'RESET',
@@ -18,3 +21,12 @@ export const FrameAspectRatios = {
 
 export type FrameAspectRatio =
   (typeof FrameAspectRatios)[keyof typeof FrameAspectRatios];
+
+export type TFrameEditorContext = {
+  frames: FrameResponseType[];
+  selectedFrame: FrameResponseType | null;
+  setFrameEditorContext: (
+    frames: FrameResponseType[],
+    selectedFrame: FrameResponseType | null
+  ) => void;
+};

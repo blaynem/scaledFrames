@@ -4,17 +4,27 @@ import styles from './FramePreview.module.css';
 export interface FramePreviewProps {
   imageUrl: string;
   title: string;
+  onClick: () => void;
+  isSelected: boolean;
 }
 
-export function FramePreview(props: FramePreviewProps) {
+export function FramePreview({
+  imageUrl,
+  title,
+  onClick,
+  isSelected,
+}: FramePreviewProps) {
   return (
-    <div className="m-1">
+    <div
+      className={isSelected ? 'm-1 border-2 border-blue-500' : 'm-1'}
+      onClick={() => onClick()}
+    >
       <img
         className="rounded-md"
         style={{ aspectRatio: 1.91 }}
-        src={props.imageUrl}
+        src={imageUrl}
       />
-      <h2 className="text-center">{props.title}</h2>
+      <h2 className="text-center">{title}</h2>
     </div>
   );
 }

@@ -10,7 +10,7 @@ type EditableFrameFields = Pick<
  *
  * Removes fields that should not be returned to the user.
  */
-type FrameResponseType = Frame & {
+export type FrameResponseType = Frame & {
   intents: Intents[];
 };
 
