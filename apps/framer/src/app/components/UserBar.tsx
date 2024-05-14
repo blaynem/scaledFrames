@@ -1,5 +1,8 @@
 'use client';
-import { createSupabaseClient } from '@framer/FramerServerSDK/client';
+import {
+  createSupabaseClient,
+  getSession,
+} from '@framer/FramerServerSDK/client';
 import {
   Menu,
   MenuButton,
@@ -9,22 +12,32 @@ import {
 } from '@headlessui/react';
 import {
   ArrowLeftStartOnRectangleIcon,
-  Cog6ToothIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 /**
  * A user bar component that displays the user's profile picture and allows them to click on settings, or log out.
  * @returns
  */
 export default function UserBar() {
+  const [email, setEmail] = useState<string>('');
   const supabase = createSupabaseClient();
   const router = useRouter();
   const logOut = () => {
     supabase.auth.signOut();
     router.push('/');
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const session = await getSession();
+      setEmail(session?.user.email ?? '');
+    };
+    fetchUser();
+  }, [supabase]);
+
   return (
     <div className="fixed top-4 right-8">
       <Menu>
@@ -43,13 +56,20 @@ export default function UserBar() {
             anchor="bottom end"
             className="w-36 origin-top-right rounded-xl border border-black/5 bg-black/5 p-1 text-sm/6 [--anchor-gap:var(--spacing-1)] focus:outline-none"
           >
+            {email && (
+              <MenuItem>
+                <p className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 cursor-default">
+                  {email}
+                </p>
+              </MenuItem>
+            )}
             {/* <MenuItem>
               <button className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-black/10">
                 <Cog6ToothIcon className="w-6" />
                 Settings
               </button>
-            </MenuItem>
-            <div className="my-1 h-px bg-black/5" /> */}
+            </MenuItem> */}
+            <div className="my-1 h-px bg-black/5" />
             <MenuItem>
               <button
                 onClick={logOut}
