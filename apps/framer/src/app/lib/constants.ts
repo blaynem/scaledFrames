@@ -1,7 +1,8 @@
 export const PAGES = {
+  API_TESTING: '/apiTesting',
+  DASHBOARD: '/dashboard',
   FRAME_EDITOR: '/FrameEditor',
   TEAM_PAGE: '/TeamPage',
-  API_TESTING: '/apiTesting',
 };
 
 /**

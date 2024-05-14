@@ -70,7 +70,7 @@ export const signupUser = async (
       if (!uniqueName) {
         throw new Error('Could not create unique name.');
       }
-      const teamName = `Team ${uniqueName}`;
+      const teamName = uniqueName;
       const projectTitle = `${uniqueName}'s Project`;
 
       const customSubDomain = convertToUrlSafe(uniqueName);

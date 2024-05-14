@@ -19,7 +19,7 @@ export const convertToUrlSafe = (val: string): string =>
 
 /**
  * Parsed parts of a Framer URL:
- * `https://{teamSubdomain}.framer.com/frames/{projectBasePath}/{framePath}`
+ * `https://{teamSubdomain}.framer.com/f/{projectBasePath}/{framePath}`
  */
 export type ParsedFrameUrl = {
   /**
@@ -54,9 +54,9 @@ export type ParsedFrameUrl = {
 
 /**
  * Parses a Framer URL into its parts:
- * `https://{teamSubdomain}.framer.com/frames/{projectBasePath}/{framePath}`
+ * `https://{teamSubdomain}.framer.com/f/{projectBasePath}/{framePath}`
  *
- * Example URL: `https://nike.framer.com/frames/epic-project/some-frame`
+ * Example URL: `https://nike.framer.com/f/epic-project/some-frame`
  * Parsed URL: `{ teamSubdomain: 'nike', projectBasePath: 'epic-project', framePath: 'some-frame' }`
  * @param inputUrl
  * @returns ParsedUrl | null
