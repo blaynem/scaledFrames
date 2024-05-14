@@ -1,8 +1,14 @@
 import { Frame, Intents, Project } from '@prisma/client';
 
 type ProjectIncludeFrames = Project & {
+  rootFrame: (Frame & { intents: Intents[] }) | null;
   frames: (Frame & { intents: Intents[] })[];
 };
+
+export type ProjectIncludeRootFrame = Project & {
+  rootFrame: Frame | null;
+};
+
 /**
  * All methods act as a filter
  */
@@ -11,9 +17,17 @@ export type GetProjectsRequestQueries = {
    * Filter by isProjectLive. If not present, is not filtered.
    */
   isProjectLive?: boolean;
+  /**
+   * Filter by teamId. If not present, is not filtered.
+   */
+  teamId?: string;
 };
 export type GetProjectByIdResponse = ProjectIncludeFrames | { error: string };
-export type GetProjectsResponse = Project[] | { error: string };
+
+/**
+ * Get a list of projects and their rootFrame, does not include all frames.
+ */
+export type GetProjectsResponse = ProjectIncludeRootFrame[] | { error: string };
 
 /**
  * Create a project

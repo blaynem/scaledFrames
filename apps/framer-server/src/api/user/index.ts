@@ -27,7 +27,20 @@ usersInstance.get('/', async (c) => {
           include: {
             team: {
               include: {
-                Projects: true,
+                _count: {
+                  select: {
+                    users: true,
+                  },
+                },
+                Projects: {
+                  include: {
+                    rootFrame: {
+                      include: {
+                        intents: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
@@ -41,7 +54,11 @@ usersInstance.get('/', async (c) => {
 
     const response: GetUserResponseType = {
       ...user,
-      teams: user.teams.map((t) => t.team),
+      teams: user.teams.map((t) => ({
+        ...t.team,
+        projects: t.team.Projects,
+        userCount: Number(t.team._count.users),
+      })),
       projects: user.teams.map((t) => t.team.Projects).flat(),
     };
 

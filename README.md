@@ -4,6 +4,27 @@
 - [NX Things](#nx-things)
 - [Database](#database)
 
+# Plans
+
+Standard:
+- $5 per month
+- Max team size of 3
+- Read-only access for team members
+
+"Premium":
+- $20 / member
+- unlimited team members
+- read / write access for all
+- Team custom subdomain
+- Custom Project paths
+- Custom fallbacks
+- Project Analytics
+
+URL:
+```ts
+var url = `https://${subdomain}.framer.com/f/${path}`
+```
+
 # Set up
 
 We're using npm instead of yarn for this project.

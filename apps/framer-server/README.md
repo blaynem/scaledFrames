@@ -6,7 +6,7 @@ nx run framer-server:serve:dev
 ```
 
 Want to verify the frame is working as expected? Run ngrok then visit https://warpcast.com/~/developers/frames.
-Pass in the url like so `https://53c3-50-39-160-155.ngrok-free.app/frames/{projectName}/{frameName}`.
+Pass in the url like so `https://53c3-50-39-160-155.ngrok-free.app/f/{projectName}/{frameName}`.
 
 
 Needed DB things
