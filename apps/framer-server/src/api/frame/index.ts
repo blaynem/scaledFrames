@@ -3,20 +3,22 @@ import { Frog } from 'frog';
 import prisma from '../../prismaClient';
 import {
   decodeJwt,
-  GetFrameResponse,
-  GetFrameRequestQueries,
   getUserFromEmail,
-  GetFramesResponse,
-  CreateFrameRequestBody,
   logActivity,
   LOG_ACTIONS,
   LOG_DESCRIPTIONS,
-  CreateFrameResponse,
   logError,
   LOG_ERROR_TYPES,
+} from '@framer/FramerServerSDK/server';
+import {
+  GetFrameResponse,
+  GetFrameRequestQueries,
+  GetFramesResponse,
+  CreateFrameRequestBody,
+  CreateFrameResponse,
   EditFrameRequestBody,
   EditFrameResponse,
-} from '@framer/FramerServerSDK';
+} from '@framer/FramerServerSDK/client';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const frameFrogInstance = new Frog();
