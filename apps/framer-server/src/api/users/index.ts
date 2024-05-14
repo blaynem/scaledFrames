@@ -2,8 +2,8 @@ import {
   FindUsersRequestQueries,
   FindUsersResponse,
   FindUsersResponseType,
-  decodeJwt,
-} from '@framer/FramerServerSDK';
+} from '@framer/FramerServerSDK/client';
+import { decodeJwt } from '@framer/FramerServerSDK/server';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
 

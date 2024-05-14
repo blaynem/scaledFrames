@@ -1,4 +1,4 @@
-import { ParsedFrameUrl } from '@framer/FramerServerSDK';
+import { ParsedFrameUrl } from '@framer/FramerServerSDK/server';
 import { SubscriptionType } from '@prisma/client';
 
 /**

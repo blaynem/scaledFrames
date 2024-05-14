@@ -1,14 +1,16 @@
 import {
   GetUserResponse,
+  GetUserResponseType,
   UserSignupRequestBody,
-  signupUser,
   UserSignupResponse,
+} from '@framer/FramerServerSDK/client';
+import {
   decodeJwt,
   getUserFromEmail,
-  GetUserResponseType,
-} from '@framer/FramerServerSDK';
-import prisma from '../../prismaClient';
+  signupUser,
+} from '@framer/FramerServerSDK/server';
 import { Frog } from 'frog';
+import prisma from '../../prismaClient';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const usersInstance = new Frog();
