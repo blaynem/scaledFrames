@@ -31,7 +31,7 @@ export const ProjectsPanel = (props: {
   const onNewProjectClick = async () => {
     const { clearToast } = addToast(ToastTypes.LOADING, 'Loading', 'infinite');
     const newProject = await clientSdk.projects.create({
-      title: 'abcd', // TODO: Assure the title is unique
+      title: 'Project',
       teamId: props.teamId,
     });
     if ('error' in newProject) {

@@ -14,6 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <div className="fixed w-full h-full m-0 p-0 bg-zinc-300/25 -z-10" />
         <ToastProvider>
           <UserBar />
           {children}

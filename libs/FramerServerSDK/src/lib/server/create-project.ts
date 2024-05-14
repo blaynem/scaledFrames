@@ -3,7 +3,7 @@ import {
   CreateProjectRequestBody,
   CreateProjectResponse,
 } from '../client/types';
-import { convertToUrlSafe } from './utils';
+import { convertToUrlSafe, getRandomColor } from './utils';
 import {
   logActivity,
   LOG_ACTIONS,
@@ -27,15 +27,27 @@ export const createProject = async (
   authUser: AuthUser
 ): Promise<CreateProjectResponse | { error: string }> => {
   try {
+    let customBasePath = `/${convertToUrlSafe(title)}`;
+    const checkUniqueProject = await prismaClient.project.findFirst({
+      where: {
+        customBasePath,
+      },
+    });
+    // If the customBasePath is not unique, add a random string to the end of it
+    if (checkUniqueProject) {
+      customBasePath = `/${convertToUrlSafe(title)}-${Math.random()
+        .toString(36) // Convert to base 36 - ex: '0.g7blh43egv4'
+        .slice(2, 6)}`; // Slice to get the first 4 characters - ex: 'g7bl'
+    }
+
     const createdProject = await prismaClient.$transaction(async (_prisma) => {
       const createdProject = await _prisma.project.create({
         data: {
+          customBasePath,
           title,
           description,
           notes,
           isProjectLive: false,
-          // TODO: Need to ensure this is unique.
-          customBasePath: `/${convertToUrlSafe(title)}`,
           customFallbackUrl: '',
           unusedWebhooks: '',
           team: {
@@ -53,16 +65,16 @@ export const createProject = async (
 
       const updatedProjectData = await _prisma.frame.create({
         data: {
-          path: '/home',
+          path: '/',
           title: 'Home',
-          imageUrl: 'https://placehold.co/600x400',
+          imageUrl: `https://placehold.co/600x600/${getRandomColor()}/white.png`,
           aspectRatio: AspectRatio.STANDARD,
           intents: {
             createMany: {
               data: [
                 {
                   type: IntentType.InternalLink,
-                  linkUrl: '/home',
+                  linkUrl: '/',
                   displayText: 'Go home',
                   displayOrder: 0,
                 },
