@@ -21,7 +21,11 @@ type ToastContextType = {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
-export const useToast = () => {
+/**
+ * Hook to use the toast context.
+ * @returns
+ */
+export const useToast = (): ToastContextType => {
   const context = useContext(ToastContext);
   if (!context) {
     throw new Error('useToast must be used within a ToastProvider');

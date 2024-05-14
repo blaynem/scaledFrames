@@ -29,18 +29,18 @@ export const ProjectsPanel = (props: {
   const clientSdk = FramerClientSDK();
 
   const onNewProjectClick = async () => {
-    const { clearToast } = addToast(ToastTypes.LOADING, 'Loading', 'infinite');
+    const loadingToast = addToast(ToastTypes.LOADING, 'Loading', 'infinite');
     const newProject = await clientSdk.projects.create({
       title: 'Project',
       teamId: props.teamId,
     });
     if ('error' in newProject) {
-      clearToast();
+      loadingToast.clearToast();
       console.error('Error creating new project: ', newProject.error);
       addToast(ToastTypes.ERROR, newProject.error, 5000);
       return;
     }
-    clearToast();
+    loadingToast.clearToast();
     router.push(`/${PAGES.FRAME_EDITOR}/${newProject.id}`);
   };
 
