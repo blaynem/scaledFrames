@@ -1,4 +1,4 @@
-import UserBar from './UserBar';
+import UserBar from '../components/UserBar';
 
 export const metadata = {
   title: 'Dashboard',

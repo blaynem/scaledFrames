@@ -14,6 +14,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 
+/**
+ * A user bar component that displays the user's profile picture and allows them to click on settings, or log out.
+ * @returns
+ */
 export default function UserBar() {
   const supabase = createSupabaseClient();
   const router = useRouter();
