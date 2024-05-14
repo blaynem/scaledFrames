@@ -1,3 +1,4 @@
+import { ToastProvider } from '../components/Toasts/ToastProvider';
 import UserBar from '../components/UserBar';
 
 export const metadata = {
@@ -13,8 +14,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <UserBar />
-        {children}
+        <ToastProvider>
+          <UserBar />
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

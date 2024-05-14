@@ -1,3 +1,4 @@
+'use client';
 import { Select } from '@headlessui/react';
 import { BoltIcon } from '@heroicons/react/20/solid';
 import {
@@ -8,6 +9,11 @@ import {
 import { useState } from 'react';
 import { TeamProject } from './page';
 import Image from 'next/image';
+import { useToast } from '../components/Toasts/ToastProvider';
+import { ToastTypes } from '../components/Toasts/GenericToast';
+import { FramerClientSDK } from '@framer/FramerServerSDK/client';
+import { useRouter } from 'next/navigation';
+import { PAGES } from '../lib/constants';
 
 export const ProjectsPanel = (props: {
   projects: TeamProject[];
@@ -16,12 +22,27 @@ export const ProjectsPanel = (props: {
     selected: string;
     onChange: (newValue: string) => void;
   };
+  teamId: string;
 }) => {
-  const onNewProjectClick = () => {
-    // TODO: Probably a dropdown toast saying "Create a new project"
-    //       Followed by a push to the new project page.
-    console.log('New Project Clicked');
+  const router = useRouter();
+  const { addToast } = useToast();
+  const clientSdk = FramerClientSDK();
+
+  const onNewProjectClick = async () => {
+    const { clearToast } = addToast(ToastTypes.LOADING, 'Loading', 'infinite');
+    const newProject = await clientSdk.projects.create({
+      title: 'abcd', // TODO: Assure the title is unique
+      teamId: props.teamId,
+    });
+    if ('error' in newProject) {
+      clearToast();
+      addToast(ToastTypes.ERROR, 'Error creating project');
+      return;
+    }
+    clearToast();
+    router.push(`/${PAGES.FRAME_EDITOR}/${newProject.id}`);
   };
+
   const onFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     console.log('Filter Changed', e.target.value);
     props.filter.onChange(e.target.value);
@@ -106,7 +127,7 @@ const ProjectCard = ({
   projectId,
   projectTitle,
 }: TeamProject) => {
-  const href = `/FrameEditor/${projectId}`;
+  const href = `/${PAGES.FRAME_EDITOR}/${projectId}`;
   return (
     <div className="bg-slate-100 flex flex-col border p-4 rounded border-slate-300">
       <a href={href} className="mb-1 relative flex grow items-center">

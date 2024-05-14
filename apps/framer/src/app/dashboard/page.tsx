@@ -102,6 +102,7 @@ export default function Dashboard() {
           teams={_teams}
         />
         <ProjectsPanel
+          teamId={selectedTeam?.id ?? ''}
           filter={{
             options: filterOptions,
             selected: selectedFilterId,
