@@ -27,7 +27,7 @@ export default function MyModal({
       // Will refresh a session if necessary.
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        return router.push(PAGES.FRAME_EDITOR);
+        return router.push(PAGES.DASHBOARD);
       }
       setShowLoginModal(true);
     }
@@ -75,8 +75,8 @@ export default function MyModal({
       return;
     }
     setShowLoginModal(false);
-    // We push them to the FrameEditor page.
-    router.push(PAGES.FRAME_EDITOR);
+    // We push them to the Dashboard page.
+    router.push(PAGES.DASHBOARD);
   };
 
   const handleEnterPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

@@ -101,6 +101,9 @@ async function main() {
       where: {
         email: usersToCreate[0].email,
       },
+      include: {
+        teams: true,
+      },
     });
     if (!alex || !blayne) {
       throw new Error('Could not find users');
@@ -119,6 +122,21 @@ async function main() {
       update: {},
     });
     console.log('--- updatedTeam', updatedTeam);
+
+    const updatedTeam2 = await prisma.userTeam.upsert({
+      where: {
+        userId_teamId: {
+          userId: alex.id,
+          teamId: blayne.teams[0].teamId,
+        },
+      },
+      create: {
+        userId: alex.id,
+        teamId: blayne.teams[0].teamId,
+      },
+      update: {},
+    });
+    console.log('--- updatedTeam2', updatedTeam2);
   };
 
   await assignToTeam();

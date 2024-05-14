@@ -94,7 +94,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="flex bg-zinc-300/25 via-40%">
+    <div className="flex bg-zinc-300/25">
       <div className="flex-1 h-[calc(100vh)] grid grid-cols-8">
         <TeamsPanel
           changeSelectedTeam={changeSelectedTeam}
