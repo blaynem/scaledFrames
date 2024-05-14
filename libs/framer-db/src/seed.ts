@@ -1,4 +1,7 @@
-import { seedSubscriptionPlans, signupUser } from '@framer/FramerServerSDK';
+import {
+  seedSubscriptionPlans,
+  signupUser,
+} from '@framer/FramerServerSDK/server';
 import prisma from './prismaClient';
 import supabase from './supabaseClient';
 

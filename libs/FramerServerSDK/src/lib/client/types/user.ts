@@ -52,7 +52,9 @@ export type UserSDKType = {
    */
   get: () => Promise<GetUserResponse>;
   /**
-   * Signup a user. Creates a user, team, and project.
+   * Will attempt to Signup a user. If one already exists, will return the first team and project.
+   *
+   * Otherwise on creation will: Creates a user, team, and project.
    *
    * Notes: Signup can only happen after a user has been authenticated via Supabase.
    *       On verify-otp, supabase saves cookies that are used to authenticate the user.

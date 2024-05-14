@@ -3,17 +3,19 @@ import {
   GetProjectsResponse,
   GetProjectByIdResponse,
   CreateProjectRequestBody,
-  createProject,
   CreateProjectResponse,
   EditProjectRequestBody,
+} from '@framer/FramerServerSDK/client';
+import {
   decodeJwt,
   getUserFromEmail,
-  LOG_ACTIONS,
-  LOG_DESCRIPTIONS,
+  createProject,
+  logError,
   LOG_ERROR_TYPES,
   logActivity,
-  logError,
-} from '@framer/FramerServerSDK';
+  LOG_ACTIONS,
+  LOG_DESCRIPTIONS,
+} from '@framer/FramerServerSDK/server';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
 

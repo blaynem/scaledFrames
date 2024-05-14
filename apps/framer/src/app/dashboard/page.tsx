@@ -94,24 +94,23 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="flex bg-zinc-300/25">
-      <div className="flex-1 h-[calc(100vh)] grid grid-cols-8">
-        <TeamsPanel
-          changeSelectedTeam={changeSelectedTeam}
-          currentTeam={_currentTeam}
-          teams={_teams}
-        />
-        <ProjectsPanel
-          filter={{
-            options: filterOptions,
-            selected: selectedFilterId,
-            onChange: (newValue) => {
-              setSelectedFilterId(newValue);
-            },
-          }}
-          projects={_projects}
-        />
-      </div>
+    <div className="grid grid-cols-8">
+      <TeamsPanel
+        changeSelectedTeam={changeSelectedTeam}
+        currentTeam={_currentTeam}
+        teams={_teams}
+      />
+      <ProjectsPanel
+        teamId={selectedTeam?.id ?? ''}
+        filter={{
+          options: filterOptions,
+          selected: selectedFilterId,
+          onChange: (newValue) => {
+            setSelectedFilterId(newValue);
+          },
+        }}
+        projects={_projects}
+      />
     </div>
   );
 }
