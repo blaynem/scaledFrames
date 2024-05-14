@@ -10,6 +10,7 @@ import { TeamType } from './page';
 export const TeamsPanel = (props: {
   currentTeam: TeamType | null;
   teams: TeamType[];
+  changeSelectedTeam: (team: TeamType) => void;
 }) => {
   const currentTeamName = props.currentTeam?.name ?? '___';
 
@@ -64,9 +65,12 @@ export const TeamsPanel = (props: {
                               {team.name}
                             </span>
                           ) : (
-                            <a className="hover:text-teal-500" href="#">
+                            <button
+                              onClick={() => props.changeSelectedTeam(team)}
+                              className="hover:text-teal-500"
+                            >
                               {team.name}
-                            </a>
+                            </button>
                           )}
                         </li>
                       );

@@ -59,6 +59,17 @@ export default function Dashboard() {
     fetchUser();
   }, []);
 
+  const changeSelectedTeam = (team: TeamType) => {
+    const _team = teams.find((t) => t.id === team.id);
+    if (!_team) {
+      console.error('Could not find team with id:', team.id);
+      return;
+    }
+
+    setSelectedTeam(_team);
+    setProjects(_team.projects);
+  };
+
   const _currentTeam: TeamType = {
     name: selectedTeam?.name ?? '',
     memberCount: selectedTeam?.userCount ?? 1,
@@ -85,7 +96,11 @@ export default function Dashboard() {
   return (
     <div className="flex bg-zinc-300/25 via-40%">
       <div className="flex-1 h-[calc(100vh)] grid grid-cols-8">
-        <TeamsPanel currentTeam={_currentTeam} teams={_teams} />
+        <TeamsPanel
+          changeSelectedTeam={changeSelectedTeam}
+          currentTeam={_currentTeam}
+          teams={_teams}
+        />
         <ProjectsPanel
           filter={{
             options: filterOptions,
