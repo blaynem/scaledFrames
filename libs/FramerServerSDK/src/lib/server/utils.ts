@@ -149,3 +149,14 @@ export const createUniqueName = async (prisma: PrismaClient) => {
 
   return null;
 };
+
+/**
+ * Return a random color from a list of options that look decent with white text.
+ *
+ * Options - orange, green, blue, pink, purple, teal, red
+ */
+export const getRandomColor = () => {
+  const options = ['orange', 'green', 'blue', 'pink', 'purple', 'teal', 'red'];
+
+  return options[Math.floor(Math.random() * options.length)];
+};

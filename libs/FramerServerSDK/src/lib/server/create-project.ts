@@ -1,9 +1,9 @@
-import { AspectRatio, IntentType, PrismaClient } from '@prisma/client';
+import { AspectRatio, IntentType, Prisma, PrismaClient } from '@prisma/client';
 import {
   CreateProjectRequestBody,
   CreateProjectResponse,
 } from '../client/types';
-import { convertToUrlSafe } from './utils';
+import { convertToUrlSafe, getRandomColor } from './utils';
 import {
   logActivity,
   LOG_ACTIONS,
@@ -27,15 +27,27 @@ export const createProject = async (
   authUser: AuthUser
 ): Promise<CreateProjectResponse | { error: string }> => {
   try {
+    let customBasePath = `/${convertToUrlSafe(title)}`;
+    const checkUniqueProject = await prismaClient.project.findFirst({
+      where: {
+        customBasePath,
+      },
+    });
+    // If the customBasePath is not unique, add a random string to the end of it
+    if (checkUniqueProject) {
+      customBasePath = `/${convertToUrlSafe(title)}-${Math.random()
+        .toString(36) // Convert to base 36 - ex: '0.g7blh43egv4'
+        .slice(2, 6)}`; // Slice to get the first 4 characters - ex: 'g7bl'
+    }
+
     const createdProject = await prismaClient.$transaction(async (_prisma) => {
       const createdProject = await _prisma.project.create({
         data: {
+          customBasePath,
           title,
           description,
           notes,
           isProjectLive: false,
-          // TODO: Need to ensure this is unique.
-          customBasePath: `/${convertToUrlSafe(title)}`,
           customFallbackUrl: '',
           unusedWebhooks: '',
           team: {
@@ -53,16 +65,16 @@ export const createProject = async (
 
       const updatedProjectData = await _prisma.frame.create({
         data: {
-          path: '/home',
+          path: '/',
           title: 'Home',
-          imageUrl: 'https://placehold.co/600x400',
+          imageUrl: `https://placehold.co/600x600/${getRandomColor()}/white.png`,
           aspectRatio: AspectRatio.STANDARD,
           intents: {
             createMany: {
               data: [
                 {
                   type: IntentType.InternalLink,
-                  linkUrl: '/home',
+                  linkUrl: '/',
                   displayText: 'Go home',
                   displayOrder: 0,
                 },
@@ -98,6 +110,11 @@ export const createProject = async (
         select: {
           project: {
             include: {
+              rootFrame: {
+                include: {
+                  intents: true,
+                },
+              },
               frames: {
                 include: {
                   intents: true,
@@ -110,17 +127,24 @@ export const createProject = async (
       return updatedProjectData.project;
     });
     logActivity(prismaClient, {
-      action: LOG_ACTIONS.UserCreated,
-      description: LOG_DESCRIPTIONS.UserCreated,
+      action: LOG_ACTIONS.ProjectCreated,
+      description: LOG_DESCRIPTIONS.ProjectCreated,
       userId: createdProject.lastUpdatedById,
     });
     return createdProject;
   } catch (error) {
-    console.error('Create Project Error: ', error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // The .code property can be accessed in a type-safe manner
+      if (error.code === 'P2002') {
+        const fields = ((error.meta?.['target'] as string[]) ?? []).join(', ');
+        return { error: `Project needs unique fields: ${fields}` };
+      }
+    }
+    console.error('server Create Project Error: ', error);
     logError({
       prisma: prismaClient,
       error,
-      errorType: LOG_ERROR_TYPES.USER_SIGNUP,
+      errorType: LOG_ERROR_TYPES.PROJECT_CREATE,
     });
     return { error: 'Error creating project' };
   }

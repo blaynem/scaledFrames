@@ -1,6 +1,11 @@
-import { SubscriptionType, IntentType, PrismaClient } from '@prisma/client';
+import {
+  SubscriptionType,
+  IntentType,
+  PrismaClient,
+  AspectRatio,
+} from '@prisma/client';
 import { UserSignupRequestBody, UserSignupResponse } from '../client/types';
-import { convertToUrlSafe, createUniqueName } from './utils';
+import { convertToUrlSafe, createUniqueName, getRandomColor } from './utils';
 import {
   LOG_ERROR_TYPES,
   LOG_ACTIONS,
@@ -161,16 +166,16 @@ export const signupUser = async (
 
       await _prisma.frame.create({
         data: {
-          path: '/home',
+          path: '/',
           title: 'Home',
-          imageUrl: 'https://i.imgur.com/CtgycuI.jpeg',
-          aspectRatio: 'WIDE',
+          imageUrl: `https://placehold.co/1146x600/${getRandomColor()}/white.png`,
+          aspectRatio: AspectRatio.WIDE,
           intents: {
             createMany: {
               data: [
                 {
                   type: IntentType.InternalLink,
-                  linkUrl: '/home',
+                  linkUrl: '/',
                   displayText: 'Go home',
                   displayOrder: 0,
                 },
@@ -215,23 +220,18 @@ export const signupUser = async (
         data: {
           path: '/frame2',
           title: 'Frame 2',
-          aspectRatio: 'STANDARD',
-          imageUrl: 'https://i.imgur.com/KDRXumd.jpeg',
+          aspectRatio: AspectRatio.STANDARD,
+          imageUrl: `https://placehold.co/600x600/${getRandomColor()}/white.png`,
           intents: {
             createMany: {
               data: [
                 {
                   type: IntentType.InternalLink,
-                  linkUrl: '/home',
+                  linkUrl: '/',
                   displayText: 'Go home',
                   displayOrder: 0,
                 },
               ],
-            },
-          },
-          rootFrameOfProjects: {
-            connect: {
-              id: createdProject.id,
             },
           },
           project: {

@@ -11,11 +11,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <UserBar />
-        {children}
-      </body>
-    </html>
+    <>
+      <div className="fixed w-full h-full m-0 p-0 bg-zinc-300/25 -z-10" />
+      <UserBar />
+      {children}
+    </>
   );
 }

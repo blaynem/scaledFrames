@@ -9,7 +9,7 @@ import { cors } from 'hono/cors';
 import {
   API_SERVER_BASE_PATH,
   FRAMES_SERVER_BASE_PATH,
-} from '@framer/FramerServerSDK';
+} from '@framer/FramerServerSDK/constants';
 
 const PORT = process.env.NEXT_PUBLIC_API_FRAMER_PORT!;
 

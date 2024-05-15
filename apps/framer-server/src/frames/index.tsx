@@ -4,7 +4,7 @@ import {
   logError,
   logIntentTrackingFarcaster,
   parseFramerUrl,
-} from '@framer/FramerServerSDK';
+} from '@framer/FramerServerSDK/server';
 import prisma from '../prismaClient';
 import { FrameImageAspectRatio } from 'node_modules/frog/_lib/types/frame';
 import {

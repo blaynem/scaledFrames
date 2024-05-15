@@ -1,14 +1,16 @@
 import {
   GetUserResponse,
+  GetUserResponseType,
   UserSignupRequestBody,
-  signupUser,
   UserSignupResponse,
+} from '@framer/FramerServerSDK/client';
+import {
   decodeJwt,
   getUserFromEmail,
-  GetUserResponseType,
-} from '@framer/FramerServerSDK';
-import prisma from '../../prismaClient';
+  signupUser,
+} from '@framer/FramerServerSDK/server';
 import { Frog } from 'frog';
+import prisma from '../../prismaClient';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const usersInstance = new Frog();
@@ -72,13 +74,11 @@ usersInstance.get('/', async (c) => {
 usersInstance.post('/signup', async (c) => {
   try {
     const token = c.req.header('Authorization') as string;
-    const { email } = await decodeJwt(token);
-
-    const authUser = await getUserFromEmail(prisma, email);
+    const { email, id } = await decodeJwt(token);
 
     const body = await c.req.json<UserSignupRequestBody>();
 
-    const returnedData = await signupUser(prisma, body, authUser);
+    const returnedData = await signupUser(prisma, body, { email, id });
     return c.json<UserSignupResponse>(returnedData);
   } catch (error) {
     console.error('Create User Error: ', error);

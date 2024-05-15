@@ -68,15 +68,19 @@ export function createSupabaseReqResClient(
  */
 export const decodeJwt = async (
   access_token: string
-): Promise<{ email: string }> => {
+): Promise<{ email: string; id: string }> => {
   const token = access_token.split(' ')[1];
   try {
     const decoded = jwt.verify(token, process.env['SUPABASE_JWT_SECRET']!);
     if (!decoded.email) {
       throw new Error('Could not get email from JWT.');
     }
+    if (!decoded.sub) {
+      throw new Error('Could not get user id from JWT.');
+    }
     return {
       email: decoded.email,
+      id: decoded.sub,
     };
   } catch (err) {
     console.error('Error decoding token', err);
