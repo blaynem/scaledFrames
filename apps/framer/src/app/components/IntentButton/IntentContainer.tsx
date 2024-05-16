@@ -1,6 +1,5 @@
 import { Intents } from '@prisma/client';
-import { IntentTypes } from '../../lib/types';
-import IntentButton, { IntentButtonProps } from './IntentButton';
+import IntentButton from './IntentButton';
 import styles from './IntentContainer.module.css';
 
 /* eslint-disable-next-line */

@@ -9,14 +9,12 @@ export interface FrameImageProps {
 
 export function FrameImage({ aspectRatio, imageUrl }: FrameImageProps) {
   return (
-    <div className={styles['container']}>
-      <img
-        className={'image rounded-md'}
-        src={imageUrl}
-        alt="frame"
-        style={{ aspectRatio: aspectRatio }}
-      />
-    </div>
+    <img
+      className={'image rounded-md width-full height-full'}
+      src={imageUrl}
+      alt="frame"
+      style={{ aspectRatio: aspectRatio }}
+    />
   );
 }
 

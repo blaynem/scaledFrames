@@ -7,6 +7,7 @@ import FramePreviewContainer from '../../components/FramePreview/FramePreviewCon
 import Layout from '../../components/Layout/Layout';
 import { TFrameEditorContext } from '../../lib/types';
 import { getFrames } from '../../utils/utils';
+import { ToastProvider } from '../../components/Toasts/ToastProvider';
 
 const initialState: TFrameEditorContext = {
   frames: [],
@@ -51,33 +52,35 @@ export default function Index({ params }: { params: { projectId: string } }) {
       <FrameEditorContext.Provider
         value={{ frames, selectedFrame, setFrameEditorContext }}
       >
-        <div className="page">
-          <div className="wrapper">
-            <div
-              className="divide-x bg-gray-100 border-gray-200 border-2 rounded-md"
-              style={{ display: 'flex', height: '100vh' }}
-            >
+        <ToastProvider>
+          <div className="page from-blue-900">
+            <div className="wrapper">
               <div
-                className="flex-item column1 border-right"
-                style={{ padding: '20px', flex: '0 0 20%' }}
+                className="divide-x bg-gradient-to-br from-indigo-200 from-40% via-white via-20% to-blue-200  "
+                style={{ display: 'flex', height: '100vh' }}
               >
-                <FramePreviewContainer />
-              </div>
-              <div
-                className="flex-item column2"
-                style={{ padding: '20px', flex: '0 0 30%' }}
-              >
-                <FrameInputs />
-              </div>
-              <div
-                className="flex-item column3"
-                style={{ padding: '20px', flex: '0 0 50%' }}
-              >
-                <FrameDebugger frameId={'1'}></FrameDebugger>
+                <div
+                  className="flex-item column1 border-right border-white overflow-y-auto"
+                  style={{ padding: '20px', flex: '0 0 20%' }}
+                >
+                  <FramePreviewContainer />
+                </div>
+                <div
+                  className="flex-item column2 overflow-y-auto"
+                  style={{ padding: '20px', flex: '0 0 30%' }}
+                >
+                  <FrameInputs />
+                </div>
+                <div
+                  className="flex-item column3 overflow-y-auto flex flex-col items-center justify-center"
+                  style={{ padding: '20px', flex: '0 0 50%' }}
+                >
+                  <FrameDebugger />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </ToastProvider>
       </FrameEditorContext.Provider>
     </Layout>
   );

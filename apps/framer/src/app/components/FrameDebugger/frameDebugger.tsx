@@ -1,28 +1,34 @@
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FrameAspectRatios, IntentTypes } from '../../lib/types';
 import FrameImage from '../FrameImage/FrameImage';
 import IntentContainer from '../IntentButton/IntentContainer';
 import { FramerClientSDK } from '@framer/FramerServerSDK/client';
-import { Frame } from '@prisma/client';
+import { AspectRatio, Frame } from '@prisma/client';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 /* eslint-disable-next-line */
-export interface FrameDebuggerProps {
-  frameId: string;
-}
 
-export function FrameDebugger({ frameId }: FrameDebuggerProps) {
+export function FrameDebugger() {
   const { frames, selectedFrame, setFrameEditorContext } =
     useContext(FrameEditorContext);
+  const [intents, setIntents] = useState(
+    selectedFrame ? selectedFrame.intents : []
+  );
+  useEffect(() => {
+    if (selectedFrame) {
+      setFrameEditorContext(frames, selectedFrame);
+      setIntents(selectedFrame.intents);
+    }
+  }, [selectedFrame, frames]);
+
   return (
-    <div
-      className="rounded-lg bg-white p-4 m-4
-    "
-    >
+    <div className="rounded-lg bg-white p-4 m-4 max-h-fit flex-shrink-1 max-w-fit flex flex-col items-center justify-center">
       <FrameImage
         aspectRatio={
-          selectedFrame ? selectedFrame.imageUrl : FrameAspectRatios['1.91:1']
+          selectedFrame && selectedFrame.aspectRatio == AspectRatio.STANDARD
+            ? '1.0'
+            : '1.91'
         }
         imageUrl={
           selectedFrame
@@ -30,7 +36,7 @@ export function FrameDebugger({ frameId }: FrameDebuggerProps) {
             : 'https://picsum.photos/1080/565'
         }
       />
-      <IntentContainer intents={selectedFrame ? selectedFrame.intents : []} />
+      <IntentContainer intents={intents} />
     </div>
   );
 }

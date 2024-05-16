@@ -1,6 +1,7 @@
 'use client';
 import { IntentType, Intents } from '@prisma/client';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 
 export interface IntentInputProps {
   intent?: Intents;
@@ -8,8 +9,11 @@ export interface IntentInputProps {
 export const IntentInput: React.FC<IntentInputProps> = ({
   intent,
 }: IntentInputProps) => {
+  const { frames, selectedFrame, setFrameEditorContext } =
+    useContext(FrameEditorContext);
+
   const [intentType, setIntentType] = useState<IntentType>(
-    IntentType.InternalLink
+    intent?.type ?? IntentType.InternalLink
   );
 
   const handleIntentTypeChange = (
@@ -21,9 +25,17 @@ export const IntentInput: React.FC<IntentInputProps> = ({
   const renderInputs = () => {
     switch (intentType) {
       case IntentType.ExternalLink:
-        return <input type="text" placeholder="Input for Type1" />;
+        return <input type="text" placeholder="URL" />;
       case IntentType.InternalLink:
-        return <input type="number" placeholder="Input for Type2" />;
+        return (
+          <select className="m-4 p-1 rounded-sm">
+            {frames.map((frame) => (
+              <option key={frame.id} value={frame.id}>
+                {frame.title}
+              </option>
+            ))}
+          </select>
+        );
       case IntentType.Post:
         return <input type="date" placeholder="Input for Type3" />;
       default:
