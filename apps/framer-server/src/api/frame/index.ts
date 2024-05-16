@@ -194,7 +194,7 @@ frameFrogInstance.post('/edit/:id', async (c) => {
           },
         },
       },
-      data: { ...updateData, IntentClickTracking: {} },
+      data: updateData,
       include: {
         intents: true,
       },
