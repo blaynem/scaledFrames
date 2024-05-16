@@ -207,6 +207,22 @@ export const FramerClientSDK = (
         });
       },
     },
+    teams: {
+      getAll: async () => {
+        const url = createUrl('/api/teams');
+        return getFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+        });
+      },
+      getById: async (teamId) => {
+        const url = createUrl(`/api/teams/${teamId}`);
+        return getFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+        });
+      },
+    },
     user: {
       get: async () => {
         const url = createUrl('/api/user');
