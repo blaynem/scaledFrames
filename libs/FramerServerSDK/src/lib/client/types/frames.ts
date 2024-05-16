@@ -10,7 +10,7 @@ type EditableFrameFields = Pick<
  *
  * Removes fields that should not be returned to the user.
  */
-type FrameResponseType = Frame & {
+export type FrameResponseType = Frame & {
   intents: Intents[];
 };
 
@@ -53,6 +53,32 @@ export type EditFrameRequestBody = {
 } & Partial<EditableFrameFields>;
 
 /**
+ * Request body to save an image to a frame when using the SDK.
+ */
+export type ImageSaveSDKBody = {
+  teamId: string;
+  projectId: string;
+  frameId: string;
+  file: File;
+  /**
+   * If there is a previous frame image url, we will delete it. Otherwise we will have orphaned images in the bucket.
+   *
+   * Should include the full url of the previous image.
+   * Ex: "http://127.0.0.1:54321/storage/v1/object/public/frames/19fc30af-8add-410c-b09f-25606acf5429/82620023-094c-453e-bfe4-1b5e89e77599/ba010cf7-fdfe-4141-8f2f-e72e481086e0/5u8ytcnxm5n"
+   */
+  previousFrameImageUrl?: string;
+};
+/**
+ * Request body to save an image to a frame through our Server.
+ */
+export type ImageSaveToFrameBodyServer = {
+  teamId: string;
+  projectId: string;
+  frameId: string;
+  imageUrl: string;
+};
+
+/**
  * Exposed SDK for Frames.
  */
 export type FrameSDKType = {
@@ -81,4 +107,15 @@ export type FrameSDKType = {
    * @returns FrameResponseType | { error: string}
    */
   edit: (id: string, body: EditFrameRequestBody) => Promise<EditFrameResponse>;
+  /**
+   * Related image operations
+   */
+  image: {
+    /**
+     * Saves an image to a frame.
+     * This will upload it to the bucket, add the url to the frame in the db, and return the updated frame.
+     * @returns FrameResponseType | { error: string}
+     */
+    saveToFrame: (body: ImageSaveSDKBody) => Promise<EditFrameResponse>;
+  };
 };
