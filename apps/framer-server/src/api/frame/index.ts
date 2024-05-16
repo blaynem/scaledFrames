@@ -18,6 +18,7 @@ import {
   CreateFrameResponse,
   EditFrameRequestBody,
   EditFrameResponse,
+  ImageSaveToFrameBodyServer,
 } from '@framer/FramerServerSDK/client';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
@@ -214,6 +215,58 @@ frameFrogInstance.post('/edit/:id', async (c) => {
       errorType: LOG_ERROR_TYPES.FRAME_UPDATE,
     });
     return c.json<EditFrameResponse>({ error: 'Error editing frame' });
+  }
+});
+
+// Saving an image to a frame
+frameFrogInstance.post('/image/save', async (c) => {
+  try {
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+
+    const authUser = await getUserFromEmail(prisma, email);
+    const body = await c.req.json<ImageSaveToFrameBodyServer>();
+
+    const supabaseStorageUrl =
+      process.env.NEXT_PUBLIC_SUPABASE_URL + '/storage/v1/object/public';
+    // `/frames` is the bucket name
+    const convertedImageUrl = `${supabaseStorageUrl}/frames/${body.imageUrl}`;
+
+    const frame = await prisma.frame.update({
+      where: {
+        id: body.frameId,
+        teamId: body.teamId,
+        team: {
+          users: {
+            some: {
+              userId: authUser.id,
+            },
+          },
+        },
+      },
+      data: {
+        imageUrl: convertedImageUrl,
+      },
+      include: {
+        intents: true,
+      },
+    });
+
+    logActivity(prisma, {
+      action: LOG_ACTIONS.FrameUpdated,
+      description: LOG_DESCRIPTIONS.FrameUpdated,
+      userId: authUser.id,
+    });
+
+    return c.json<EditFrameResponse>(frame);
+  } catch (error) {
+    console.error('Save Image to Frame Error: ', error);
+    logError({
+      prisma,
+      error,
+      errorType: LOG_ERROR_TYPES.FRAME_UPDATE,
+    });
+    return c.json<EditFrameResponse>({ error: 'Error saving image to frame' });
   }
 });
 

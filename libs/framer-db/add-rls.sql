@@ -53,7 +53,7 @@ BEGIN
 END
 $$;
 
--- Create or replace policy for inserting files based on team membership
+-- Create or replace policy for INSERTING files based on team membership
 DO $$
 BEGIN
   DROP POLICY IF EXISTS "Write access based on team membership" ON storage.objects;
@@ -72,7 +72,26 @@ BEGIN
 END
 $$;
 
--- Create or replace policy for deleting files based on team membership
+-- Create or replace policy for UPDATING files based on team membership
+DO $$
+BEGIN
+  DROP POLICY IF EXISTS "Update access based on team membership" ON storage.objects;
+  CREATE POLICY "Update access based on team membership"
+  ON storage.objects
+  FOR UPDATE
+  TO authenticated
+  USING (
+    bucket_id = 'frames' AND
+    EXISTS (
+      SELECT 1
+      FROM public."UserTeam" ut
+      WHERE ut."userId" = auth.uid() AND ut."teamId" = path_tokens[1]::uuid
+    )
+  );
+END
+$$;
+
+-- Create or replace policy for DELETING files based on team membership
 DO $$
 BEGIN
   DROP POLICY IF EXISTS "Delete access based on team membership" ON storage.objects;
