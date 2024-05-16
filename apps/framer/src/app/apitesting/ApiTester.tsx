@@ -52,22 +52,24 @@ export const APITester = () => {
     }
 
     if (!image) {
+      console.log('---no image');
       return;
     }
 
     const team = user.teams[0];
-    const { data, error } = await supabase.storage.from('frames').upload(
-      createImagePath({
-        teamId: team.id,
-        projectId: team.Projects[0].id,
-        fileName: image.name,
-      }),
-      image
-    );
-    if (error) {
-      console.error('---error', error);
+
+    const response = await clientSDK.frames.image.saveToFrame({
+      teamId: team.id,
+      projectId: team.projects[0].id,
+      frameId: team.projects[0].rootFrame?.id || '',
+      file: image,
+      previousFrameImageUrl: team.projects[0].rootFrame?.imageUrl,
+    });
+    if ('error' in response) {
+      console.error('---error', response);
+      return;
     }
-    console.log('---data', data);
+    console.log('---response', response);
   };
 
   const deleteImage = async () => {
@@ -84,7 +86,7 @@ export const APITester = () => {
     const { data, error } = await supabase.storage.from('frames').remove([
       createImagePath({
         teamId: team.id,
-        projectId: team.Projects[0].id,
+        projectId: team.projects[0].id,
         fileName: image.name,
       }),
     ]);
@@ -132,6 +134,8 @@ export const APITester = () => {
   };
 
   const getUser = async () => {
+    const userdata = await clientSDK.user.get();
+    console.log('---userdata', userdata);
     const { data, error } = await supabase.auth.getUser();
     if (error) {
       return setDisplayUser('No user found');

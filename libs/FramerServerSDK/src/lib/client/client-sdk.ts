@@ -1,5 +1,27 @@
-import { getSession } from './supabaseClient';
-import { FramerClientSDKConfig, FramerClientSDKType } from './types';
+import { createSupabaseClient, getSession } from './supabaseClient';
+import {
+  FramerClientSDKConfig,
+  FramerClientSDKType,
+  ImageSaveToFrameBodyServer,
+} from './types';
+
+/**
+ * Create a bucket save path for the image.
+ */
+const createBucketSavePath = ({
+  teamId,
+  projectId,
+  frameId,
+}: {
+  teamId: string;
+  projectId: string;
+  frameId: string;
+}) => {
+  // We generate a hash because every image should be unique.
+  // Supabase has a CDN that caches images, so we don't want to overwrite the original paths.
+  const hash = Math.random().toString(36).substring(2);
+  return `${teamId}/${projectId}/${frameId}/${hash}`;
+};
 
 const getAuthToken = async () => {
   const session = await getSession();
@@ -106,6 +128,45 @@ export const FramerClientSDK = (
           url: url.toString(),
           body,
         });
+      },
+      image: {
+        async saveToFrame(body) {
+          const supabase = createSupabaseClient();
+
+          // If there is a previous frame image url, we will delete it.
+          if (body.previousFrameImageUrl) {
+            const _prevUrl = body.previousFrameImageUrl.split('/frames/')[1];
+            await supabase.storage.from('frames').remove([_prevUrl]);
+          }
+
+          // We upload the image to the bucket with supabase client.
+          const { data, error } = await supabase.storage.from('frames').upload(
+            createBucketSavePath({
+              teamId: body.teamId,
+              projectId: body.projectId,
+              frameId: body.frameId,
+            }),
+            body.file
+          );
+          if (error) {
+            console.error('---error', error);
+            return { error: error.message };
+          }
+
+          // Then send off the saved image url to the server.
+          const serverBody: ImageSaveToFrameBodyServer = {
+            teamId: body.teamId,
+            projectId: body.projectId,
+            frameId: body.frameId,
+            imageUrl: `${data.path}`,
+          };
+          const url = createUrl('/api/frames/image/save');
+          return postFetch({
+            authToken: (await getAuthToken()) ?? '',
+            url: url.toString(),
+            body: serverBody,
+          });
+        },
       },
     },
     projects: {
