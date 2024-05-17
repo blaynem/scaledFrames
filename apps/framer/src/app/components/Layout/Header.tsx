@@ -12,6 +12,8 @@ import {
   PlusIcon,
 } from '@heroicons/react/20/solid';
 import { Menu, Transition } from '@headlessui/react';
+import Link from 'next/link';
+import UserBar from '../UserBar';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -22,9 +24,11 @@ export default function Header() {
     <div className="p-2">
       <div className="lg:flex lg:items-center lg:justify-between">
         <div className="min-w-0 flex-1">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-            Framer
-          </h2>
+          <Link href="/dashboard">
+            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+              Framer (BETA)
+            </h2>
+          </Link>
         </div>
         <div className="mt-5 flex lg:ml-4 lg:mt-0">
           <span className="hidden sm:block">

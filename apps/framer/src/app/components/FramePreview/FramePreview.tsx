@@ -20,8 +20,8 @@ export function FramePreview({
     <div
       className={
         isSelected
-          ? 'm-1 p-1 rounded-lg bg-gradient-to-tl from-orange-100  border-2 border-blue-500'
-          : 'm-1 p-1 rounded-lg bg-gradient-to-tl from-blue-100  border-1 border-white'
+          ? 'm-1 p-1 rounded-lg bg-white border-2 border-blue-500 h-9/12 w-9/12'
+          : 'm-1 p-1 rounded-lg bg-white from-blue-100  border-1 border-white h-9/12 w-9/12'
       }
       onClick={() => onClick()}
     >

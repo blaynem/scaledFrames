@@ -1,5 +1,4 @@
 import React from 'react';
-import './FramePreviewContainer.css';
 import FramePreview from './FramePreview';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 import {
@@ -9,6 +8,7 @@ import {
 import { AspectRatio } from '@prisma/client';
 import { useToast } from '../Toasts/ToastProvider';
 import { ToastTypes } from '../Toasts/GenericToast';
+import { PlusIcon } from '@heroicons/react/24/outline';
 
 const FramePreviewContainer = () => {
   const { frames, selectedFrame, setFrameEditorContext } =
@@ -53,28 +53,27 @@ const FramePreviewContainer = () => {
   };
 
   return (
-    <div className="frame-preview-container">
-      <div className="frame-preview-wrapper">
-        {frames.map((frame) => (
-          <FramePreview
-            key={frame.title}
-            imageUrl={frame.imageUrl}
-            title={frame.title}
-            onClick={() => {
-              setFrameEditorContext(frames, frame);
-            }}
-            aspectRatio={aspectRatio}
-            isSelected={selectedFrame?.id === frame.id}
-          />
-        ))}
+    <div className="flex flex-col  justify-items-center items-center">
+      {frames.map((frame) => (
+        <FramePreview
+          key={frame.title}
+          imageUrl={frame.imageUrl}
+          title={frame.title}
+          onClick={() => {
+            setFrameEditorContext(frames, frame);
+          }}
+          aspectRatio={aspectRatio}
+          isSelected={selectedFrame?.id === frame.id}
+        />
+      ))}
 
-        <button
-          className="width-full h-40 bg-gradient-to-b from-red-100 rounded-md"
-          onClick={handleCreateNewFrame}
-        >
-          Create New Frame
-        </button>
-      </div>
+      <button
+        className="w-9/12 h-40 bg-white rounded-md flex flex-row items-center justify-center mt-4"
+        onClick={handleCreateNewFrame}
+      >
+        <PlusIcon className="h-8 w-8"></PlusIcon>
+        Create New Frame
+      </button>
     </div>
   );
 };

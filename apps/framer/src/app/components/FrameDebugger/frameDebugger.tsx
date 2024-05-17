@@ -23,21 +23,23 @@ export function FrameDebugger() {
   }, [selectedFrame, frames]);
 
   return (
-    <div className="rounded-lg bg-white p-4 m-4 max-h-fit flex-shrink-1 max-w-fit flex flex-col items-center justify-center">
-      <FrameImage
-        aspectRatio={
-          selectedFrame && selectedFrame.aspectRatio == AspectRatio.STANDARD
-            ? '1.0'
-            : '1.91'
-        }
-        imageUrl={
-          selectedFrame
-            ? selectedFrame.imageUrl
-            : 'https://picsum.photos/1080/565'
-        }
-      />
-      <IntentContainer intents={intents} />
-    </div>
+    selectedFrame && (
+      <div className="rounded-lg bg-white p-4 m-4 max-h-fit flex-shrink-1 w-9/12 h-9/12 flex flex-col items-center justify-center">
+        <FrameImage
+          aspectRatio={
+            selectedFrame && selectedFrame.aspectRatio == AspectRatio.STANDARD
+              ? '1.0'
+              : '1.91'
+          }
+          imageUrl={
+            selectedFrame
+              ? selectedFrame.imageUrl
+              : 'https://picsum.photos/1080/565'
+          }
+        />
+        <IntentContainer intents={intents} />
+      </div>
+    )
   );
 }
 
