@@ -68,6 +68,7 @@ model Team {
   // Frames that the team owns
   frames   Frame[]    @relation("FrameOwner")
   Projects Project[]  @relation("ProjectOwner")
+  Invites  Invites[]
 }
 
 /// UserTeam is the join table between User and Team
@@ -284,6 +285,16 @@ model SubscriptionPayment {
   updatedAt          DateTime         @updatedAt
 }
 
+model Invites {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String
+  role      Role
+  team      Team     @relation(fields: [teamId], references: [id])
+  teamId    String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum SubscriptionStatus {
   Active
   Cancelled
@@ -455,8 +466,6 @@ enum Role {
   Member
   /// Can only view the project.
   Viewer
-  /// Has not accepted the invite yet.
-  Invited
 }
 
 /// The type of image that we are displaying to the end user.
