@@ -6,32 +6,31 @@ import {
 } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { TeamType } from './page';
+import Link from 'next/link';
 
 export const TeamsPanel = (props: {
-  currentTeam: TeamType | null;
+  currentTeam: TeamType;
   teams: TeamType[];
   changeSelectedTeam: (team: TeamType) => void;
 }) => {
-  const currentTeamName = props.currentTeam?.name ?? '___';
-
   return (
     <div className="relative px-8 xl:pr-16 py-4 column-1 col-span-3 sm:col-span-2 min-w-80">
       <h1 className="p-8 pl-0 font-bold text-xl uppercase">Framer (beta)</h1>
       <Popover>
-        {({ open: popperOpen }) => (
+        {({ open: popperOpen, close: closePopper }) => (
           <>
             <PopoverButton className="rounded-md w-full text-left p-2 pl-3 text-sm/6 border border-slate-400 focus:outline-none data-[active]:border-slate-800 data-[hover]:border-slate-800 data-[focus]:border-slate-800">
               <div className="flex">
-                <p className="flex-1 font-semibold ">{currentTeamName} Team</p>
+                <p className="flex-1 font-semibold ">
+                  {props.currentTeam.name} Team
+                </p>
                 <ChevronDownIcon
                   className={`w-5 h-5 transition ${
                     popperOpen ? 'rotate-180' : 'rotate-0'
                   }`}
                 />
               </div>
-              <p className="mt-2">
-                {props.currentTeam?.memberCount ?? 1} Users
-              </p>
+              <p className="mt-2">{props.currentTeam.memberCount} Users</p>
             </PopoverButton>
             <Transition
               enter="transition ease-out duration-200"
@@ -45,19 +44,19 @@ export const TeamsPanel = (props: {
                 anchor="bottom"
                 className="border border-slate-200 shadow-xl w-[var(--button-width)] rounded-md divide-y divide-slate-300 text-sm/6 [--anchor-gap:4px]"
               >
-                {/* <div>
-                    <a className="hover:text-teal-500" href="#">
-                      <p className="py-2 px-3">Team Profile</p>
-                    </a>
-                    <a className="hover:text-teal-500" href="#">
-                      <p className="py-2 px-3">Users</p>
-                    </a>
-                  </div> */}
+                <div>
+                  <Link
+                    className="hover:text-teal-500"
+                    href={`team/${props.currentTeam.id}`}
+                  >
+                    <p className="py-2 px-3">Team Profile</p>
+                  </Link>
+                </div>
                 <div className="relative">
                   <p className="py-2 px-3">Switch Team View:</p>
                   <ul className="list-disc list-inside">
                     {props.teams.map((team) => {
-                      const isTeam = team.id === props.currentTeam?.id;
+                      const isTeam = team.id === props.currentTeam.id;
                       return (
                         <li key={team.id} className="px-3 mb-2">
                           {isTeam ? (
@@ -66,7 +65,10 @@ export const TeamsPanel = (props: {
                             </span>
                           ) : (
                             <button
-                              onClick={() => props.changeSelectedTeam(team)}
+                              onClick={() => {
+                                props.changeSelectedTeam(team);
+                                closePopper();
+                              }}
                               className="hover:text-teal-500"
                             >
                               {team.name}

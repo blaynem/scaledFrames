@@ -4,9 +4,11 @@ import {
   GetUserResponseType,
   TeamAndProject,
 } from '@framer/FramerServerSDK/client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ProjectsPanel } from './ProjectsPanel';
 import { TeamsPanel } from './TeamsPanel';
+import { useToast } from '../components/Toasts/ToastProvider';
+import { ToastTypes } from '../components/Toasts/GenericToast';
 
 export type TeamType = {
   id: string;
@@ -24,6 +26,12 @@ export type TeamProject = {
   memberCount: number;
 };
 
+const mapToTeam = (team: TeamAndProject): TeamType => ({
+  name: team.name,
+  memberCount: team.userCount,
+  id: team.id,
+});
+
 const filterOptions = [
   { label: 'Owned by anyone', value: 'anyone' },
   { label: 'Owned by Me', value: 'me' },
@@ -31,6 +39,9 @@ const filterOptions = [
 ];
 
 export default function Dashboard() {
+  const { addToast } = useToast();
+  const fetchedRef = useRef(false);
+
   const [selectedFilterId, setSelectedFilterId] = useState(
     filterOptions[0].value
   );
@@ -43,21 +54,28 @@ export default function Dashboard() {
     const framerSdk = FramerClientSDK();
 
     const fetchUser = async () => {
-      const user = await framerSdk.user.get();
-      if ('error' in user) {
-        console.error('Error fetching user:', user.error);
+      // Prevents the double fetch in strict mode because of the way useEffect works
+      if (fetchedRef.current) return;
+      fetchedRef.current = true;
+
+      const loadingToast = addToast(ToastTypes.LOADING, 'loading');
+      const _user = await framerSdk.user.get();
+      if ('error' in _user) {
+        console.error('Error fetching user:', _user.error);
+        loadingToast.clearToast();
         return;
       }
 
       // We want to keep these data fetches pure
-      setUser(user);
-      setTeams(user.teams);
-      setSelectedTeam(user.teams[0]);
-      setProjects(user.teams[0].projects);
+      setUser(_user);
+      setTeams(_user.teams);
+      setSelectedTeam(_user.teams[0]);
+      setProjects(_user.teams[0].projects);
+      loadingToast.clearToast();
     };
 
     fetchUser();
-  }, []);
+  }, [addToast]);
 
   const changeSelectedTeam = (team: TeamType) => {
     const _team = teams.find((t) => t.id === team.id);
@@ -70,27 +88,24 @@ export default function Dashboard() {
     setProjects(_team.projects);
   };
 
-  const _currentTeam: TeamType = {
-    name: selectedTeam?.name ?? '',
-    memberCount: selectedTeam?.userCount ?? 1,
-    id: selectedTeam?.id ?? '',
-  };
-  const _teams: TeamType[] = teams.map((team) => ({
-    name: team.name,
-    memberCount: team.userCount,
-    id: team.id,
-  }));
+  if (!selectedTeam) {
+    return <div>Loading...</div>;
+  }
+
+  const _currentTeam: TeamType = mapToTeam(selectedTeam);
+  const _teams: TeamType[] = teams.map(mapToTeam);
+
   const _projects: TeamProject[] = projects.map((p) => {
-    const projectPath = p.customBasePath + p.rootFrame?.path;
+    const projectPath = p.customBasePath + p.rootFrame.path;
     return {
       isLive: p.isProjectLive,
       projectId: p.id,
       projectUrl: `https://www.framer.com/f${projectPath}`,
       projectUrlSmall: `/f${projectPath}`,
-      imageSrc: p.rootFrame?.imageUrl ?? '',
+      imageSrc: p.rootFrame.imageUrl,
       projectTitle: p.title,
-      memberCount: selectedTeam?.userCount ?? 1,
-    };
+      memberCount: selectedTeam.userCount,
+    } satisfies TeamProject;
   });
 
   return (
@@ -101,7 +116,7 @@ export default function Dashboard() {
         teams={_teams}
       />
       <ProjectsPanel
-        teamId={selectedTeam?.id ?? ''}
+        teamId={selectedTeam.id}
         filter={{
           options: filterOptions,
           selected: selectedFilterId,
