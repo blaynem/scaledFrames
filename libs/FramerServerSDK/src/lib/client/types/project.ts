@@ -1,12 +1,12 @@
 import { Frame, Intents, Project } from '@prisma/client';
 
 type ProjectIncludeFrames = Project & {
-  rootFrame: (Frame & { intents: Intents[] }) | null;
+  rootFrame: Frame & { intents: Intents[] };
   frames: (Frame & { intents: Intents[] })[];
 };
 
 export type ProjectIncludeRootFrame = Project & {
-  rootFrame: Frame | null;
+  rootFrame: Frame;
 };
 
 /**

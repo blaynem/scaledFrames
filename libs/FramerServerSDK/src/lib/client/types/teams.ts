@@ -1,12 +1,13 @@
-import { Team, User } from '@prisma/client';
+import { Role, Team, User } from '@prisma/client';
 import { ProjectIncludeRootFrame } from './project';
 
+export type TeamMemberType = User & { role: Role };
 export type GetTeamResponseType = Team & {
   /**
    * The number of users in the team.
    */
   userCount: number;
-  members: User[];
+  members: TeamMemberType[];
   projects: ProjectIncludeRootFrame[];
 };
 

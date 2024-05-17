@@ -5,6 +5,7 @@ import {
   GetTeamResponseType,
   GetTeamsResponse,
 } from 'libs/FramerServerSDK/src/lib/client/types/teams';
+import { ProjectIncludeRootFrame } from '@framer/FramerServerSDK/client';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const teamsInstance = new Frog();
@@ -52,10 +53,22 @@ teamsInstance.get('/', async (c) => {
     }
 
     const response: GetTeamResponseType[] = teams.map((u) => ({
-      ...u.team,
+      id: u.team.id,
+      name: u.team.name,
+      createdAt: u.team.createdAt,
+      customSubDomain: u.team.customSubDomain,
+      updatedAt: u.team.updatedAt,
+      subscriptionId: u.team.subscriptionId,
+      isDeleted: u.team.isDeleted,
+      ownerId: u.team.ownerId,
       userCount: u.team._count.users,
-      members: u.team.users.map((u) => u.user),
-      projects: u.team.Projects,
+      members: u.team.users.map((_m) => {
+        return {
+          ..._m.user,
+          role: _m.role,
+        };
+      }),
+      projects: u.team.Projects as ProjectIncludeRootFrame[], // Overrides the rootFrame type being null.
     }));
 
     return c.json<GetTeamsResponse>(response);
@@ -110,10 +123,22 @@ teamsInstance.get('/:teamId', async (c) => {
     }
 
     const response: GetTeamResponseType = {
-      ...data.team,
+      id: data.team.id,
+      name: data.team.name,
+      createdAt: data.team.createdAt,
+      customSubDomain: data.team.customSubDomain,
+      updatedAt: data.team.updatedAt,
+      subscriptionId: data.team.subscriptionId,
+      isDeleted: data.team.isDeleted,
+      ownerId: data.team.ownerId,
       userCount: data.team._count.users,
-      members: data.team.users.map((u) => u.user),
-      projects: data.team.Projects,
+      members: data.team.users.map((u) => {
+        return {
+          ...u.user,
+          role: u.role,
+        };
+      }),
+      projects: data.team.Projects as ProjectIncludeRootFrame[], // Overrides the rootFrame type being null.
     };
 
     return c.json<GetTeamResponseType>(response);

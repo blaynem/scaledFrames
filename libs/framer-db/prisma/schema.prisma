@@ -76,6 +76,9 @@ model UserTeam {
   userId String @db.Uuid
   team   Team   @relation(fields: [teamId], references: [id])
   teamId String @db.Uuid
+  /// The role that the user has in the team.
+  /// Defaults to Viewer if none provided on creation.
+  role   Role   @default(Viewer)
 
   @@id([userId, teamId])
   @@index([teamId])
@@ -125,6 +128,7 @@ model Project {
   lastUpdatedById String @db.Uuid
 
   /// The initial frame that will be shown as the root page of the project
+  /// While it says it's optional, it will always be there. This is more to allow for the relation to be created.
   rootFrame   Frame?  @relation("ProjectRootFrame", fields: [rootFrameId], references: [id])
   rootFrameId String? @db.Uuid
 
@@ -441,6 +445,19 @@ model ConsumerKnownData {
 }
 
 // =============== ENUMS ===============
+
+enum Role {
+  /// Is the owner of the team.
+  Owner
+  /// Can view and interact with the project, can invite other users to the project.
+  Admin
+  /// Can view and interact with the project.
+  Member
+  /// Can only view the project.
+  Viewer
+  /// Has not accepted the invite yet.
+  Invited
+}
 
 /// The type of image that we are displaying to the end user.
 /// This is not considering if its a gif, or png, etc. It is considering whether the images change based on inputs.
