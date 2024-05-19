@@ -1,14 +1,9 @@
 import {
   GetUserResponse,
-  GetUserResponseType,
   UserSignupRequestBody,
   UserSignupResponse,
 } from '@framer/FramerServerSDK/client';
-import {
-  decodeJwt,
-  getUserFromEmail,
-  signupUser,
-} from '@framer/FramerServerSDK/server';
+import { decodeJwt, signupUser } from '@framer/FramerServerSDK/server';
 import { Frog } from 'frog';
 import prisma from '../../prismaClient';
 
@@ -24,47 +19,13 @@ usersInstance.get('/', async (c) => {
       where: {
         email,
       },
-      include: {
-        teams: {
-          include: {
-            team: {
-              include: {
-                _count: {
-                  select: {
-                    users: true,
-                  },
-                },
-                Projects: {
-                  include: {
-                    rootFrame: {
-                      include: {
-                        intents: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
     });
 
     if (!user) {
       return c.json<GetUserResponse>({ error: 'User not found' });
     }
 
-    const response: GetUserResponseType = {
-      ...user,
-      teams: user.teams.map((t) => ({
-        ...t.team,
-        projects: t.team.Projects,
-        userCount: Number(t.team._count.users),
-      })),
-      projects: user.teams.map((t) => t.team.Projects).flat(),
-    };
-
-    return c.json<GetUserResponse>(response);
+    return c.json<GetUserResponse>(user);
   } catch (error) {
     console.error('Get Users Error: ', error);
     return c.json<GetUserResponse>({ error: 'Error fetching user' });

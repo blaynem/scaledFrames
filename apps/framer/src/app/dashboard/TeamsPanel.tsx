@@ -5,24 +5,28 @@ import {
   PopoverPanel,
 } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import { TeamType } from './page';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useUser } from './UserContext';
 
-export const TeamsPanel = (props: {
-  currentTeam: TeamType;
-  teams: TeamType[];
-  changeSelectedTeam: (team: TeamType) => void;
-}) => {
+export const TeamsPanel = () => {
+  const { selectedTeam, teams, changeSelectedTeam } = useUser();
+  const pathname = usePathname();
+
+  if (!selectedTeam) {
+    return null;
+  }
+
   return (
-    <div className="relative px-8 xl:pr-16 py-4 column-1 col-span-3 sm:col-span-2 min-w-80">
+    <div className="relative px-8 py-4 min-w-[360px]">
       <h1 className="p-8 pl-0 font-bold text-xl uppercase">Framer (beta)</h1>
       <Popover>
         {({ open: popperOpen, close: closePopper }) => (
           <>
-            <PopoverButton className="rounded-md w-full text-left p-2 pl-3 text-sm/6 border border-slate-400 focus:outline-none data-[active]:border-slate-800 data-[hover]:border-slate-800 data-[focus]:border-slate-800">
+            <PopoverButton className="rounded-md bg-zinc-100 w-full text-left p-2 pl-3 text-sm/6 border border-slate-400 focus:outline-none data-[active]:border-slate-800 data-[hover]:border-slate-800 data-[focus]:border-slate-800">
               <div className="flex">
                 <p className="flex-1 font-semibold ">
-                  {props.currentTeam.name} Team
+                  {selectedTeam.name} Team
                 </p>
                 <ChevronDownIcon
                   className={`w-5 h-5 transition ${
@@ -30,7 +34,7 @@ export const TeamsPanel = (props: {
                   }`}
                 />
               </div>
-              <p className="mt-2">{props.currentTeam.memberCount} Users</p>
+              <p className="mt-2">{selectedTeam.userCount} Users</p>
             </PopoverButton>
             <Transition
               enter="transition ease-out duration-200"
@@ -42,21 +46,21 @@ export const TeamsPanel = (props: {
             >
               <PopoverPanel
                 anchor="bottom"
-                className="border border-slate-200 shadow-xl w-[var(--button-width)] rounded-md divide-y divide-slate-300 text-sm/6 [--anchor-gap:4px]"
+                className="border bg-zinc-100 border-slate-200 shadow-xl w-[var(--button-width)] rounded-md divide-y divide-slate-300 text-sm/6 [--anchor-gap:4px]"
               >
-                <div>
+                {/* <div>
                   <Link
                     className="hover:text-teal-500"
-                    href={`team/${props.currentTeam.id}`}
+                    href={`team/${selectedTeam.id}`}
                   >
                     <p className="py-2 px-3">Team Profile</p>
                   </Link>
-                </div>
+                </div> */}
                 <div className="relative">
-                  <p className="py-2 px-3">Switch Team View:</p>
+                  <p className="py-2 px-3">Change Teams</p>
                   <ul className="list-disc list-inside">
-                    {props.teams.map((team) => {
-                      const isTeam = team.id === props.currentTeam.id;
+                    {teams.map((team) => {
+                      const isTeam = team.id === selectedTeam.id;
                       return (
                         <li key={team.id} className="px-3 mb-2">
                           {isTeam ? (
@@ -66,7 +70,7 @@ export const TeamsPanel = (props: {
                           ) : (
                             <button
                               onClick={() => {
-                                props.changeSelectedTeam(team);
+                                changeSelectedTeam(team.id);
                                 closePopper();
                               }}
                               className="hover:text-teal-500"
@@ -84,6 +88,26 @@ export const TeamsPanel = (props: {
           </>
         )}
       </Popover>
+      <Link
+        href="/dashboard"
+        className={`block mt-4 text-slate-600 ${
+          pathname === '/dashboard'
+            ? 'font-semibold cursor-default'
+            : 'hover:text-teal-500 '
+        }`}
+      >
+        Projects
+      </Link>
+      <Link
+        href={`/dashboard/team`}
+        className={`block mt-4 text-slate-600 ${
+          pathname === '/dashboard/team'
+            ? 'font-semibold cursor-default'
+            : 'hover:text-teal-500 '
+        }`}
+      >
+        Team Settings
+      </Link>
     </div>
   );
 };

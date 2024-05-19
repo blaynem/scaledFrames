@@ -66,7 +66,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <ToastContext.Provider value={{ addToast }}>
-      <div className="absolute z-10 right-4 top-4">
+      <div className="fixed z-10 right-4 top-4">
         {toasts.map((toast) => (
           <GenericToast
             closeToast={() => {

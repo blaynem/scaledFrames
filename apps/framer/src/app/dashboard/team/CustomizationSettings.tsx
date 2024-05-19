@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { sectionWrapper, headerSection } from './page';
 
-export const CustomizationSettiongs = (props: {
+export const CustomizationSettings = (props: {
   defaultState: { teamName: string; subdomain: string };
 }) => {
   const [{ teamName, subdomain }, setFormData] = useState(props.defaultState);

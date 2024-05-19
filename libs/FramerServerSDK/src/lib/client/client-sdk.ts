@@ -222,6 +222,38 @@ export const FramerClientSDK = (
           url: url.toString(),
         });
       },
+      leaveTeam: async (teamId) => {
+        const url = createUrl(`/api/teams/${teamId}/leave`);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body: {},
+        });
+      },
+      inviteUser: async (body) => {
+        const url = createUrl(`/api/teams/${body.teamId}/invite`);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body,
+        });
+      },
+      removeUser: async (body) => {
+        const url = createUrl(`/api/teams/${body.teamId}/remove`);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body,
+        });
+      },
+      editUserRole: async (body) => {
+        const url = createUrl(`/api/teams/${body.teamId}/edit-role`);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body,
+        });
+      },
     },
     user: {
       get: async () => {

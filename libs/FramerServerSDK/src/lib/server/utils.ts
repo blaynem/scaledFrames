@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { FRAMES_SERVER_BASE_PATH } from '../../constants';
+import { FRAMES_SERVER_BASE_PATH } from '../constants';
 import { PrismaClient } from '@prisma/client';
 
 /**

@@ -4,6 +4,17 @@ import { cookies } from 'next/headers';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { verify } from 'hono/jwt';
+import { createClient } from '@supabase/supabase-js';
+
+export const createSupabaseOnlyServer = () =>
+  createClient(
+    process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+    // NOTE THIS IS THE SERVICE ROLE. NEVER EXPOSE THIS TO THE CLIENT. AHHH!!!
+    // The reason we can use it here is because this will only ever be run on the server.
+    // NOTE THIS IS THE SERVICE ROLE. NEVER EXPOSE THIS TO THE CLIENT. AHHH!!!
+    // The reason we can use it here is because this will only ever be run on the server.
+    process.env['SUPABASE_SERVICE_ROLE_KEY']!
+  );
 
 // server component can only get cookies and not set them, hence the "component" check
 export function createSupabaseServerClient(component = false) {
@@ -27,11 +38,6 @@ export function createSupabaseServerClient(component = false) {
       },
     }
   );
-}
-
-export function createSupabaseServerComponentClient() {
-  cookies().getAll();
-  return createSupabaseServerClient(true);
 }
 
 export function createSupabaseReqResClient(

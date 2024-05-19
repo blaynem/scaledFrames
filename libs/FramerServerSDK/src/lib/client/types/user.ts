@@ -30,18 +30,10 @@ export type UserSignupResponse =
   | { error: string };
 
 export type TeamAndProject = Team & {
-  /**
-   * The number of users in the team.
-   */
-  userCount: number;
-  projects: ProjectIncludeRootFrame[];
-};
-export type GetUserResponseType = User & {
-  teams: TeamAndProject[];
   projects: ProjectIncludeRootFrame[];
 };
 
-export type GetUserResponse = GetUserResponseType | { error: string };
+export type GetUserResponse = User | { error: string };
 
 /**
  * Exposed methods for the user SDK.
