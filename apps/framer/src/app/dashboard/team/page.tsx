@@ -6,7 +6,7 @@ import { FramerClientSDK } from '@framer/FramerServerSDK/client';
 import { useToast } from '../../components/Toasts/ToastProvider';
 import { ToastTypes } from '../../components/Toasts/GenericToast';
 import { Role } from '@prisma/client';
-import { useUser } from '../UserContext';
+import { useUser } from '../../components/UserContext';
 import { useRouter } from 'next/navigation';
 
 export const convertToUrlSafe = (val: string): string =>

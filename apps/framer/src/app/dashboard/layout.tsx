@@ -1,7 +1,7 @@
 'use client';
 import UserBar from '../components/UserBar';
 import { TeamsPanel } from './TeamsPanel';
-import { UserProvider } from './UserContext';
+import { UserProvider } from '../components/UserContext';
 
 export default function RootLayout({
   children,

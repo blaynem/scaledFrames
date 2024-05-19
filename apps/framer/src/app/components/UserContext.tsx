@@ -4,8 +4,8 @@ import {
   FramerClientSDK,
   GetTeamResponseType,
 } from '@framer/FramerServerSDK/client';
-import { ToastTypes } from '../components/Toasts/GenericToast';
-import { useToast } from '../components/Toasts/ToastProvider';
+import { ToastTypes } from './Toasts/GenericToast';
+import { useToast } from './Toasts/ToastProvider';
 import { User } from '@prisma/client';
 
 type UserContextType = {

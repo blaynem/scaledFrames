@@ -13,7 +13,7 @@ import { ToastTypes } from '../components/Toasts/GenericToast';
 import { FramerClientSDK } from '@framer/FramerServerSDK/client';
 import { useRouter } from 'next/navigation';
 import { PAGES } from '../lib/constants';
-import { useUser } from './UserContext';
+import { useUser } from '../components/UserContext';
 
 type TeamProject = {
   isLive: boolean;

@@ -6,7 +6,7 @@ import InviteUser from './InviteUser';
 import { ToastTypes } from '../../components/Toasts/GenericToast';
 import { useToast } from '../../components/Toasts/ToastProvider';
 import { useEffect, useState } from 'react';
-import { useUser } from '../UserContext';
+import { useUser } from '../../components/UserContext';
 
 type RoleProps = {
   /**

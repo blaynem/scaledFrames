@@ -7,7 +7,7 @@ import {
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useUser } from './UserContext';
+import { useUser } from '../components/UserContext';
 
 export const TeamsPanel = () => {
   const { selectedTeam, teams, changeSelectedTeam } = useUser();
