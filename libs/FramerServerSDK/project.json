@@ -5,14 +5,25 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/framer-server",
+        "command": "tsc --noEmit"
+      }
+    },
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/FramerServerSDK",
         "main": "libs/FramerServerSDK/src/index.ts",
         "tsConfig": "libs/FramerServerSDK/tsconfig.lib.json",
-        "assets": ["libs/FramerServerSDK/*.md"]
+        "assets": [
+          "libs/FramerServerSDK/*.md"
+        ]
       }
     }
   }
