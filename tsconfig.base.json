@@ -16,9 +16,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@framer/FramerServerSDK/constants": [
-        "libs/FramerServerSDK/src/constants.ts"
-      ],
+      "@framer/FramerServerSDK": ["libs/FramerServerSDK/src/lib/index.ts"],
       "@framer/FramerServerSDK/client": [
         "libs/FramerServerSDK/src/lib/client/index.ts"
       ],

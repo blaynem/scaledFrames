@@ -1,5 +1,6 @@
 import { FrameSDKType } from './frames';
 import { ProjectSDKType } from './project';
+import { TeamsSDKType } from './teams';
 import { UserSDKType } from './user';
 import { UsersSDKType } from './users';
 
@@ -24,6 +25,10 @@ export type FramerClientSDKType = {
    * API endpoints for projects
    */
   projects: ProjectSDKType;
+  /**
+   * API endpoints for teams
+   */
+  teams: TeamsSDKType;
   /**
    * API endpoints for signed in user.
    */

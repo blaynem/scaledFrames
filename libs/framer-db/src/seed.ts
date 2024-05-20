@@ -4,6 +4,7 @@ import {
 } from '@framer/FramerServerSDK/server';
 import prisma from './prismaClient';
 import supabase from './supabaseClient';
+import { Role } from '@prisma/client';
 
 const usersToCreate = [
   {
@@ -119,6 +120,7 @@ async function main() {
         },
       },
       create: {
+        role: Role.Admin,
         userId: blayne.id,
         teamId: alex.teams[0].teamId,
       },
@@ -134,6 +136,7 @@ async function main() {
         },
       },
       create: {
+        role: Role.Member,
         userId: alex.id,
         teamId: blayne.teams[0].teamId,
       },

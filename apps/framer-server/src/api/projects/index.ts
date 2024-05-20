@@ -64,7 +64,7 @@ projectsFrogInstance.get('/', async (c) => {
     const response: GetProjectsResponse = projects.map((project) => {
       return {
         ...project,
-        rootFrame: project.rootFrame,
+        rootFrame: project.rootFrame!, // rootFrame is always defined
       };
     });
 
@@ -115,7 +115,7 @@ projectsFrogInstance.get('/:id', async (c) => {
 
     const resposne: GetProjectByIdResponse = {
       ...project,
-      rootFrame: project.rootFrame,
+      rootFrame: project.rootFrame!,
     };
 
     return c.json<GetProjectByIdResponse>(resposne);
@@ -196,7 +196,7 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
 
     const response: CreateProjectResponse = {
       ...project,
-      rootFrame: project.rootFrame,
+      rootFrame: project.rootFrame!, // rootFrame is always defined
     };
 
     return c.json<CreateProjectResponse>(response);

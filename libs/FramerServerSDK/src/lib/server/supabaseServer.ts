@@ -1,9 +1,20 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import jwt from 'jsonwebtoken';
 import { type NextRequest, type NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { verify } from 'hono/jwt';
+import { createClient } from '@supabase/supabase-js';
+
+export const createSupabaseOnlyServer = () =>
+  createClient(
+    process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+    // NOTE THIS IS THE SERVICE ROLE. NEVER EXPOSE THIS TO THE CLIENT. AHHH!!!
+    // The reason we can use it here is because this will only ever be run on the server.
+    // NOTE THIS IS THE SERVICE ROLE. NEVER EXPOSE THIS TO THE CLIENT. AHHH!!!
+    // The reason we can use it here is because this will only ever be run on the server.
+    process.env['SUPABASE_SERVICE_ROLE_KEY']!
+  );
 
 // server component can only get cookies and not set them, hence the "component" check
 export function createSupabaseServerClient(component = false) {
@@ -27,11 +38,6 @@ export function createSupabaseServerClient(component = false) {
       },
     }
   );
-}
-
-export function createSupabaseServerComponentClient() {
-  cookies().getAll();
-  return createSupabaseServerClient(true);
 }
 
 export function createSupabaseReqResClient(
@@ -71,7 +77,7 @@ export const decodeJwt = async (
 ): Promise<{ email: string; id: string }> => {
   const token = access_token.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env['SUPABASE_JWT_SECRET']!);
+    const decoded = await verify(token, process.env['SUPABASE_JWT_SECRET']!);
     if (!decoded.email) {
       throw new Error('Could not get email from JWT.');
     }

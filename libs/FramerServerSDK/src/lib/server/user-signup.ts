@@ -3,6 +3,7 @@ import {
   IntentType,
   PrismaClient,
   AspectRatio,
+  Role,
 } from '@prisma/client';
 import { UserSignupRequestBody, UserSignupResponse } from '../client/types';
 import { convertToUrlSafe, createUniqueName, getRandomColor } from './utils';
@@ -111,6 +112,7 @@ export const signupUser = async (
 
       const createUserTeam = await _prisma.userTeam.create({
         data: {
+          role: Role.Owner, // User is an Owner of their own team.
           user: {
             connect: {
               id: createdUserData.id,
