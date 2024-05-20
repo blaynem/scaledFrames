@@ -27,7 +27,7 @@ export default function Index({ params }: { params: { projectId: string } }) {
   useEffect(() => {
     const fetchFrames = async () => {
       const tempFrames = await getFrames(params.projectId);
-
+      setSelectedFrame(tempFrames[0]);
       setFrames(tempFrames);
     };
 

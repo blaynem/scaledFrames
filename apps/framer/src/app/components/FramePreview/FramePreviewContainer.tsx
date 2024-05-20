@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import FramePreview from './FramePreview';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 import {
@@ -15,7 +15,7 @@ const FramePreviewContainer = () => {
     React.useContext(FrameEditorContext);
   const clientSdk = FramerClientSDK();
   const { addToast } = useToast();
-
+  useEffect(() => {}, [frames]);
   const aspectRatio =
     frames[0] && frames[0].aspectRatio == AspectRatio.STANDARD ? 1.0 : 1.91;
 

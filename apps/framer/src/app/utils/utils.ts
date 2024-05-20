@@ -18,3 +18,7 @@ export async function getFrames(
     return response;
   }
 }
+
+export function findFrameIdxById(frames: FrameResponseType[], id: string) {
+  return frames.findIndex((frame) => frame.id === id);
+}
