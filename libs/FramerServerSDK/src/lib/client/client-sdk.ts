@@ -254,6 +254,14 @@ export const FramerClientSDK = (
           body,
         });
       },
+      editTeamProperties: async (body) => {
+        const url = createUrl(`/api/teams/${body.teamId}/edit`);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body,
+        });
+      },
     },
     user: {
       get: async () => {

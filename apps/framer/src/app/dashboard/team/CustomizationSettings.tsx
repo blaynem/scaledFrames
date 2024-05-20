@@ -3,9 +3,13 @@ import { useEffect, useState } from 'react';
 import { sectionWrapper, headerSection } from './page';
 import { getAllowedFeatures } from '@framer/FramerServerSDK';
 import { useUser } from '../../components/UserContext';
+import { FramerClientSDK } from '@framer/FramerServerSDK/client';
+import { useToast } from '../../components/Toasts/ToastProvider';
+import { ToastTypes } from '../../components/Toasts/GenericToast';
 
 export const CustomizationSettings = () => {
-  const { selectedTeam } = useUser();
+  const { selectedTeam, refreshTeamsData } = useUser();
+  const { addToast } = useToast();
 
   const [teamName, setTeamName] = useState(selectedTeam?.name);
   const [subdomain, setSubdomain] = useState(selectedTeam?.customSubDomain);
@@ -35,8 +39,22 @@ export const CustomizationSettings = () => {
     return null;
   }
 
-  const onSaveChanges = () => {
-    window.alert('Save Changes');
+  const onSaveChanges = async () => {
+    const loadingToast = addToast(ToastTypes.LOADING, 'Saving changes...');
+    const clientSdk = FramerClientSDK();
+    const data = await clientSdk.teams.editTeamProperties({
+      teamId: selectedTeam.id,
+      name: teamName,
+      customSubDomain: subdomain,
+    });
+    if ('error' in data) {
+      loadingToast.clearToast();
+      console.error(data.error);
+      addToast(ToastTypes.ERROR, data.error);
+      return;
+    }
+    refreshTeamsData();
+    loadingToast.clearToast();
   };
 
   const allowedFeatures = getAllowedFeatures(

@@ -12,6 +12,8 @@ import {
   InvitedUserResponse,
   EditUserRoleRequest,
   EditUserRoleResponse,
+  EditTeamRequest,
+  EditTeamResponse,
 } from '@framer/FramerServerSDK/client';
 import { decodeJwt } from '@framer/FramerServerSDK/server';
 
@@ -450,6 +452,54 @@ teamsInstance.post('/:teamId/edit-role', async (c) => {
   } catch (error) {
     console.error('Edit User Role Error: ', error);
     return c.json<EditUserRoleResponse>({ error: 'Error editing user role' });
+  }
+});
+
+// Edit team properties
+teamsInstance.post('/:teamId/edit', async (c) => {
+  try {
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+    const teamId = c.req.param('teamId');
+    const { name, customSubDomain } = await c.req.json<EditTeamRequest>();
+
+    const userTeamData = await prisma.userTeam.findFirst({
+      where: {
+        user: {
+          email,
+        },
+        teamId,
+      },
+    });
+
+    if (!userTeamData) {
+      return c.json<EditTeamResponse>({ error: 'Team or user not found' });
+    }
+
+    // Now that we have the users role, we can determine what they can do.
+    const permissions = getRolePermissions(userTeamData.role);
+
+    // If the user is not allowed to edit the team, return an error.
+    if (!permissions.canEditTeam) {
+      return c.json<EditTeamResponse>({
+        error: 'You do not have permission to edit this team.',
+      });
+    }
+
+    const teamData = await prisma.team.update({
+      where: {
+        id: teamId,
+      },
+      data: {
+        name,
+        customSubDomain,
+      },
+    });
+
+    return c.json<EditTeamResponse>(teamData);
+  } catch (error) {
+    console.error('Edit Team Error: ', error);
+    return c.json<EditTeamResponse>({ error: 'Error editing team' });
   }
 });
 
