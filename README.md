@@ -12,7 +12,7 @@ Standard:
 - Read-only access for team members
 
 "Premium":
-- $20 / member
+- $20 / non-readonly member
 - unlimited team members
 - read / write access for all
 - Team custom subdomain

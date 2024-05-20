@@ -7,7 +7,7 @@ interface InviteUserProps {
   onSubmit: (email: string, role: Role) => void;
 }
 
-export default function InviteUser({
+export default function InviteUserModal({
   open,
   onClose,
   onSubmit,

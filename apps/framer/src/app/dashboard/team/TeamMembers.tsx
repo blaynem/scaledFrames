@@ -2,42 +2,14 @@ import { FramerClientSDK } from '@framer/FramerServerSDK/client';
 import { sectionWrapper, headerSection } from './page';
 import { MinusCircleIcon } from '@heroicons/react/24/solid';
 import { Role } from '@prisma/client';
-import InviteUser from './InviteUser';
+import InviteUserModal from './InviteUserModal';
 import { ToastTypes } from '../../components/Toasts/GenericToast';
 import { useToast } from '../../components/Toasts/ToastProvider';
 import { useEffect, useState } from 'react';
 import { useUser } from '../../components/UserContext';
-
-type RoleProps = {
-  /**
-   * If true, this role can invite new members to the team.
-   */
-  canInvite: boolean;
-  /**
-   * If not null, this function will be called to determine if the role can remove the target role.
-   */
-  canRemove: (targetRole: Role) => boolean;
-};
-const viewProps: { [key in Role]: RoleProps } = {
-  [Role.Owner]: {
-    canInvite: true,
-    canRemove: (targetRole: Role) =>
-      ([Role.Admin, Role.Member, Role.Viewer] as Role[]).includes(targetRole),
-  },
-  [Role.Admin]: {
-    canInvite: true,
-    canRemove: (targetRole: Role) =>
-      ([Role.Member, Role.Viewer] as Role[]).includes(targetRole),
-  },
-  [Role.Member]: {
-    canInvite: false,
-    canRemove: () => false,
-  },
-  [Role.Viewer]: {
-    canInvite: false,
-    canRemove: () => false,
-  },
-};
+import GeneralModal from '../../components/Modal';
+import { PencilIcon } from '@heroicons/react/24/outline';
+import { getRolePermissions } from '@framer/FramerServerSDK';
 
 type MemberDisplay = {
   id: string;
@@ -51,6 +23,11 @@ export const TeamMembers = () => {
   const { selectedTeam, user } = useUser();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [members, setMembers] = useState<MemberDisplay[]>([]);
+  const [memberToRemove, setMemberToRemove] = useState<MemberDisplay | null>(
+    null
+  );
+  const [memberRoleChange, setMemberRoleChange] =
+    useState<MemberDisplay | null>(null);
 
   useEffect(() => {
     if (!selectedTeam) return;
@@ -118,19 +95,124 @@ export const TeamMembers = () => {
     );
   };
 
-  const memberRole =
+  const handleUpdateRole = async (member: MemberDisplay, role: Role) => {
+    const loadingToast = addToast(ToastTypes.LOADING, 'Updating role...');
+    const clientSdk = FramerClientSDK();
+    const res = await clientSdk.teams.editUserRole({
+      teamId: selectedTeam.id,
+      userId: member.id,
+      role,
+    });
+
+    if ('error' in res) {
+      loadingToast.clearToast();
+      return addToast(ToastTypes.ERROR, res.error);
+    }
+
+    setMembers((prev) =>
+      prev.map((m) => {
+        if (m.id === member.id) {
+          return { ...m, role };
+        }
+        return m;
+      })
+    );
+
+    loadingToast.clearToast();
+    addToast(
+      ToastTypes.SUCCESS,
+      `Successfully updated ${member.displayName ?? member.email}'s role`
+    );
+  };
+
+  const _userRole =
     selectedTeam.members.find((member) => member.id === user.id)?.role ??
     Role.Viewer;
-  const { canInvite, canRemove } = viewProps[memberRole];
+  const userPermissions = getRolePermissions(_userRole);
+
+  // Determine if we show the edit role button or not.
+  const showEditRole = (member: MemberDisplay) => {
+    if (_userRole === Role.Owner) {
+      // Owner can't edit their own role.
+      if (member.role === Role.Owner) return false;
+    }
+    return userPermissions.canEditTargetsRole(member.role);
+  };
 
   return (
     <div className={sectionWrapper}>
-      <InviteUser
+      {/* Modal for inviting a new Team Member */}
+      <InviteUserModal
         open={inviteOpen}
         onClose={() => setInviteOpen(false)}
         onSubmit={handleInviteUser}
       />
+
+      {/* Modal for removing a Team Member */}
+      <GeneralModal
+        open={!!memberToRemove}
+        onClose={() => setMemberToRemove(null)}
+        onConfirm={() => {
+          if (memberToRemove) {
+            handleRemoveUser(memberToRemove);
+            setMemberToRemove(null);
+          }
+        }}
+        headerText="Remove User"
+        buttonText="Remove"
+        contentText={`Are you sure you want to remove ${
+          memberToRemove?.displayName ?? memberToRemove?.email
+        } from the team?`}
+      />
+
+      {/* Modal for editing a Team Members Role */}
+      <GeneralModal
+        open={!!memberRoleChange}
+        onClose={() => setMemberRoleChange(null)}
+        onConfirm={() => {
+          const _newRole = (
+            document.getElementById('role-change') as HTMLSelectElement
+          )?.value as Role;
+          if (memberRoleChange) {
+            handleUpdateRole(memberRoleChange, _newRole);
+            setMemberRoleChange(null);
+          }
+        }}
+        headerText="Change Role"
+        buttonText="Confirm"
+      >
+        <div>
+          <p className="p-4 text-sm font-regular">
+            Changing role for:{' '}
+            <span className="font-medium">
+              {memberRoleChange?.displayName ?? memberRoleChange?.email}
+            </span>
+          </p>
+
+          <div className="p-4 pt-0">
+            <label
+              htmlFor="role-change"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Role
+            </label>
+            <select
+              id="role-change"
+              name="role-change"
+              defaultValue={memberRoleChange?.role}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              required
+            >
+              <option value={Role.Admin}>Admin</option>
+              <option value={Role.Member}>Member</option>
+              <option value={Role.Viewer}>Viewer</option>
+            </select>
+          </div>
+        </div>
+      </GeneralModal>
+
       <h2 className={headerSection}>Team Members</h2>
+
       <ul className="divide-y divide-gray-200 dark:divide-gray-700">
         {members.map((member) => (
           <li key={member.id} className={'py-2'}>
@@ -150,11 +232,25 @@ export const TeamMembers = () => {
                     You
                   </span>
                 )}
-                <div className="mr-4 text-base font-semibold text-gray-900 dark:text-white">
+                <div className="flex mr-4 text-base font-semibold text-gray-900 dark:text-white">
+                  {showEditRole(member) && (
+                    <button
+                      onClick={() => {
+                        setMemberRoleChange(member);
+                      }}
+                      className="mr-4"
+                    >
+                      <PencilIcon className="h-6 w-6" />
+                    </button>
+                  )}
                   {member.role}
                 </div>
-                {canRemove(member.role) && (
-                  <button onClick={() => handleRemoveUser(member)}>
+                {userPermissions.canRemoveTarget(member.role) && (
+                  <button
+                    onClick={() => {
+                      setMemberToRemove(member);
+                    }}
+                  >
                     <MinusCircleIcon className="text-red-500 hover:text-red-700 h-6 w-6" />
                   </button>
                 )}
@@ -163,7 +259,7 @@ export const TeamMembers = () => {
           </li>
         ))}
       </ul>
-      {canInvite && (
+      {userPermissions.canEditTeam && (
         <div className="flex justify-end">
           <button
             onClick={() => setInviteOpen(true)}

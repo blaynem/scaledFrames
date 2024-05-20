@@ -8,6 +8,8 @@ import { ToastTypes } from '../../components/Toasts/GenericToast';
 import { Role } from '@prisma/client';
 import { useUser } from '../../components/UserContext';
 import { useRouter } from 'next/navigation';
+import GeneralModal from '../../components/Modal';
+import { useState } from 'react';
 
 export const convertToUrlSafe = (val: string): string =>
   val
@@ -24,6 +26,7 @@ export default function TeamPage() {
   const { addToast } = useToast();
   const router = useRouter();
   const { selectedTeam, user, refreshTeamsData } = useUser();
+  const [leaveTeamOpen, setLeaveTeamOpen] = useState(false);
 
   if (!selectedTeam || !user) {
     return <div>Loading...</div>;
@@ -57,23 +60,26 @@ export default function TeamPage() {
 
   return (
     <div className="max-w-[800px]">
+      <GeneralModal
+        open={!!leaveTeamOpen}
+        onClose={() => setLeaveTeamOpen(false)}
+        onConfirm={handleLeaveTeam}
+        headerText="Leave Team"
+        buttonText="Confirm"
+        contentText={`Are you sure you want to leave the team ${selectedTeam.name}?`}
+      />
       <h1 className="text-3xl mb-8 font-bold text-gray-900 dark:text-white">
         {selectedTeam.name} Settings
       </h1>
-      <CustomizationSettings
-        defaultState={{
-          teamName: selectedTeam.name,
-          subdomain: convertToUrlSafe(selectedTeam.name),
-        }}
-      />
+      <CustomizationSettings />
       <TeamMembers />
-      <SubscriptionPanel teamId={'1'} />
+      <SubscriptionPanel />
       <div className={sectionWrapper}>
         <h2 className={headerSection}>Leave Team</h2>
         <button
           disabled={selectedTeam.ownerId === user.id}
           type="button"
-          onClick={handleLeaveTeam}
+          onClick={() => setLeaveTeamOpen(true)}
           className="text-white bg-red-600 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
         >
           Leave Team

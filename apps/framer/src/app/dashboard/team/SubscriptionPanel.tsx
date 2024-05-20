@@ -1,6 +1,6 @@
 import { sectionWrapper, headerSection } from './page';
 
-export const SubscriptionPanel = (props: { teamId: string }) => {
+export const SubscriptionPanel = () => {
   return (
     <div className={sectionWrapper}>
       <h2 className={headerSection}>Subscription</h2>

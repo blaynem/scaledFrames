@@ -10,10 +10,11 @@ export default function RootLayout({
 }) {
   return (
     <UserProvider>
-      <div
-        id="background"
-        className="fixed w-full h-full m-0 p-0 bg-zinc-100 -z-10"
-      >
+      <div>
+        <div
+          id="background"
+          className="fixed w-full h-full m-0 p-0 bg-zinc-100 -z-10"
+        />
         <UserBar />
         <div className="w-full flex">
           <TeamsPanel />

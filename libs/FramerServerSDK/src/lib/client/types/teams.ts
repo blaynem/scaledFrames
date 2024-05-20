@@ -1,8 +1,19 @@
-import { Role, Team, User } from '@prisma/client';
+import {
+  Role,
+  SubscriptionPlan,
+  Team,
+  TeamSubscription,
+  User,
+} from '@prisma/client';
 import { ProjectIncludeRootFrame } from './project';
+
+export type TeamSubscriptType = TeamSubscription & {
+  plan: SubscriptionPlan;
+};
 
 export type TeamMemberType = User & { role: Role };
 export type GetTeamResponseType = Team & {
+  subscription: TeamSubscriptType;
   /**
    * The number of users in the team.
    */

@@ -1,7 +1,7 @@
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
 import { Role } from '@prisma/client';
-import { getPermissions } from '@framer/FramerServerSDK';
+import { getRolePermissions } from '@framer/FramerServerSDK';
 import {
   GetTeamsResponse,
   GetTeamResponseType,
@@ -32,6 +32,11 @@ teamsInstance.get('/', async (c) => {
       include: {
         team: {
           include: {
+            subscription: {
+              include: {
+                plan: true,
+              },
+            },
             Projects: {
               include: {
                 rootFrame: {
@@ -76,6 +81,7 @@ teamsInstance.get('/', async (c) => {
           role: _m.role,
         };
       }),
+      subscription: u.team.subscription,
       projects: u.team.Projects as ProjectIncludeRootFrame[], // Overrides the rootFrame type being null.
     }));
 
@@ -102,6 +108,11 @@ teamsInstance.get('/:teamId', async (c) => {
       include: {
         team: {
           include: {
+            subscription: {
+              include: {
+                plan: true,
+              },
+            },
             Projects: {
               include: {
                 rootFrame: {
@@ -146,6 +157,7 @@ teamsInstance.get('/:teamId', async (c) => {
           role: u.role,
         };
       }),
+      subscription: data.team.subscription,
       projects: data.team.Projects as ProjectIncludeRootFrame[], // Overrides the rootFrame type being null.
     };
 
@@ -251,7 +263,7 @@ teamsInstance.post('/:teamId/remove', async (c) => {
     }
 
     // Now that we have the users role, we can determine what they can do.
-    const permissions = getPermissions(userTeamData.role);
+    const permissions = getRolePermissions(userTeamData.role);
 
     // If the user is not allowed to remove the target, return an error.
     if (!permissions.canRemoveTarget(targetUser.role)) {
@@ -321,7 +333,7 @@ teamsInstance.post('/:teamId/invite', async (c) => {
     }
 
     // Now that we have the users role, we can determine what they can do.
-    const permissions = getPermissions(userTeamData.role);
+    const permissions = getRolePermissions(userTeamData.role);
 
     // If the user is not allowed to invite, return an error.
     if (!permissions.canEditTeam) {
@@ -415,7 +427,7 @@ teamsInstance.post('/:teamId/edit-role', async (c) => {
     }
 
     // Get permissions for the user based on their role
-    const userPermissions = getPermissions(userTeamData.role);
+    const userPermissions = getRolePermissions(userTeamData.role);
 
     // Whether the user can edit the target user's role.
     if (!userPermissions.canEditTargetsRole(targetUser.role)) {

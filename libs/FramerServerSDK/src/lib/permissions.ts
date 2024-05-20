@@ -1,6 +1,6 @@
-import { Role } from '@prisma/client';
+import { Role, SubscriptionType } from '@prisma/client';
 
-type PermissionsType = {
+type RolePermissionsType = {
   /**
    * A function that will be called to determine if the users role has permissions to remove the member with the target role.
    * @param targetRole - The role of the team member to be removed.
@@ -39,7 +39,7 @@ type PermissionsType = {
   canDeleteProject: boolean;
 };
 
-const lowestPermissions: PermissionsType = {
+const lowestRolePermissions: RolePermissionsType = {
   canRemoveTarget: () => false,
   canEditTargetsRole: () => false,
   canEditTeam: false,
@@ -48,7 +48,7 @@ const lowestPermissions: PermissionsType = {
   canDeleteProject: false,
 };
 
-export const getPermissions = (callersRole: Role): PermissionsType => {
+export const getRolePermissions = (callersRole: Role): RolePermissionsType => {
   switch (callersRole) {
     case Role.Owner:
       return {
@@ -61,7 +61,7 @@ export const getPermissions = (callersRole: Role): PermissionsType => {
         canEditTeam: true,
         canEditSubscription: true,
         canEditProject: true,
-      } satisfies PermissionsType;
+      } satisfies RolePermissionsType;
     case Role.Admin:
       return {
         canRemoveTarget: (targetRole: Role) =>
@@ -71,15 +71,74 @@ export const getPermissions = (callersRole: Role): PermissionsType => {
         canEditProject: true,
         canEditSubscription: false,
         canDeleteProject: false,
-      } satisfies PermissionsType;
+      } satisfies RolePermissionsType;
     case Role.Member:
       return {
-        ...lowestPermissions,
+        ...lowestRolePermissions,
         canEditProject: true,
-      } satisfies PermissionsType;
+      } satisfies RolePermissionsType;
     default:
       return {
-        ...lowestPermissions,
-      } satisfies PermissionsType;
+        ...lowestRolePermissions,
+      } satisfies RolePermissionsType;
+  }
+};
+
+export type SubscriptionGatedFeatures = {
+  /**
+   * If true, then the team is allowed to have and edit the custom subdomain.
+   */
+  canHaveCustomSubdomain: boolean;
+  /**
+   * If true, then the team is allowed to have and edit the custom project paths.
+   */
+  canHaveCustomProjectPaths: boolean;
+  /**
+   * If true, then the team is allowed to have and edit the custom project fallback.
+   */
+  canHaveCustomProjectFallback: boolean;
+  /**
+   * The maximum number of team members that can be in a team.
+   */
+  maxTeamMembers: number;
+  /**
+   * If true then only the Teams Owner can edit any project information.
+   *
+   * This is reserved for non-Free tier customers.
+   */
+  readonlyMembers: boolean;
+  /**
+   * If true, then the team has access to the analytics dashboard.
+   */
+  canViewAnalytics: boolean;
+};
+
+/**
+ * Gets subscription gated features based on the subscription type.
+ * @param subscription
+ * @returns
+ */
+export const getAllowedFeatures = (
+  subscription: SubscriptionType
+): SubscriptionGatedFeatures => {
+  switch (subscription) {
+    case SubscriptionType.Pro || SubscriptionType.Enterprise:
+      return {
+        canHaveCustomSubdomain: true,
+        canHaveCustomProjectPaths: true,
+        canHaveCustomProjectFallback: true,
+        maxTeamMembers: 10,
+        readonlyMembers: false,
+        canViewAnalytics: true,
+      } satisfies SubscriptionGatedFeatures;
+    default:
+      return {
+        canHaveCustomSubdomain: false,
+        canHaveCustomProjectPaths: false,
+        canHaveCustomProjectFallback: false,
+        maxTeamMembers: 3,
+        readonlyMembers: true,
+        canViewAnalytics: false,
+      } satisfies SubscriptionGatedFeatures;
   }
 };
