@@ -3,7 +3,13 @@ import { Frame, Intents } from '@prisma/client';
 // Frame fields that are allowed to be edited by the user.
 type EditableFrameFields = Pick<
   Frame,
-  'path' | 'title' | 'imageUrl' | 'aspectRatio' | 'imageLinkUrl' | 'imageType'
+  | 'path'
+  | 'title'
+  | 'imageUrl'
+  | 'aspectRatio'
+  | 'imageLinkUrl'
+  | 'imageType'
+  | 'isDeleted'
 >;
 /**
  * Fields that are returned to the user when fetching a frame.

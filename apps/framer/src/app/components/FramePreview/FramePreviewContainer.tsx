@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import FramePreview from './FramePreview';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 import {
-  FrameResponseType,
+  EditFrameRequestBody,
   FramerClientSDK,
 } from '@framer/FramerServerSDK/client';
 import { AspectRatio } from '@prisma/client';
@@ -15,7 +15,7 @@ const FramePreviewContainer = () => {
     React.useContext(FrameEditorContext);
   const clientSdk = FramerClientSDK();
   const { addToast } = useToast();
-  useEffect(() => {}, [frames]);
+
   const aspectRatio =
     frames[0] && frames[0].aspectRatio == AspectRatio.STANDARD ? 1.0 : 1.91;
 
@@ -35,12 +35,13 @@ const FramePreviewContainer = () => {
     const newFrame = await clientSdk.frames.create({
       projectId: selectedFrame.projectId,
       teamId: selectedFrame?.teamId,
-      path: 'new-frame',
-      title: 'New Frame',
+      path: `new-frame ${frames.length + 1}`,
+      title: `New Frame ${frames.length + 1}`,
       imageUrl: 'https://via.placeholder.com/1080x565',
-      imageLinkUrl: 'https://via.placeholder.com/565/1080',
+      imageLinkUrl: 'https://via.placeholder.com/1080x565',
       aspectRatio: frames[0].aspectRatio,
       imageType: 'Static',
+      isDeleted: false,
     });
     if ('error' in newFrame) {
       loadingToast.clearToast();
@@ -49,6 +50,32 @@ const FramePreviewContainer = () => {
       return;
     }
     setFrameEditorContext([...frames, newFrame], newFrame);
+    loadingToast.clearToast();
+  };
+
+  const handleDeleteFrame = async (frameId: string) => {
+    const loadingToast = addToast(ToastTypes.LOADING, 'Loading', 'infinite');
+    const currFrame = frames.find((frame) => frame.id === frameId);
+    if (!currFrame) {
+      loadingToast.clearToast();
+      console.error('Error deleting frame: frame not found');
+      addToast(ToastTypes.ERROR, 'Error deleting frame: frame not found', 5000);
+      return;
+    }
+    const body: EditFrameRequestBody = {
+      projectId: currFrame.projectId,
+      teamId: currFrame.teamId,
+      isDeleted: true,
+    };
+    const response = await clientSdk.frames.edit(frameId, body);
+    if ('error' in response) {
+      loadingToast.clearToast();
+      console.error('Error deleting frame: ', response.error);
+      addToast(ToastTypes.ERROR, response.error, 5000);
+      return;
+    }
+    const newFrames = frames.filter((frame) => frame.id !== frameId);
+    setFrameEditorContext(newFrames, newFrames[0]);
     loadingToast.clearToast();
   };
 
@@ -64,6 +91,7 @@ const FramePreviewContainer = () => {
           }}
           aspectRatio={aspectRatio}
           isSelected={selectedFrame?.id === frame.id}
+          handleRemove={() => handleDeleteFrame(frame.id)}
         />
       ))}
 
@@ -78,21 +106,4 @@ const FramePreviewContainer = () => {
   );
 };
 
-const newFrame: FrameResponseType = {
-  aspectRatio: AspectRatio.STANDARD,
-  id: 'new-frame',
-  imageUrl: 'https://via.placeholder.com/150',
-  title: 'New Frame',
-  intents: [],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  createdById: '1234',
-  imageLinkUrl: 'https://via.placeholder.com/150',
-  isDeleted: false,
-  projectId: '1234',
-  imageType: 'Static',
-  lastUpdatedById: '1234',
-  path: 'new-frame',
-  teamId: '1234',
-};
 export default FramePreviewContainer;

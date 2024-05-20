@@ -1,3 +1,4 @@
+import { TrashIcon } from '@heroicons/react/24/outline';
 import styles from './FramePreview.module.css';
 
 /* eslint-disable-next-line */
@@ -7,6 +8,7 @@ export interface FramePreviewProps {
   onClick: () => void;
   isSelected: boolean;
   aspectRatio: number;
+  handleRemove: () => void;
 }
 
 export function FramePreview({
@@ -15,6 +17,7 @@ export function FramePreview({
   onClick,
   isSelected,
   aspectRatio,
+  handleRemove,
 }: FramePreviewProps) {
   return (
     <div
@@ -25,6 +28,9 @@ export function FramePreview({
       }
       onClick={() => onClick()}
     >
+      <button className="absolute" onClick={() => handleRemove()}>
+        <TrashIcon className="m-2 rounded-sm h-8 w-8 text-red-500" />
+      </button>
       <img
         className="rounded-md"
         style={{ aspectRatio: aspectRatio }}

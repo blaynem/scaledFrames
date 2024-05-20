@@ -58,7 +58,7 @@ export function FrameInputs(props: FrameInputsProps) {
       tempFrames[idx].intents = tempIntents;
 
       setIntents([...intents, exampleIntent]);
-      setFrameEditorContext(tempFrames, tempFrame);
+      setFrameEditorContext(frames, tempFrame);
     }
   };
 
