@@ -13,6 +13,7 @@ import { ToastTypes } from '../components/Toasts/GenericToast';
 import { FramerClientSDK } from '@framer/FramerServerSDK/client';
 import { useRouter } from 'next/navigation';
 import { PAGES } from '../lib/constants';
+import Link from 'next/link';
 import { useUser } from '../components/UserContext';
 
 type TeamProject = {
@@ -153,10 +154,10 @@ const ProjectCard = ({
   projectId,
   projectTitle,
 }: TeamProject) => {
-  const href = `/${PAGES.FRAME_EDITOR}/${projectId}`;
+  const href = '/FrameEditor/' + projectId;
   return (
     <div className="bg-slate-100 flex flex-col border p-4 rounded border-slate-300">
-      <a href={href} className="mb-1 relative flex grow items-center">
+      <Link href={href} className="mb-1 relative flex grow items-center">
         <div className="w-full overflow-hidden">
           <Image src={imageSrc} alt="Display" width={600} height={600} />
         </div>
@@ -165,10 +166,11 @@ const ProjectCard = ({
             <BoltIcon className="h-10 w-10 fill-emerald-400" />
           </div>
         )}
-      </a>
-      <a href={href}>
+      </Link>
+      <Link href={href}>
         <h3 className="mb-2 text-lg font-semibold">{projectTitle}</h3>
-      </a>
+      </Link>
+
       <div className="relative">
         <input
           disabled

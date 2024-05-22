@@ -1,47 +1,43 @@
+'use client';
+
+import { useContext, useEffect, useState } from 'react';
 import { FrameAspectRatios, IntentTypes } from '../../lib/types';
 import FrameImage from '../FrameImage/FrameImage';
 import IntentContainer from '../IntentButton/IntentContainer';
-import styles from './frameDebugger.module.css';
-import {
-  FramerClientSDK,
-  GetFrameResponse,
-} from '@framer/FramerServerSDK/client';
+import { FramerClientSDK } from '@framer/FramerServerSDK/client';
+import { AspectRatio, Frame } from '@prisma/client';
+import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 /* eslint-disable-next-line */
-export interface FrameDebuggerProps {
-  frameId: string;
-}
 
-export async function FrameDebugger({ frameId }: FrameDebuggerProps) {
-  const framerClientSDK = FramerClientSDK();
-  let frame = {} as GetFrameResponse;
-  try {
-    frame = await framerClientSDK.frames.getById(frameId);
-  } catch {
-    console.error('Failed to get frame');
-  }
-  if ('error' in frame) {
-    console.error(frame.error);
-    return null;
-  }
+export function FrameDebugger() {
+  const { frames, selectedFrame, setFrameEditorContext } =
+    useContext(FrameEditorContext);
+  const [intents, setIntents] = useState(
+    selectedFrame ? selectedFrame.intents : []
+  );
+  const aspectRatio =
+    frames[0] && frames[0].aspectRatio == AspectRatio.STANDARD ? '1.0' : '1.91';
+  useEffect(() => {
+    if (selectedFrame) {
+      setFrameEditorContext(frames, selectedFrame);
+      setIntents(selectedFrame.intents);
+    }
+  }, [selectedFrame, frames]);
 
   return (
-    <div
-      className="rounded-lg bg-white p-4 m-4
-    "
-    >
-      <FrameImage
-        aspectRatio={frame.aspectRatio ?? FrameAspectRatios['1.91:1']}
-        imageUrl={frame.imageLinkUrl ?? 'https://picsum.photos/1080/565'}
-      />
-      <IntentContainer
-        intents={[
-          { intentType: IntentTypes.EXTERNAL_LINK, text: 'link' },
-          { text: 'internal link', intentType: IntentTypes.INTERNAL_LINK },
-          { text: 'internal link', intentType: IntentTypes.INTERNAL_LINK },
-          { text: 'internal link', intentType: IntentTypes.INTERNAL_LINK },
-        ]}
-      />
-    </div>
+    selectedFrame && (
+      <div className="rounded-lg bg-white p-4 m-4 max-h-fit flex-shrink-1 w-9/12 h-9/12 flex flex-col items-center justify-center">
+        <FrameImage
+          aspectRatio={aspectRatio}
+          imageUrl={
+            selectedFrame
+              ? selectedFrame.imageUrl
+              : 'https://picsum.photos/1080/565'
+          }
+        />
+        <IntentContainer intents={intents} />
+      </div>
+    )
   );
 }
 
