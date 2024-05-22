@@ -1,9 +1,7 @@
+'use client';
 import UserBar from '../components/UserBar';
-
-export const metadata = {
-  title: 'Dashboard',
-  description: 'Projects and Teams Overview',
-};
+import { TeamsPanel } from './TeamsPanel';
+import { UserProvider } from '../components/UserContext';
 
 export default function RootLayout({
   children,
@@ -11,10 +9,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <div className="fixed w-full h-full m-0 p-0 bg-zinc-300/25 -z-10" />
-      <UserBar />
-      {children}
-    </>
+    <UserProvider>
+      <div>
+        <div
+          id="background"
+          className="fixed w-full h-full m-0 p-0 bg-zinc-100 -z-10"
+        />
+        <UserBar />
+        <div className="w-full flex">
+          <TeamsPanel />
+          <div className="px-8 py-12 w-full">{children}</div>
+        </div>
+      </div>
+    </UserProvider>
   );
 }

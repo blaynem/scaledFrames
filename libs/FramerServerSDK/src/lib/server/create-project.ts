@@ -131,7 +131,13 @@ export const createProject = async (
       description: LOG_DESCRIPTIONS.ProjectCreated,
       userId: createdProject.lastUpdatedById,
     });
-    return createdProject;
+    const response: CreateProjectResponse = {
+      ...createdProject,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      rootFrame: createdProject.rootFrame!,
+      frames: createdProject.frames,
+    };
+    return response;
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       // The .code property can be accessed in a type-safe manner

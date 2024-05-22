@@ -7,7 +7,6 @@ import {
   PlusIcon,
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import { TeamProject } from './page';
 import Image from 'next/image';
 import { useToast } from '../components/Toasts/ToastProvider';
 import { ToastTypes } from '../components/Toasts/GenericToast';
@@ -15,25 +14,41 @@ import { FramerClientSDK } from '@framer/FramerServerSDK/client';
 import { useRouter } from 'next/navigation';
 import { PAGES } from '../lib/constants';
 import Link from 'next/link';
+import { useUser } from '../components/UserContext';
 
-export const ProjectsPanel = (props: {
-  projects: TeamProject[];
-  filter: {
-    options: { value: string; label: string }[];
-    selected: string;
-    onChange: (newValue: string) => void;
-  };
-  teamId: string;
-}) => {
+type TeamProject = {
+  isLive: boolean;
+  projectId: string;
+  projectUrl: string;
+  projectUrlSmall: string;
+  projectTitle: string;
+  imageSrc: string;
+  memberCount: number;
+};
+
+const filterOptions = [
+  { label: 'Owned by anyone', value: 'anyone' },
+  { label: 'Owned by Me', value: 'me' },
+  { label: 'Not Owned by Me', value: 'not-me' },
+];
+export const ProjectsPanel = () => {
+  const { selectedTeam } = useUser();
+  const [selectedFilterId, setSelectedFilterId] = useState(
+    filterOptions[0].value
+  );
   const router = useRouter();
   const { addToast } = useToast();
   const clientSdk = FramerClientSDK();
+
+  if (!selectedTeam) {
+    return <div>Loading...</div>;
+  }
 
   const onNewProjectClick = async () => {
     const loadingToast = addToast(ToastTypes.LOADING, 'Loading', 'infinite');
     const newProject = await clientSdk.projects.create({
       title: 'Project',
-      teamId: props.teamId,
+      teamId: selectedTeam.id,
     });
     if ('error' in newProject) {
       loadingToast.clearToast();
@@ -45,13 +60,21 @@ export const ProjectsPanel = (props: {
     router.push(`/${PAGES.FRAME_EDITOR}/${newProject.id}`);
   };
 
-  const onFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log('Filter Changed', e.target.value);
-    props.filter.onChange(e.target.value);
-  };
+  const _projects: TeamProject[] = selectedTeam.projects.map((p) => {
+    const projectPath = p.customBasePath + p.rootFrame.path;
+    return {
+      isLive: p.isProjectLive,
+      projectId: p.id,
+      projectUrl: `https://www.framer.com/f${projectPath}`,
+      projectUrlSmall: `/f${projectPath}`,
+      imageSrc: p.rootFrame.imageUrl,
+      projectTitle: p.title,
+      memberCount: selectedTeam.userCount,
+    } satisfies TeamProject;
+  });
 
   return (
-    <div className="px-8 py-12 column-1 col-span-5 sm:col-span-6">
+    <div className="">
       <div className="mb-8">
         <h2 className="py-2 text-3xl font-semibold">Create a Project</h2>
         <div className="">
@@ -67,15 +90,17 @@ export const ProjectsPanel = (props: {
         <div className="mb-8 flex justify-between">
           <h2 className="py-2 text-3xl font-semibold">Projects in this Team</h2>
           <Select
-            value={props.filter.selected}
-            onChange={onFilterChange}
+            value={selectedFilterId}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setSelectedFilterId(e.target.value)
+            }
             style={{
               borderWidth: 1,
               borderStyle: 'solid',
             }}
             className="border-slate-200 p-2 rounded-l data-[hover]:cursor-pointer focus:outline-none data-[active]:border-slate-800 data-[hover]:border-slate-800 data-[focus]:border-slate-800"
           >
-            {props.filter.options.map((option) => (
+            {filterOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -83,7 +108,7 @@ export const ProjectsPanel = (props: {
           </Select>
         </div>
         <div className="grid grid-cols-3 gap-4">
-          {props.projects.map((project) => (
+          {_projects.map((project) => (
             <ProjectCard key={project.projectId} {...project} />
           ))}
         </div>
