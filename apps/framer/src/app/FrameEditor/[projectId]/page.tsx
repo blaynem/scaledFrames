@@ -56,7 +56,7 @@ export default function Index({ params }: { params: { projectId: string } }) {
           <div className="page from-blue-900">
             <div className="wrapper">
               <div
-                className="divide-x bg-gradient-to-br from-indigo-900 to-black "
+                className="divide-x bg-gradient-to-br from-slate-300 to-slate-200"
                 style={{ display: 'flex', height: '100vh' }}
               >
                 <div
