@@ -1,4 +1,4 @@
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import styles from './FramePreview.module.css';
 
 /* eslint-disable-next-line */
@@ -23,13 +23,13 @@ export function FramePreview({
     <div
       className={
         isSelected
-          ? 'm-1 p-1 rounded-lg bg-white border-2 border-blue-500 h-9/12 w-9/12'
-          : 'm-1 p-1 rounded-lg bg-white from-blue-100  border-1 border-white h-9/12 w-9/12'
+          ? 'm-1 p-1 rounded-lg bg-white border-2 border-blue-500 h-9/12 w-9/12 relative'
+          : 'm-1 p-1 rounded-lg bg-white from-blue-100  border-1 border-white h-9/12 w-9/12 relative'
       }
       onClick={() => onClick()}
     >
       <button className="absolute" onClick={() => handleRemove()}>
-        <TrashIcon className="m-2 rounded-sm h-8 w-8 text-red-500" />
+        <XCircleIcon className="m-2 rounded-sm h-8 w-8 text-red-500" />
       </button>
       <img
         className="rounded-md"

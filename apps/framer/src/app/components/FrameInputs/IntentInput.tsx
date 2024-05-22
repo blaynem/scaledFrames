@@ -2,7 +2,7 @@
 import { IntentType, Intents } from '@prisma/client';
 import React, { use, useContext, useEffect, useState } from 'react';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { MinusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export interface IntentInputProps {
   intent: Intents;
@@ -107,7 +107,7 @@ export const IntentInput: React.FC<IntentInputProps> = ({
         }}
         className="mx-2 flex justify-center items-end"
       >
-        <TrashIcon className="m-2 rounded-sm h-8 w-8 text-red-500" />
+        <MinusCircleIcon className="m-2 rounded-sm h-8 w-8 text-red-500" />
       </button>
       <div className="w-full mx-1">
         <label className=" pt-1 block mb-2 text-sm font-medium text-gray-100 ">

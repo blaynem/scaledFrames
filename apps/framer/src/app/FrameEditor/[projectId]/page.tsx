@@ -60,7 +60,7 @@ export default function Index({ params }: { params: { projectId: string } }) {
                 style={{ display: 'flex', height: '100vh' }}
               >
                 <div
-                  className="flex-item column1 border-right border-white overflow-y-auto"
+                  className="flex-item column1 overflow-y-auto"
                   style={{ padding: '20px', flex: '0 0 20%' }}
                 >
                   <FramePreviewContainer />

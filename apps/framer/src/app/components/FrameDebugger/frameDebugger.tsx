@@ -15,6 +15,8 @@ export function FrameDebugger() {
   const [intents, setIntents] = useState(
     selectedFrame ? selectedFrame.intents : []
   );
+  const aspectRatio =
+    frames[0] && frames[0].aspectRatio == AspectRatio.STANDARD ? '1.0' : '1.91';
   useEffect(() => {
     if (selectedFrame) {
       setFrameEditorContext(frames, selectedFrame);
@@ -26,11 +28,7 @@ export function FrameDebugger() {
     selectedFrame && (
       <div className="rounded-lg bg-white p-4 m-4 max-h-fit flex-shrink-1 w-9/12 h-9/12 flex flex-col items-center justify-center">
         <FrameImage
-          aspectRatio={
-            selectedFrame && selectedFrame.aspectRatio == AspectRatio.STANDARD
-              ? '1.0'
-              : '1.91'
-          }
+          aspectRatio={aspectRatio}
           imageUrl={
             selectedFrame
               ? selectedFrame.imageUrl
