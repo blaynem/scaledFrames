@@ -45,6 +45,13 @@ export type EditUserRoleResponse =
   | Pick<TeamMemberType, 'role'>
   | { error: string };
 
+export type EditTeamRequest = Partial<
+  Pick<Team, 'name' | 'customSubDomain'>
+> & { teamId: string };
+export type EditTeamResponse =
+  | Pick<Team, 'name' | 'customSubDomain' | 'id'>
+  | { error: string };
+
 /**
  * Exposed methods for the Team SDK.
  */
@@ -77,4 +84,10 @@ export type TeamsSDKType = {
    * Edit the role of a user in the team.
    */
   editUserRole: (body: EditUserRoleRequest) => Promise<EditUserRoleResponse>;
+  /**
+   * Edit properties of the team.
+   *
+   * Not including subscription changes.
+   */
+  editTeamProperties: (body: EditTeamRequest) => Promise<EditTeamResponse>;
 };
