@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import LoginModal from './components/Login/LoginModal';
 import './page.module.css';
-import { Bars3Icon, BoltIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import Hero from './components/Hero/Hero';
 
@@ -20,21 +20,12 @@ export default function Index() {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
       />
-      <header className="absolute inset-x-0 top-0 z-50">
+      <header>
         <nav
           className="flex items-center justify-between p-6 lg:px-8"
           aria-label="Global"
         >
-          <div className="flex lg:flex-1">
-            <a href="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">Your Company</span>
-              <BoltIcon
-                className="h-8 w-auto text-indigo-600"
-                aria-hidden="true"
-              />
-            </a>
-          </div>
-          <div className="flex lg:hidden">
+          <div className="w-full flex justify-end lg:hidden">
             <button
               type="button"
               className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
@@ -62,7 +53,7 @@ export default function Index() {
           <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
               <a href="#" className="-m-1.5 p-1.5">
-                <span className="sr-only">Your Company</span>
+                <span className="sr-only">Framer</span>
                 <img
                   className="h-8 w-auto"
                   src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
@@ -96,7 +87,11 @@ export default function Index() {
           </Dialog.Panel>
         </Dialog>
       </header>
-      <Hero />
+      <Hero
+        openLoginModal={() => {
+          setLoginModalOpen(true);
+        }}
+      />
     </div>
   );
 }

@@ -69,6 +69,7 @@ export default function MyModal({
       email,
     });
     if ('erorr' in response) {
+      loadingToast.clearToast();
       addToast(ToastTypes.ERROR, 'There was an error sending the OTP.', 5000);
       return;
     }
@@ -127,7 +128,7 @@ export default function MyModal({
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
       <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-        <DialogPanel className="max-w-lg space-y-4 bg-white p-12">
+        <DialogPanel className="max-w-lg space-y-4 bg-white p-4 sm:p-6 md:p-12">
           {sentOtp ? (
             <>
               <DialogTitle className="font-bold">Verify OTP</DialogTitle>
@@ -165,8 +166,10 @@ export default function MyModal({
             <>
               <DialogTitle className="font-bold">Sign In</DialogTitle>
               <Description>
-                {`Enter your email below to get started. We'll send you a One-Time
-                Password (OTP) to verify your identity.`}
+                {`Whether you're signing up or signing in, all we need is your email.`}
+                <br />
+                <br />
+                {`We'll send you a One-Time Password (OTP) to verify your identity.`}
               </Description>
               <Input
                 autoComplete="email"
