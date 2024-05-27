@@ -5,16 +5,16 @@ import {
   AspectRatio,
   Role,
 } from '@prisma/client';
-import { UserSignupRequestBody, UserSignupResponse } from '../client/types';
-import { convertToUrlSafe, createUniqueName, getRandomColor } from './utils';
+import { UserSignupRequestBody, UserSignupResponse } from '../../client/types';
+import { convertToUrlSafe, createUniqueName, getRandomColor } from '../utils';
 import {
   LOG_ERROR_TYPES,
   LOG_ACTIONS,
   logActivity,
   logError,
   LOG_DESCRIPTIONS,
-} from './logging';
-import { AuthUser } from './types';
+} from '../logging';
+import { AuthUser } from '../types';
 
 /**
  * Signs up a user. If a user already exists, it will return the first team and project they have.

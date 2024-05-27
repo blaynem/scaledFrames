@@ -2,16 +2,16 @@ import { AspectRatio, IntentType, Prisma, PrismaClient } from '@prisma/client';
 import {
   CreateProjectRequestBody,
   CreateProjectResponse,
-} from '../client/types';
-import { convertToUrlSafe, getRandomColor } from './utils';
+} from '../../client/types';
+import { convertToUrlSafe, getRandomColor } from '../utils';
 import {
   logActivity,
   LOG_ACTIONS,
   logError,
   LOG_ERROR_TYPES,
   LOG_DESCRIPTIONS,
-} from './logging';
-import { AuthUser } from './types';
+} from '../logging';
+import { AuthUser } from '../types';
 
 /**
  * Creates a Project and Frame for the user.
