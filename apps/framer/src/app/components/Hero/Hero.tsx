@@ -307,7 +307,7 @@ export function FAQAccordion() {
         'Yes, you can link your frames to external sites. This allows for seamless transactions such as payments with Stripe or crypto transactions, enhancing the functionality of your frames.',
     },
     {
-      question: 'How fast are the server response times?',
+      question: 'Will the frames render fast?',
       answer:
         'Our servers are optimized for quick response times, ensuring that your audience experiences smooth and uninterrupted interactions with your frames.',
     },
