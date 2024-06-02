@@ -185,32 +185,11 @@ frameFrogInstance.post('/edit/:id', async (c) => {
 
     const authUser = await getUserFromEmail(prisma, email);
 
-    const filteredIntents = body.intents.map((intent) => ({
-      linkUrl: intent.linkUrl || '',
-      displayText: intent.displayText || '',
-      displayOrder: intent.displayOrder || 0,
-      isDeleted: intent.isDeleted || false,
-      type: intent.type || IntentType.ExternalLink, // Replace `undefined` with a default value for `type`
-    }));
+    const filteredIntents = body.intents.filter(
+      (intent) => intent.type !== undefined
+    );
+
     const deleted = await prisma.intents.deleteMany({
-      where: {
-        framesId: id,
-      },
-    });
-
-    await prisma.intents.createMany({
-      skipDuplicates: true,
-      data: filteredIntents.map((intent) => ({
-        framesId: id,
-        linkUrl: intent.linkUrl || '',
-        displayText: intent.displayText || '',
-        displayOrder: intent.displayOrder || 0,
-        isDeleted: intent.isDeleted || false,
-        type: intent.type || IntentType.ExternalLink, // Replace `undefined` with a default value for `type`
-      })),
-    });
-
-    const intents = await prisma.intents.findMany({
       where: {
         framesId: id,
       },
@@ -231,7 +210,18 @@ frameFrogInstance.post('/edit/:id', async (c) => {
       data: {
         ...updateData,
         intents: {
-          connect: intents,
+          createMany: {
+            skipDuplicates: true,
+            data: filteredIntents.map((intent) => ({
+              ...intent,
+              framesId: id,
+              linkUrl: intent.linkUrl || '',
+              displayText: intent.displayText || '',
+              displayOrder: intent.displayOrder || 0,
+              isDeleted: intent.isDeleted || false,
+              type: intent.type || IntentType.ExternalLink, // Replace `undefined` with a default value for `type`
+            })),
+          },
         },
       },
       include: {

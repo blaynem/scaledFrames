@@ -139,6 +139,7 @@ export function FrameInputs(props: FrameInputsProps) {
         path: path,
         imageUrl: imageUrl,
         isDeleted: false,
+        intents: selectedFrame.intents,
       };
       const newFrame = await clientSdk.frames.edit(selectedFrame.id, body);
       const idx = findFrameIdxById(frames, selectedFrame.id);
