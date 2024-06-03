@@ -14,6 +14,7 @@ import {
 import { Menu, Transition } from '@headlessui/react';
 import Link from 'next/link';
 import UserBar from '../UserBar';
+import { APP_NAME } from '@framer/FramerServerSDK';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -26,7 +27,7 @@ export default function Header() {
         <div className="min-w-0 flex-1">
           <Link href="/dashboard">
             <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-              Framer (BETA)
+              {APP_NAME} (BETA)
             </h2>
           </Link>
         </div>

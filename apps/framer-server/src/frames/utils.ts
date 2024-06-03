@@ -1,3 +1,4 @@
+import { APP_DOMAIN, APP_NAME } from '@framer/FramerServerSDK';
 import { ParsedFrameUrl } from '@framer/FramerServerSDK/server';
 import { SubscriptionType } from '@prisma/client';
 
@@ -26,11 +27,10 @@ export const isUsingCustomSubdomain = (
   ) {
     return false;
   }
-  // TODO: is `framer` our subdomain?
   return (
     parsedFrameUrl.teamSubdomain !== 'localhost' &&
     parsedFrameUrl.teamSubdomain !== 'www' &&
-    parsedFrameUrl.teamSubdomain !== 'framer'
+    parsedFrameUrl.teamSubdomain !== APP_NAME.toLowerCase().replace(' ', '')
   );
 };
 

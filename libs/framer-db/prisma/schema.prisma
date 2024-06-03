@@ -49,7 +49,7 @@ model Team {
   subscription    TeamSubscription @relation(fields: [subscriptionId], references: [id])
   subscriptionId  String           @unique @db.Uuid
   /// The custom subdomain that the team has for their frames.
-  /// "https://{subdomain}.framer.com" is the format.
+  /// "https://{subdomain}.scaledframes.com" is the format.
   /// This is so if an advertiser is linking to a frame, they can have a custom domain that will be shown.
   ///
   /// We should likely lock this to a subscription type.
@@ -104,9 +104,9 @@ model Project {
   isDeleted     Boolean  @default(false)
 
   /// The custom path that the project will be shown at.
-  /// If the custom path is "example", then the project will be shown at "https://www.framer.com/example"
-  /// All frames will then be shown  at "https://www.framer.com/example/{frame.path}"
-  /// If the user has custom subdomain, then it will be shown at "https://{subdomain}.framer.com/{customBasePath}/{frame.path}"
+  /// If the custom path is "example", then the project will be shown at "https://www.scaledframes.com/example"
+  /// All frames will then be shown  at "https://www.scaledframes.com/example/{frame.path}"
+  /// If the user has custom subdomain, then it will be shown at "https://{subdomain}.scaledframes.com/{customBasePath}/{frame.path}"
   ///
   /// Defaults to the title of the project, minus any special characters.
   customBasePath String @unique

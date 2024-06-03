@@ -1,3 +1,4 @@
+import { APP_NAME } from '@framer/FramerServerSDK';
 import { ToastProvider } from './components/Toasts/ToastProvider';
 import './global.css';
 
@@ -5,7 +6,7 @@ import { Arimo } from 'next/font/google';
 import { Libre_Franklin } from 'next/font/google';
 
 export const metadata = {
-  title: 'Welcome to Framer',
+  title: APP_NAME,
   description: 'The easiest way to create Farcaster Frames.',
 };
 

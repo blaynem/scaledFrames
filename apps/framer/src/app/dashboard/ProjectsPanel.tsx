@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { PAGES } from '../lib/constants';
 import Link from 'next/link';
 import { useUser } from '../components/UserContext';
+import { APP_DOMAIN } from '@framer/FramerServerSDK';
 
 type TeamProject = {
   isLive: boolean;
@@ -65,7 +66,7 @@ export const ProjectsPanel = () => {
     return {
       isLive: p.isProjectLive,
       projectId: p.id,
-      projectUrl: `https://www.framer.com/f${projectPath}`,
+      projectUrl: `${APP_DOMAIN}/f${projectPath}`,
       projectUrlSmall: `/f${projectPath}`,
       imageSrc: p.rootFrame.imageUrl,
       projectTitle: p.title,

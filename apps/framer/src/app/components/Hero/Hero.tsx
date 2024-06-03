@@ -7,6 +7,7 @@ import {
   AccordionTrigger,
 } from '../ui/accordion';
 import Image from 'next/image';
+import { APP_NAME } from '@framer/FramerServerSDK';
 
 const words = [
   'Frame.',
@@ -57,7 +58,7 @@ export default function Hero({
                     <FlipWords words={words} />
                   </h1>
                   <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
-                    {`Welcome to Framer, the ultimate platform for creating and hosting dynamic Farcaster Frames. Whether you're an advertiser looking to engage your audience or an individual with a story to tell, our tools empower you to craft captivating visual narratives.`}
+                    {`Welcome to ${APP_NAME}, the ultimate platform for creating and hosting dynamic Farcaster Frames. Whether you're an advertiser looking to engage your audience or an individual with a story to tell, our tools empower you to craft captivating visual narratives.`}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -87,7 +88,7 @@ export default function Hero({
                   Tell Your Story, One Frame at a Time
                 </h2>
                 <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
-                  {`Framer provides all the tools you need to create and share
+                  {`${APP_NAME} provides all the tools you need to create and share
                   engaging stories. From easy-to-use editing tools to powerful
                   publishing features, we've got you covered.`}
                 </p>
@@ -233,7 +234,7 @@ export default function Hero({
           <div className="container m-auto grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                Get started with Framer
+                Get started with {APP_NAME}
               </h2>
               <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
                 Sign up for a free trial and start creating stories today. You
@@ -256,7 +257,7 @@ export default function Hero({
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          © 2024 Framer. All rights reserved.
+          © 2024 {APP_NAME}. All rights reserved.
         </p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link className="text-xs hover:underline underline-offset-4" href="#">
@@ -282,7 +283,7 @@ export function FAQAccordion() {
         'A Farcaster Frame is a customizable visualization within the Farcaster ecosystem. It can include images, buttons, and other interactive elements to help you tell your story or present information in a unique way.',
     },
     {
-      question: 'How does Framer work?',
+      question: `How does ${APP_NAME} work?`,
       answer:
         'Our application allows you to create, edit, and host Farcaster Frames. You can design frames with images and buttons, track engagement with analytics, and collaborate with team members on projects. We also provide hosting and integration with external sites for transactions.',
     },
