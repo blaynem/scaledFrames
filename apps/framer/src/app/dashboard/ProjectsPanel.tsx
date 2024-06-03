@@ -57,7 +57,7 @@ export const ProjectsPanel = () => {
       return;
     }
     loadingToast.clearToast();
-    router.push(`/${PAGES.FRAME_EDITOR}/${newProject.id}`);
+    router.push(`${PAGES.FRAME_EDITOR}/${newProject.id}`);
   };
 
   const _projects: TeamProject[] = selectedTeam.projects.map((p) => {
@@ -154,7 +154,7 @@ const ProjectCard = ({
   projectId,
   projectTitle,
 }: TeamProject) => {
-  const href = '/FrameEditor/' + projectId;
+  const href = `${PAGES.FRAME_EDITOR}/${projectId}`;
   return (
     <div className="bg-slate-100 flex flex-col border p-4 rounded border-slate-300">
       <Link href={href} className="mb-1 relative flex grow items-center">
