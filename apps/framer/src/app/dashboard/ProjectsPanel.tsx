@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { PAGES } from '../lib/constants';
 import Link from 'next/link';
 import { useUser } from '../components/UserContext';
+import { APP_DOMAIN } from '@framer/FramerServerSDK';
 
 type TeamProject = {
   isLive: boolean;
@@ -57,7 +58,7 @@ export const ProjectsPanel = () => {
       return;
     }
     loadingToast.clearToast();
-    router.push(`/${PAGES.FRAME_EDITOR}/${newProject.id}`);
+    router.push(`${PAGES.FRAME_EDITOR}/${newProject.id}`);
   };
 
   const _projects: TeamProject[] = selectedTeam.projects.map((p) => {
@@ -65,7 +66,7 @@ export const ProjectsPanel = () => {
     return {
       isLive: p.isProjectLive,
       projectId: p.id,
-      projectUrl: `https://www.framer.com/f${projectPath}`,
+      projectUrl: `${APP_DOMAIN}/f${projectPath}`,
       projectUrlSmall: `/f${projectPath}`,
       imageSrc: p.rootFrame.imageUrl,
       projectTitle: p.title,
@@ -154,7 +155,7 @@ const ProjectCard = ({
   projectId,
   projectTitle,
 }: TeamProject) => {
-  const href = '/FrameEditor/' + projectId;
+  const href = `${PAGES.FRAME_EDITOR}/${projectId}`;
   return (
     <div className="bg-slate-100 flex flex-col border p-4 rounded border-slate-300">
       <Link href={href} className="mb-1 relative flex grow items-center">

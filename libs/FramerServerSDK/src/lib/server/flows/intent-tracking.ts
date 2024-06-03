@@ -1,5 +1,5 @@
 import { IntentClickTracking, IntentType, PrismaClient } from '@prisma/client';
-import { LOG_ERROR_TYPES, logError } from './logging';
+import { LOG_ERROR_TYPES, logError } from '../logging';
 
 /**
  * Logs an intent tracking interaction to the database from a Farcaster app.

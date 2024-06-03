@@ -1,6 +1,6 @@
-import { faker } from '@faker-js/faker';
 import { FRAMES_SERVER_BASE_PATH } from '../constants';
 import { PrismaClient } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Returns a URL-safe version of the provided string.
@@ -19,7 +19,7 @@ export const convertToUrlSafe = (val: string): string =>
 
 /**
  * Parsed parts of a Framer URL:
- * `https://{teamSubdomain}.framer.com/f/{projectBasePath}/{framePath}`
+ * `https://{teamSubdomain}.scaledframes.com/f/{projectBasePath}/{framePath}`
  */
 export type ParsedFrameUrl = {
   /**
@@ -54,9 +54,9 @@ export type ParsedFrameUrl = {
 
 /**
  * Parses a Framer URL into its parts:
- * `https://{teamSubdomain}.framer.com/f/{projectBasePath}/{framePath}`
+ * `https://{teamSubdomain}.scaledframes.com/f/{projectBasePath}/{framePath}`
  *
- * Example URL: `https://nike.framer.com/f/epic-project/some-frame`
+ * Example URL: `https://nike.scaledframes.com/f/epic-project/some-frame`
  * Parsed URL: `{ teamSubdomain: 'nike', projectBasePath: 'epic-project', framePath: 'some-frame' }`
  * @param inputUrl
  * @returns ParsedUrl | null
@@ -115,24 +115,22 @@ const formatPart = (part: string) => {
 };
 
 /**
- * Creates a random name based on {catchPhraseDescriptor} and {buzzNoun} from faker.
- * @returns Randomized name ex: FaultTolerantMaximize
+ * Gets a random UUID and formats it into a name.
  */
-export const createRandomizedName = () => {
-  const firstPart = faker.company.catchPhraseDescriptor();
-  const secondPart = faker.company.buzzNoun();
-  return formatPart(firstPart) + formatPart(secondPart);
+export const getRandomUUID = () => {
+  const firstPart = uuidv4().split('-')[0].slice(0, 6);
+  return formatPart(firstPart);
 };
 
 /**
  * Attempts to create a unique name that matches no subdomain or project base path.
  * Will attempt to create a unique name 25 times before returning null.
  */
-export const createUniqueName = async (prisma: PrismaClient) => {
+export const createUniqueSubdomain = async (prisma: PrismaClient) => {
   let count = 0;
   while (count <= 25) {
-    const randomizedName = createRandomizedName();
-    const urlSafeName = convertToUrlSafe(randomizedName);
+    const randomizedSubdomain = getRandomUUID();
+    const urlSafeName = convertToUrlSafe(randomizedSubdomain);
     const subDomainExists = await prisma.team.findFirst({
       where: { customSubDomain: urlSafeName },
     });
@@ -141,7 +139,7 @@ export const createUniqueName = async (prisma: PrismaClient) => {
     });
 
     if (!subDomainExists && !basePathExists) {
-      return randomizedName;
+      return randomizedSubdomain;
     }
 
     count++;

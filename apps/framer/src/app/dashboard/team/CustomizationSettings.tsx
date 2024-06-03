@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { sectionWrapper, headerSection } from './page';
-import { getAllowedFeatures } from '@framer/FramerServerSDK';
+import { APP_NAME, getAllowedFeatures } from '@framer/FramerServerSDK';
 import { useUser } from '../../components/UserContext';
 import { FramerClientSDK } from '@framer/FramerServerSDK/client';
 import { useToast } from '../../components/Toasts/ToastProvider';
@@ -106,8 +106,8 @@ export const CustomizationSettings = () => {
           id="subdomain-helper-text-explanation"
           className="mt-2 text-sm text-gray-500 dark:text-gray-400"
         >
-          Create a custom subdomain for your team. Ex: <b>team-name</b>
-          .framer.com
+          Create a custom subdomain for your team. Ex: <b>team-name</b>.
+          {APP_NAME.toLowerCase()}.com
         </p>
       </div>
       {showSaveButton && (

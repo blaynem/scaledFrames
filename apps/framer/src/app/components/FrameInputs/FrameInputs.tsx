@@ -16,6 +16,7 @@ import {
 import { findFrameIdxById } from '../../utils/utils';
 import { ToastTypes } from '../Toasts/GenericToast';
 import { useToast } from '../Toasts/ToastProvider';
+import { APP_DOMAIN } from '@framer/FramerServerSDK';
 
 /* eslint-disable-next-line */
 export interface FrameInputsProps {}
@@ -77,7 +78,7 @@ export function FrameInputs(props: FrameInputsProps) {
       displayOrder: intents.length + 1,
       framesId: selectedFrame ? selectedFrame.id : '1234',
       isDeleted: false,
-      linkUrl: 'https://www.framer.com',
+      linkUrl: APP_DOMAIN,
     };
 
     if (selectedFrame) {
