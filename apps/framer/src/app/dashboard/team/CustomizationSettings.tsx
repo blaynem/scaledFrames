@@ -1,41 +1,25 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { sectionWrapper, headerSection } from './page';
-import { APP_NAME, getAllowedFeatures } from '@framer/FramerServerSDK';
+import {
+  APP_NAME,
+  getAllowedFeatures,
+  getRolePermissions,
+} from '@framer/FramerServerSDK';
 import { useUser } from '../../components/UserContext';
 import { FramerClientSDK } from '@framer/FramerServerSDK/client';
 import { useToast } from '../../components/Toasts/ToastProvider';
 import { ToastTypes } from '../../components/Toasts/GenericToast';
+import { Role } from '@prisma/client';
 
 export const CustomizationSettings = () => {
-  const { selectedTeam, refreshTeamsData } = useUser();
+  const { selectedTeam, refreshTeamsData, user } = useUser();
   const { addToast } = useToast();
 
   const [teamName, setTeamName] = useState(selectedTeam?.name);
   const [subdomain, setSubdomain] = useState(selectedTeam?.customSubDomain);
-  const [showSaveButton, setShowSaveButton] = useState(false);
 
-  useEffect(() => {
-    if (!selectedTeam) return;
-
-    // show save change button
-    if (
-      teamName !== selectedTeam.name ||
-      subdomain !== selectedTeam.customSubDomain
-    ) {
-      setShowSaveButton(true);
-    } else {
-      setShowSaveButton(false);
-    }
-  }, [
-    teamName,
-    subdomain,
-    selectedTeam?.name,
-    selectedTeam?.customSubDomain,
-    selectedTeam,
-  ]);
-
-  if (!selectedTeam) {
+  if (!selectedTeam || !user) {
     return null;
   }
 
@@ -61,6 +45,21 @@ export const CustomizationSettings = () => {
     selectedTeam.subscription.plan.subscriptionType
   );
 
+  const _userRole =
+    selectedTeam.members.find((member) => member.id === user.id)?.role ??
+    Role.Viewer;
+  const userPermissions = getRolePermissions(_userRole);
+
+  const onTeamNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!userPermissions.canEditTeam) return;
+    setTeamName(e.target.value);
+  };
+
+  const showSaveButton =
+    userPermissions.canEditProject &&
+    (teamName !== selectedTeam.name ||
+      subdomain !== selectedTeam.customSubDomain);
+
   return (
     <div className={sectionWrapper}>
       <h2 className={headerSection}>Customization</h2>
@@ -72,12 +71,13 @@ export const CustomizationSettings = () => {
           Team Name
         </label>
         <input
+          disabled={!userPermissions.canEditTeam}
           value={teamName}
-          onChange={(e) => setTeamName(e.target.value)}
+          onChange={(e) => onTeamNameChange(e)}
           type="text"
           id="team-name-helper-text"
           aria-describedby="team-name-helper-text-explanation"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg disabled:text-black/50 disabled:bg-slate-300 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder={selectedTeam.name}
         />
       </div>
@@ -99,7 +99,7 @@ export const CustomizationSettings = () => {
           type="text"
           id="subdomain-helper-text"
           aria-describedby="subdomain-helper-text-explanation"
-          className="disabled:hover:cursor-not-allowed disabled:text-black/50 disabled:bg-slate-300 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="disabled:text-black/50 disabled:bg-slate-300 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder={selectedTeam.customSubDomain}
         />
         <p

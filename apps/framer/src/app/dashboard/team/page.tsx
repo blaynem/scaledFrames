@@ -10,6 +10,7 @@ import { useUser } from '../../components/UserContext';
 import { useRouter } from 'next/navigation';
 import GeneralModal from '../../components/Modal';
 import { useState } from 'react';
+import { getRolePermissions } from '@framer/FramerServerSDK';
 
 export const convertToUrlSafe = (val: string): string =>
   val
@@ -58,6 +59,11 @@ export default function TeamPage() {
     router.push('/dashboard');
   };
 
+  const _userRole =
+    selectedTeam.members.find((member) => member.id === user.id)?.role ??
+    Role.Viewer;
+  const userPermissions = getRolePermissions(_userRole);
+
   return (
     <div className="max-w-[800px]">
       <GeneralModal
@@ -72,8 +78,8 @@ export default function TeamPage() {
         {selectedTeam.name} Settings
       </h1>
       <CustomizationSettings />
-      <TeamMembers />
-      <SubscriptionPanel />
+      {userPermissions.canEditTeam && <TeamMembers />}
+      {userPermissions.canEditSubscription && <SubscriptionPanel />}
       <div className={sectionWrapper}>
         <h2 className={headerSection}>Leave Team</h2>
         <button
