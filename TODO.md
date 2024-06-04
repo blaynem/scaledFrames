@@ -1,3 +1,8 @@
+Setting up Domain and email and all things associated with it
+- Stripe for payments (pobably yeah)
+- Set up development test for stripe
+- How to deal with cancellations or reduction in subscription level or changes in team size?
+- SSL Cert - https://zerossl.com/
 
 
 # Before Release
@@ -23,3 +28,4 @@
 - Add requestIds to all things in the server so its easier to track things down!
 - Teams Page
     - edit subscription
+- Actual paid subs

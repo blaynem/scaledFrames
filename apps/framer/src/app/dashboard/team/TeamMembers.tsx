@@ -9,7 +9,10 @@ import { useEffect, useState } from 'react';
 import { useUser } from '../../components/UserContext';
 import GeneralModal from '../../components/Modal';
 import { PencilIcon } from '@heroicons/react/24/outline';
-import { getRolePermissions } from '@framer/FramerServerSDK';
+import {
+  getAllowedFeatures,
+  getRolePermissions,
+} from '@framer/FramerServerSDK';
 
 type MemberDisplay = {
   id: string;
@@ -129,6 +132,9 @@ export const TeamMembers = () => {
     selectedTeam.members.find((member) => member.id === user.id)?.role ??
     Role.Viewer;
   const userPermissions = getRolePermissions(_userRole);
+  const subscriptionPermissions = getAllowedFeatures(
+    selectedTeam.subscription.plan.subscriptionType
+  );
 
   // Determine if we show the edit role button or not.
   const showEditRole = (member: MemberDisplay) => {
@@ -138,6 +144,9 @@ export const TeamMembers = () => {
     }
     return userPermissions.canEditTargetsRole(member.role);
   };
+
+  const isInviteDisabled =
+    members.length < subscriptionPermissions.maxTeamMembers;
 
   return (
     <div className={sectionWrapper}>
@@ -261,13 +270,17 @@ export const TeamMembers = () => {
       </ul>
       {userPermissions.canEditTeam && (
         <div className="flex justify-end">
-          <button
-            onClick={() => setInviteOpen(true)}
-            type="button"
-            className="text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Invite
-          </button>
+          {!isInviteDisabled ? (
+            <p className="text-sm">Upgrade Subscription to invite more.</p>
+          ) : (
+            <button
+              onClick={() => setInviteOpen(true)}
+              type="button"
+              className="text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Invite
+            </button>
+          )}
         </div>
       )}
     </div>

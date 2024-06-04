@@ -48,6 +48,10 @@ const lowestRolePermissions: RolePermissionsType = {
   canDeleteProject: false,
 };
 
+/**
+ * Depending on the role of the user, they will have different permissions.
+ * Ex: An owner can delete a project, but a member cannot.
+ */
 export const getRolePermissions = (callersRole: Role): RolePermissionsType => {
   switch (callersRole) {
     case Role.Owner:
