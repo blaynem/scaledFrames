@@ -77,7 +77,7 @@ export const ProjectsPanel = () => {
   return (
     <div className="">
       <div className="mb-8">
-        <h2 className="py-2 text-3xl font-semibold">Create a Project</h2>
+        <h2 className="pb-2 text-3xl font-semibold">Create a Project</h2>
         <div className="">
           <button onClick={onNewProjectClick} className="hover:text-blue-500">
             <div className="mb-2 w-20 h-20 flex justify-center items-center rounded-md bg-indigo-600 p-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">

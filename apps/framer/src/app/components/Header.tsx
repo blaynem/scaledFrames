@@ -1,4 +1,5 @@
 'use client';
+import { APP_NAME } from '@framer/FramerServerSDK';
 import {
   createSupabaseClient,
   getSession,
@@ -14,17 +15,20 @@ import {
   ArrowLeftStartOnRectangleIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { PAGES } from '../lib/constants';
 
 /**
- * A user bar component that displays the user's profile picture and allows them to click on settings, or log out.
+ * A Header bar component that displays the user's profile picture and allows them to click on settings, or log out.
  * @returns
  */
-export default function UserBar() {
+export default function Header() {
   const [email, setEmail] = useState<string>('');
   const supabase = createSupabaseClient();
   const router = useRouter();
+
   const logOut = () => {
     supabase.auth.signOut();
     router.push('/');
@@ -39,7 +43,19 @@ export default function UserBar() {
   }, [supabase]);
 
   return (
-    <div className="fixed top-4 right-8">
+    <div className="relative p-4 flex justify-between">
+      <div className="flex items-center">
+        <Link href={PAGES.DASHBOARD}>
+          <h2 className="mr-8 text-2xl font-bold leading-7 text-gray-900">
+            {APP_NAME} (BETA)
+          </h2>
+        </Link>
+        <Link href={PAGES.DASHBOARD}>
+          <h2 className={`mr-4 text-xl font-medium text-gray-900`}>
+            Dashboard
+          </h2>
+        </Link>
+      </div>
       <Menu>
         <MenuButton className="p-2 rounded-full bg-green-400 text-sm/6 font-semibold focus:outline-none data-[hover]:bg-green-600 data-[open]:bg-green-600 data-[focus]:outline-1 data-[focus]:outline-black">
           <UserCircleIcon className="w-12" />

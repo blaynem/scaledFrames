@@ -8,7 +8,6 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUser } from '../components/UserContext';
-import { APP_NAME } from '@framer/FramerServerSDK';
 
 export const TeamsPanel = () => {
   const { selectedTeam, teams, changeSelectedTeam, user } = useUser();
@@ -20,13 +19,10 @@ export const TeamsPanel = () => {
 
   return (
     <div className="relative px-8 py-4 min-w-[360px]">
-      <h1 className="p-8 pl-0 font-bold text-xl uppercase">
-        {APP_NAME} (beta)
-      </h1>
       <Popover>
         {({ open: popperOpen, close: closePopper }) => (
           <>
-            <p>Selected Team</p>
+            <p className="font-semibold text-lg">Selected Team</p>
             <PopoverButton className="rounded-md bg-zinc-100 w-full text-left p-2 pl-3 text-sm/6 border border-slate-400 focus:outline-none data-[active]:border-slate-800 data-[hover]:border-slate-800 data-[focus]:border-slate-800">
               <div className="flex">
                 <p className="flex-1 font-semibold ">{selectedTeam.name}</p>

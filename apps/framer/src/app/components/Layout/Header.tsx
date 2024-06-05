@@ -13,7 +13,6 @@ import {
 } from '@heroicons/react/20/solid';
 import { Menu, Transition } from '@headlessui/react';
 import Link from 'next/link';
-import UserBar from '../UserBar';
 import { APP_NAME } from '@framer/FramerServerSDK';
 
 function classNames(...classes: any) {
