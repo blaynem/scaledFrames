@@ -5,6 +5,9 @@ import { Input } from '../../../components/ui/Input';
 import { Textarea } from '../../../components/ui/TextArea';
 import { createFramerUrl } from '@framer/FramerServerSDK';
 import { CopyButtonInput } from '../../../components/ui/CopyButtonInput';
+import Link from 'next/link';
+import { PAGES } from '../../../lib/constants';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
 
 const DESCRIPTION = 'description';
 const IS_PROJECT_LIVE = 'isProjectLive';
@@ -177,7 +180,13 @@ export default function ProjectOverview() {
           </form>
         </div>
         <div className="p-8 w-[400px]">
-          <h1>Preview</h1>
+          <div className="mb-12 flex items-center justify-between">
+            <h2 className="text-xl font-semibold ">Edit Frame</h2>
+            <Link href={PAGES.FRAME_EDITOR + '/' + projectData.id}>
+              <PencilSquareIcon className="ml- h-8 w-8" />
+            </Link>
+          </div>
+          <h2 className="text-xl font-semibold ">Preview</h2>
           <p className="">
             This is a preview of what your Project will look like when displayed
             on a supported application or website.
