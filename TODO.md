@@ -9,7 +9,6 @@ Setting up Domain and email and all things associated with it
 - Need a way to save intents to a frame. Right now they are never able to be edited.
     - "How does the client want to handle this?"
         - We likely want to save them all at one time. So rather than create a separate endpoint, we can edit the frames endpoint to accept intents as well.
-- We need a way to edit Project details.
 - Do we add a Create a Project "From a template" option?
 - What if when a user was created, we did NOT automatically add the Project for them?
 - Maybe we just write a "how to" guide

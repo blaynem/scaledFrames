@@ -19,11 +19,7 @@ import {
 import { Prisma } from '@prisma/client';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
-import {
-  convertToUrlSafe,
-  getAllowedFeatures,
-  getRolePermissions,
-} from '@framer/FramerServerSDK';
+import { convertToUrlSafe, getAllowedFeatures } from '@framer/FramerServerSDK';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const projectsFrogInstance = new Frog();
