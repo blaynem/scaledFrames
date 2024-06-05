@@ -1,4 +1,4 @@
-import { FRAMES_SERVER_BASE_PATH } from '../constants';
+import { FRAMES_SERVER_BASE_PATH } from './constants';
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
  */
 export const convertToUrlSafe = (val: string): string =>
   val
+    .trim()
     .replace(/[^a-zA-Z0-9 -]/g, '')
     .replace(/\s+/g, '-')
     .toLowerCase();
@@ -50,6 +51,30 @@ export type ParsedFrameUrl = {
    * This is mostly used for "looks" of the URL.
    */
   teamSubdomain: string;
+};
+
+/**
+ * Creates a Framer URL from the provided parts that can be shareable:
+ * `https://{teamSubdomain}.scaledframes.com/f/{projectBasePath}/{framePath}`
+ *
+ * Team subdomain is optional, as custom subdomains require subscription.
+ *
+ * Example URL:
+ * 1. `https://nike.scaledframes.com/f/epic-project/some-frame`
+ * 2. `https://scaledframes.com/f/epic-project/some-frame`
+ */
+export const createFramerShareableUrl = ({
+  teamSubdomain,
+  projectBasePath,
+  framePath,
+}: {
+  teamSubdomain?: string;
+  projectBasePath: string;
+  framePath: string;
+}) => {
+  return `https://${
+    teamSubdomain ? `${teamSubdomain}.` : ''
+  }scaledframes.com/f${projectBasePath}${framePath}`;
 };
 
 /**

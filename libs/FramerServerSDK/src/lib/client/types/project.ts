@@ -57,6 +57,10 @@ export type CreateProjectRequestBody = {
 export type CreateProjectResponse = ProjectIncludeFrames | { error: string };
 export type EditProjectRequestBody = {
   /**
+   * Custom base path for the project.
+   */
+  customBasePath?: string;
+  /**
    * Id of Team the project belongs to.
    */
   teamId: string;

@@ -10,7 +10,7 @@ import {
   convertToUrlSafe,
   createUniqueSubdomain,
   getRandomColor,
-} from '../utils';
+} from '../../utils';
 import {
   LOG_ERROR_TYPES,
   LOG_ACTIONS,

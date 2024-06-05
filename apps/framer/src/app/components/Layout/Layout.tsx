@@ -1,4 +1,4 @@
-import Header from './Header';
+import Header from '../../components/Header';
 import styles from './Layout.module.css';
 
 /* eslint-disable-next-line */
@@ -9,7 +9,7 @@ export interface LayoutProps {
 export function Layout(props: LayoutProps) {
   return (
     <div className="">
-      <Header></Header>
+      <Header />
       {props.children}
     </div>
   );

@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react';
 import { useUser } from '../../components/UserContext';
 import GeneralModal from '../../components/Modal';
 import { PencilIcon } from '@heroicons/react/24/outline';
-import { getRolePermissions } from '@framer/FramerServerSDK';
 
 type MemberDisplay = {
   id: string;
@@ -20,7 +19,8 @@ type MemberDisplay = {
 
 export const TeamMembers = () => {
   const { addToast } = useToast();
-  const { selectedTeam, user } = useUser();
+  const { selectedTeam, user, userPermissions, allowedFeatures, userRole } =
+    useUser();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [members, setMembers] = useState<MemberDisplay[]>([]);
   const [memberToRemove, setMemberToRemove] = useState<MemberDisplay | null>(
@@ -125,19 +125,16 @@ export const TeamMembers = () => {
     );
   };
 
-  const _userRole =
-    selectedTeam.members.find((member) => member.id === user.id)?.role ??
-    Role.Viewer;
-  const userPermissions = getRolePermissions(_userRole);
-
   // Determine if we show the edit role button or not.
   const showEditRole = (member: MemberDisplay) => {
-    if (_userRole === Role.Owner) {
+    if (userRole === Role.Owner) {
       // Owner can't edit their own role.
       if (member.role === Role.Owner) return false;
     }
     return userPermissions.canEditTargetsRole(member.role);
   };
+
+  const isInviteDisabled = members.length >= allowedFeatures.maxTeamMembers;
 
   return (
     <div className={sectionWrapper}>
@@ -261,13 +258,17 @@ export const TeamMembers = () => {
       </ul>
       {userPermissions.canEditTeam && (
         <div className="flex justify-end">
-          <button
-            onClick={() => setInviteOpen(true)}
-            type="button"
-            className="text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Invite
-          </button>
+          {isInviteDisabled ? (
+            <p className="text-sm">Upgrade Subscription to invite more.</p>
+          ) : (
+            <button
+              onClick={() => setInviteOpen(true)}
+              type="button"
+              className="text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Invite
+            </button>
+          )}
         </div>
       )}
     </div>
