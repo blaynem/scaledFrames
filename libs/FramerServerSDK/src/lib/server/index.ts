@@ -6,4 +6,3 @@ export * from './logging';
 export * from './seed-subscription-plan';
 export * from './supabaseServer';
 export * from './types';
-export * from './utils';

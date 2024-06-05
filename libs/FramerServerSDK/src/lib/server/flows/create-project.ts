@@ -3,7 +3,7 @@ import {
   CreateProjectRequestBody,
   CreateProjectResponse,
 } from '../../client/types';
-import { convertToUrlSafe, getRandomColor } from '../utils';
+import { convertToUrlSafe, getRandomColor } from '../../utils';
 import {
   logActivity,
   LOG_ACTIONS,

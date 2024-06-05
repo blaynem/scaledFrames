@@ -1,4 +1,4 @@
-import { FRAMES_SERVER_BASE_PATH } from '../constants';
+import { FRAMES_SERVER_BASE_PATH } from './constants';
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -50,6 +50,24 @@ export type ParsedFrameUrl = {
    * This is mostly used for "looks" of the URL.
    */
   teamSubdomain: string;
+};
+
+/**
+ * Creates a Framer URL from the provided parts:
+ * `https://{teamSubdomain}.scaledframes.com/f/{projectBasePath}/{framePath}`
+ *
+ * Team subdomain is optional and defaults to "www", as custom subdomains require subscription.
+ */
+export const createFramerUrl = ({
+  teamSubdomain = 'www',
+  projectBasePath,
+  framePath,
+}: {
+  teamSubdomain?: string;
+  projectBasePath: string;
+  framePath: string;
+}) => {
+  return `https://${teamSubdomain}.scaledframes.com/f${projectBasePath}${framePath}`;
 };
 
 /**

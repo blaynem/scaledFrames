@@ -1,6 +1,6 @@
 import { Role, SubscriptionType } from '@prisma/client';
 
-type RolePermissionsType = {
+export type RolePermissionsType = {
   /**
    * A function that will be called to determine if the users role has permissions to remove the member with the target role.
    * @param targetRole - The role of the team member to be removed.
@@ -39,7 +39,7 @@ type RolePermissionsType = {
   canDeleteProject: boolean;
 };
 
-const lowestRolePermissions: RolePermissionsType = {
+export const lowestRolePermissions: RolePermissionsType = {
   canRemoveTarget: () => false,
   canEditTargetsRole: () => false,
   canEditTeam: false,

@@ -1,4 +1,4 @@
-import { APP_NAME, FRAMES_SERVER_BASE_PATH } from '../constants';
+import { APP_NAME, FRAMES_SERVER_BASE_PATH } from './constants';
 import { ParsedFrameUrl, parseFramerUrl } from './utils';
 
 describe('parseFramerUrl', () => {
