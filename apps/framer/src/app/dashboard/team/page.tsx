@@ -10,7 +10,6 @@ import { useUser } from '../../components/UserContext';
 import { useRouter } from 'next/navigation';
 import GeneralModal from '../../components/Modal';
 import { useState } from 'react';
-import { getRolePermissions } from '@framer/FramerServerSDK';
 
 export const convertToUrlSafe = (val: string): string =>
   val
@@ -26,7 +25,7 @@ export const headerSection =
 export default function TeamPage() {
   const { addToast } = useToast();
   const router = useRouter();
-  const { selectedTeam, user, refreshTeamsData } = useUser();
+  const { selectedTeam, user, refreshTeamsData, userPermissions } = useUser();
   const [leaveTeamOpen, setLeaveTeamOpen] = useState(false);
 
   if (!selectedTeam || !user) {
@@ -58,11 +57,6 @@ export default function TeamPage() {
 
     router.push('/dashboard');
   };
-
-  const _userRole =
-    selectedTeam.members.find((member) => member.id === user.id)?.role ??
-    Role.Viewer;
-  const userPermissions = getRolePermissions(_userRole);
 
   return (
     <div className="max-w-[800px]">

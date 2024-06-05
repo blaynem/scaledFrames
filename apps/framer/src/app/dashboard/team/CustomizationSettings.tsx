@@ -1,19 +1,20 @@
 'use client';
 import { useState } from 'react';
 import { sectionWrapper, headerSection } from './page';
-import {
-  APP_NAME,
-  getAllowedFeatures,
-  getRolePermissions,
-} from '@framer/FramerServerSDK';
+import { APP_NAME } from '@framer/FramerServerSDK';
 import { useUser } from '../../components/UserContext';
 import { FramerClientSDK } from '@framer/FramerServerSDK/client';
 import { useToast } from '../../components/Toasts/ToastProvider';
 import { ToastTypes } from '../../components/Toasts/GenericToast';
-import { Role } from '@prisma/client';
 
 export const CustomizationSettings = () => {
-  const { selectedTeam, refreshTeamsData, user } = useUser();
+  const {
+    selectedTeam,
+    refreshTeamsData,
+    user,
+    userPermissions,
+    allowedFeatures,
+  } = useUser();
   const { addToast } = useToast();
 
   const [teamName, setTeamName] = useState(selectedTeam?.name);
@@ -40,15 +41,6 @@ export const CustomizationSettings = () => {
     refreshTeamsData();
     loadingToast.clearToast();
   };
-
-  const allowedFeatures = getAllowedFeatures(
-    selectedTeam.subscription.plan.subscriptionType
-  );
-
-  const _userRole =
-    selectedTeam.members.find((member) => member.id === user.id)?.role ??
-    Role.Viewer;
-  const userPermissions = getRolePermissions(_userRole);
 
   const onTeamNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!userPermissions.canEditTeam) return;

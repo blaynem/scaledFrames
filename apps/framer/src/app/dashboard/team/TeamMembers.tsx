@@ -9,10 +9,6 @@ import { useEffect, useState } from 'react';
 import { useUser } from '../../components/UserContext';
 import GeneralModal from '../../components/Modal';
 import { PencilIcon } from '@heroicons/react/24/outline';
-import {
-  getAllowedFeatures,
-  getRolePermissions,
-} from '@framer/FramerServerSDK';
 
 type MemberDisplay = {
   id: string;
@@ -23,7 +19,8 @@ type MemberDisplay = {
 
 export const TeamMembers = () => {
   const { addToast } = useToast();
-  const { selectedTeam, user } = useUser();
+  const { selectedTeam, user, userPermissions, allowedFeatures, userRole } =
+    useUser();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [members, setMembers] = useState<MemberDisplay[]>([]);
   const [memberToRemove, setMemberToRemove] = useState<MemberDisplay | null>(
@@ -128,25 +125,16 @@ export const TeamMembers = () => {
     );
   };
 
-  const _userRole =
-    selectedTeam.members.find((member) => member.id === user.id)?.role ??
-    Role.Viewer;
-  const userPermissions = getRolePermissions(_userRole);
-  const subscriptionPermissions = getAllowedFeatures(
-    selectedTeam.subscription.plan.subscriptionType
-  );
-
   // Determine if we show the edit role button or not.
   const showEditRole = (member: MemberDisplay) => {
-    if (_userRole === Role.Owner) {
+    if (userRole === Role.Owner) {
       // Owner can't edit their own role.
       if (member.role === Role.Owner) return false;
     }
     return userPermissions.canEditTargetsRole(member.role);
   };
 
-  const isInviteDisabled =
-    members.length < subscriptionPermissions.maxTeamMembers;
+  const isInviteDisabled = members.length < allowedFeatures.maxTeamMembers;
 
   return (
     <div className={sectionWrapper}>

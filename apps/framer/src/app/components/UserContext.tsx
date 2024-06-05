@@ -3,12 +3,34 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import {
   FramerClientSDK,
   GetTeamResponseType,
+  ProjectIncludeRootFrame,
 } from '@framer/FramerServerSDK/client';
 import { ToastTypes } from './Toasts/GenericToast';
 import { useToast } from './Toasts/ToastProvider';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
+import {
+  RolePermissionsType,
+  SubscriptionGatedFeatures,
+  getAllowedFeatures,
+  getRolePermissions,
+  lowestRolePermissions,
+} from '@framer/FramerServerSDK';
+import { useRouter } from 'next/navigation';
+import { PAGES } from '../lib/constants';
 
 type UserContextType = {
+  /**
+   * The features that are allowed based on the currently selected teams subscription.
+   */
+  allowedFeatures: SubscriptionGatedFeatures;
+  /**
+   * The permissions that the user has based on their role in the currently selected team.
+   */
+  userPermissions: RolePermissionsType;
+  /**
+   * The role of the user in the currently selected team.
+   */
+  userRole: Role;
   /**
    * Technically only used for the initial fetch.
    */
@@ -23,6 +45,15 @@ type UserContextType = {
    * Change the selected team, update the projects list.
    */
   changeSelectedTeam: (teamId: string) => void;
+
+  /**
+   * Get the project data by the project ID.
+   *
+   * Note: This is based on the selected team data. It's not a new fetch request. If we need to refetch data we should use `refreshTeamsData`.
+   */
+  getProjectDataById: (
+    projectId: string
+  ) => ProjectIncludeRootFrame | undefined;
   /**
    * Refresh all the team data. A bit of a hacky way to refresh the data.
    *
@@ -36,7 +67,9 @@ type UserContextType = {
 const UserContext = createContext<UserContextType | null>(null);
 
 /**
- * Hook to use the User context.
+ * Contains many goodies that are needed throughout the app.
+ *
+ * Including permissions and subscription features.
  * @returns
  */
 export const useUser = (): UserContextType => {
@@ -50,6 +83,7 @@ export const useUser = (): UserContextType => {
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { addToast } = useToast();
   const fetchedRef = useRef(false);
+  const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
@@ -57,6 +91,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedTeam, setSelectedTeam] = useState<GetTeamResponseType | null>(
     null
   );
+  const [allowedFeatures, setAllowedFeatures] =
+    useState<SubscriptionGatedFeatures>(getAllowedFeatures('Free'));
+  const [userPermissions, setUserPermissions] = useState<RolePermissionsType>(
+    lowestRolePermissions
+  );
+  const [userRole, setUserRole] = useState<Role>(Role.Viewer);
+
+  const getProjectDataById = (projectId: string) => {
+    return selectedTeam?.projects.find((project) => project.id === projectId);
+  };
 
   const refreshTeamsData = async () => {
     const framerSdk = FramerClientSDK();
@@ -69,6 +113,24 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const _selectedTeamData = _teams[0];
     setTeams(_teams);
     setSelectedTeam(_selectedTeamData);
+  };
+
+  /**
+   * When a user changes the selected team, we need to update the allowed features and user permissions as well.
+   */
+  const handleSelectedTeamChange = async (
+    selectedTeamData: GetTeamResponseType,
+    userId: string
+  ) => {
+    setSelectedTeam(selectedTeamData);
+    setAllowedFeatures(
+      getAllowedFeatures(selectedTeamData.subscription.plan.subscriptionType)
+    );
+    const _userRole =
+      selectedTeamData.members.find((member) => member.id === userId)?.role ??
+      Role.Viewer;
+    setUserRole(_userRole);
+    setUserPermissions(getRolePermissions(_userRole));
   };
 
   useEffect(() => {
@@ -95,7 +157,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const _selectedTeamData = _teams[0];
       setUser(_user);
       setTeams(_teams);
-      setSelectedTeam(_selectedTeamData);
+      handleSelectedTeamChange(_selectedTeamData, _user.id);
+
       loadingToast.clearToast();
       setIsLoading(false);
     };
@@ -110,18 +173,24 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    setSelectedTeam(_team);
+    handleSelectedTeamChange(_team, user?.id ?? '');
+    // We push them to the dashboard otherwise its a little disorienting when we change teams.
+    router.push(PAGES.DASHBOARD);
   };
 
   return (
     <UserContext.Provider
       value={{
+        getProjectDataById,
         changeSelectedTeam,
         refreshTeamsData,
         isLoading,
         user,
         teams,
         selectedTeam,
+        allowedFeatures,
+        userPermissions,
+        userRole,
       }}
     >
       {children}
