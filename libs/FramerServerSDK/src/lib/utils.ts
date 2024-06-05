@@ -54,12 +54,16 @@ export type ParsedFrameUrl = {
 };
 
 /**
- * Creates a Framer URL from the provided parts:
+ * Creates a Framer URL from the provided parts that can be shareable:
  * `https://{teamSubdomain}.scaledframes.com/f/{projectBasePath}/{framePath}`
  *
- * Team subdomain is optional and defaults to "www", as custom subdomains require subscription.
+ * Team subdomain is optional, as custom subdomains require subscription.
+ *
+ * Example URL:
+ * 1. `https://nike.scaledframes.com/f/epic-project/some-frame`
+ * 2. `https://scaledframes.com/f/epic-project/some-frame`
  */
-export const createFramerUrl = ({
+export const createFramerShareableUrl = ({
   teamSubdomain,
   projectBasePath,
   framePath,

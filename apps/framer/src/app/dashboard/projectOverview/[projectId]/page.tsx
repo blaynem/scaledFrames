@@ -3,7 +3,7 @@ import { useParams } from 'next/navigation';
 import { useUser } from '../../../components/UserContext';
 import { Input } from '../../../components/ui/Input';
 import { Textarea } from '../../../components/ui/TextArea';
-import { createFramerUrl } from '@framer/FramerServerSDK';
+import { createFramerShareableUrl } from '@framer/FramerServerSDK';
 import { CopyButtonInput } from '../../../components/ui/CopyButtonInput';
 import Link from 'next/link';
 import { PAGES } from '../../../lib/constants';
@@ -69,7 +69,7 @@ export default function ProjectOverview() {
     refreshTeamsData();
   };
 
-  const framerUrl = createFramerUrl({
+  const shareableUrl = createFramerShareableUrl({
     teamSubdomain: allowedFeatures.canHaveCustomSubdomain
       ? selectedTeam.customSubDomain
       : undefined,
@@ -88,7 +88,7 @@ export default function ProjectOverview() {
             <h2 className="mb-4 text-xl font-semibold">Share your Frame</h2>
             <div>
               <p>Share this link to your Frame</p>
-              <CopyButtonInput value={framerUrl} textToCopy={framerUrl} />
+              <CopyButtonInput value={shareableUrl} textToCopy={shareableUrl} />
             </div>
           </div>
           <form onSubmit={onSubmit}>

@@ -25,7 +25,7 @@ export const headerSection =
 export default function TeamPage() {
   const { addToast } = useToast();
   const router = useRouter();
-  const { selectedTeam, user, refreshTeamsData, userPermissions } = useUser();
+  const { selectedTeam, user, refreshTeamsData } = useUser();
   const [leaveTeamOpen, setLeaveTeamOpen] = useState(false);
 
   if (!selectedTeam || !user) {
@@ -72,8 +72,8 @@ export default function TeamPage() {
         {selectedTeam.name} Settings
       </h1>
       <CustomizationSettings />
-      {userPermissions.canEditTeam && <TeamMembers />}
-      {userPermissions.canEditSubscription && <SubscriptionPanel />}
+      <TeamMembers />
+      <SubscriptionPanel />
       <div className={sectionWrapper}>
         <h2 className={headerSection}>Leave Team</h2>
         <button
