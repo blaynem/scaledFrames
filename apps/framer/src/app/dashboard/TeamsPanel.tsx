@@ -8,6 +8,7 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUser } from '../components/UserContext';
+import { PAGES } from '../lib/constants';
 
 export const TeamsPanel = () => {
   const { selectedTeam, teams, changeSelectedTeam, user } = useUser();
@@ -90,9 +91,9 @@ export const TeamsPanel = () => {
         )}
       </Popover>
       <Link
-        href="/dashboard"
+        href={PAGES.DASHBOARD}
         className={`block mt-4 text-slate-600 ${
-          pathname === '/dashboard'
+          pathname === PAGES.DASHBOARD
             ? 'font-semibold cursor-default'
             : 'hover:text-teal-500 '
         }`}
@@ -100,9 +101,9 @@ export const TeamsPanel = () => {
         Projects
       </Link>
       <Link
-        href={`/dashboard/team`}
+        href={PAGES.TEAM_SETTINGS}
         className={`block mt-4 text-slate-600 ${
-          pathname === '/dashboard/team'
+          pathname === PAGES.TEAM_SETTINGS
             ? 'font-semibold cursor-default'
             : 'hover:text-teal-500 '
         }`}
