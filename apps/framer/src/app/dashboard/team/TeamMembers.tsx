@@ -134,7 +134,7 @@ export const TeamMembers = () => {
     return userPermissions.canEditTargetsRole(member.role);
   };
 
-  const isInviteDisabled = members.length < allowedFeatures.maxTeamMembers;
+  const isInviteDisabled = members.length >= allowedFeatures.maxTeamMembers;
 
   return (
     <div className={sectionWrapper}>
@@ -258,7 +258,7 @@ export const TeamMembers = () => {
       </ul>
       {userPermissions.canEditTeam && (
         <div className="flex justify-end">
-          {!isInviteDisabled ? (
+          {isInviteDisabled ? (
             <p className="text-sm">Upgrade Subscription to invite more.</p>
           ) : (
             <button

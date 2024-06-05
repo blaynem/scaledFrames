@@ -16,6 +16,7 @@ Setting up Domain and email and all things associated with it
 - `path` in the freameEditor should be under like "advanced settings"
 - `intents` should be called "buttons" or "actions" for user
 - write about "compatible platforms" like warpcast, etc.
+- Verify permissions are correctly applied to all endpoints
 
 
 # After Release
