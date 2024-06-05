@@ -16,8 +16,14 @@ import {
   LOG_ACTIONS,
   LOG_DESCRIPTIONS,
 } from '@framer/FramerServerSDK/server';
+import { Prisma } from '@prisma/client';
 import prisma from '../../prismaClient';
 import { Frog } from 'frog';
+import {
+  convertToUrlSafe,
+  getAllowedFeatures,
+  getRolePermissions,
+} from '@framer/FramerServerSDK';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const projectsFrogInstance = new Frog();
@@ -156,6 +162,36 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
     const id = c.req.param('id');
     const body = await c.req.json<EditProjectRequestBody>();
     const authUser = await getUserFromEmail(prisma, email);
+
+    const updateData: Prisma.ProjectUpdateInput = {
+      description: body.description,
+      isProjectLive: body.isProjectLive,
+      notes: body.notes,
+      title: body.title,
+    };
+
+    // If the user can add a custom base path, then lets update it
+    // customBasePath: body.customBasePath,
+    const teamSubscription = await prisma.team.findFirstOrThrow({
+      where: {
+        id: body.teamId,
+      },
+      select: {
+        subscription: {
+          include: {
+            plan: true,
+          },
+        },
+      },
+    });
+    const allowedFeatures = getAllowedFeatures(
+      teamSubscription.subscription.plan.subscriptionType
+    );
+    if (allowedFeatures.canHaveCustomProjectPaths && body.customBasePath) {
+      // Clean up the base path before saving it
+      updateData.customBasePath = convertToUrlSafe(body.customBasePath);
+    }
+
     const project = await prisma.project.update({
       where: {
         id,
@@ -168,12 +204,7 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
           },
         },
       },
-      data: {
-        title: body.title,
-        description: body.description,
-        notes: body.notes,
-        isProjectLive: body.isProjectLive,
-      },
+      data: updateData,
       include: {
         frames: {
           include: {
@@ -201,6 +232,13 @@ projectsFrogInstance.post('/edit/:id', async (c) => {
 
     return c.json<CreateProjectResponse>(response);
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        return c.json<CreateProjectResponse>({
+          error: 'Project with that base path already exists',
+        });
+      }
+    }
     console.error('Edit a project Error: ', error);
     logError({
       prisma,

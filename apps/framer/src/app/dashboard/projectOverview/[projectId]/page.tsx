@@ -8,20 +8,28 @@ import { CopyButtonInput } from '../../../components/ui/CopyButtonInput';
 import Link from 'next/link';
 import { PAGES } from '../../../lib/constants';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import {
+  EditProjectRequestBody,
+  FramerClientSDK,
+} from '@framer/FramerServerSDK/client';
+import { useToast } from '../../../components/Toasts/ToastProvider';
+import { ToastTypes } from '../../../components/Toasts/GenericToast';
 
 const DESCRIPTION = 'description';
 const IS_PROJECT_LIVE = 'isProjectLive';
 const NOTES = 'notes';
 const CUSTOM_BASE_PATH = 'customBasePath';
-const CUSTOM_FALLBACK_URL = 'customFallbackUrl';
+// const CUSTOM_FALLBACK_URL = 'customFallbackUrl';
 
 export default function ProjectOverview() {
+  const { addToast } = useToast();
+  const clientSdk = FramerClientSDK();
   const {
     selectedTeam,
     getProjectDataById,
     userPermissions,
-    userRole,
     allowedFeatures,
+    refreshTeamsData,
   } = useUser();
   const { projectId } = useParams<{ projectId: string }>();
   const projectData = getProjectDataById(projectId);
@@ -32,33 +40,34 @@ export default function ProjectOverview() {
 
   const isReadOnly = !userPermissions.canEditProject;
 
-  console.log('projectData', projectData);
-
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const loadingToast = addToast(ToastTypes.LOADING, 'Saving', 'infinite');
     // get values from form
     const formData = new FormData(e.currentTarget);
     const _isProjectLive = formData.get(IS_PROJECT_LIVE);
     const _description = formData.get(DESCRIPTION);
     const _notes = formData.get(NOTES);
     const _customBasePath = formData.get(CUSTOM_BASE_PATH);
-    const _customFallbackUrl = formData.get(CUSTOM_FALLBACK_URL);
 
-    console.log('formData', {
-      isProjectLive: _isProjectLive,
-      description: _description,
-      notes: _notes,
-      customBasePath: _customBasePath,
-      customFallbackUrl: _customFallbackUrl,
-    });
+    const body: EditProjectRequestBody = {
+      teamId: selectedTeam.id,
+      isProjectLive: _isProjectLive === 'on',
+      description: (_description as string) ?? '',
+      notes: (_notes as string) ?? '',
+      customBasePath: (_customBasePath as string) ?? '',
+    };
 
-    // submit data
-    console.log('submit', e);
+    const response = await clientSdk.projects.edit(projectId, body);
+    loadingToast.clearToast();
+
+    if ('error' in response) {
+      addToast(ToastTypes.ERROR, response.error, 5000);
+      return;
+    }
+
+    refreshTeamsData();
   };
-
-  console.log('allowedFeatures', allowedFeatures);
-  console.log('userRole', userRole);
-  console.log('userPermissions', userPermissions);
 
   const framerUrl = createFramerUrl({
     teamSubdomain: allowedFeatures.canHaveCustomSubdomain
@@ -121,7 +130,7 @@ export default function ProjectOverview() {
                   name={CUSTOM_BASE_PATH}
                   id={CUSTOM_BASE_PATH}
                   placeholder="Enter custom base path"
-                  defaultValue={projectData.customBasePath}
+                  defaultValue={'/' + projectData.customBasePath}
                 />
                 {!isReadOnly && !allowedFeatures.canHaveCustomProjectPaths && (
                   <p className="text-sm text-gray-500 dark:text-gray-400">

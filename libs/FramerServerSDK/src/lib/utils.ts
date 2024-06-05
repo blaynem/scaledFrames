@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
  */
 export const convertToUrlSafe = (val: string): string =>
   val
+    .trim()
     .replace(/[^a-zA-Z0-9 -]/g, '')
     .replace(/\s+/g, '-')
     .toLowerCase();
@@ -59,7 +60,7 @@ export type ParsedFrameUrl = {
  * Team subdomain is optional and defaults to "www", as custom subdomains require subscription.
  */
 export const createFramerUrl = ({
-  teamSubdomain = 'www',
+  teamSubdomain,
   projectBasePath,
   framePath,
 }: {
@@ -67,7 +68,9 @@ export const createFramerUrl = ({
   projectBasePath: string;
   framePath: string;
 }) => {
-  return `https://${teamSubdomain}.scaledframes.com/f${projectBasePath}${framePath}`;
+  return `https://${
+    teamSubdomain ? `${teamSubdomain}.` : ''
+  }scaledframes.com/f${projectBasePath}${framePath}`;
 };
 
 /**

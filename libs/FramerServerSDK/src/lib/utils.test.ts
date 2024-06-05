@@ -1,5 +1,5 @@
 import { APP_NAME, FRAMES_SERVER_BASE_PATH } from './constants';
-import { ParsedFrameUrl, parseFramerUrl } from './utils';
+import { ParsedFrameUrl, convertToUrlSafe, parseFramerUrl } from './utils';
 
 describe('parseFramerUrl', () => {
   it('should parse a Framer URL correctly', () => {
@@ -70,5 +70,10 @@ describe('parseFramerUrl', () => {
     expect(testUrl4).toEqual(expectedTest4);
     expect(testUrl5).toEqual(expectedTest5);
     expect(testUrl6).toEqual(expectedTest6);
+  });
+  it('convertToUrlSafe works as expected', () => {
+    expect(convertToUrlSafe('Hello World')).toBe('hello-world');
+    expect(convertToUrlSafe('/9ec522//')).toBe('9ec522');
+    expect(convertToUrlSafe('/9ec522/+-=12#49(08/')).toBe('9ec522-124908');
   });
 });
