@@ -17,6 +17,7 @@ import { findFrameIdxById } from '../../utils/utils';
 import { ToastTypes } from '../Toasts/GenericToast';
 import { useToast } from '../Toasts/ToastProvider';
 import { APP_DOMAIN } from '@framer/FramerServerSDK';
+import ImageUploadModal from '../ImageUploadModal/ImageUploadModal';
 
 /* eslint-disable-next-line */
 export interface FrameInputsProps {}
@@ -28,19 +29,18 @@ export function FrameInputs(props: FrameInputsProps) {
     selectedFrame ? selectedFrame.intents : []
   );
   const { addToast } = useToast();
-
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<any>(null);
+  const [hasChanges, setHasChanges] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState(selectedFrame ? selectedFrame.title : '');
   const [path, setPath] = useState(selectedFrame ? selectedFrame.path : '');
   const [imageUrl, setImageUrl] = useState(
     selectedFrame ? selectedFrame.imageUrl : ''
   );
+  const [show, setShow] = useState(false);
+  const clientSdk = FramerClientSDK();
 
   const fileSelectedHandler = (event: any) => {
     const file = event.target.files[0];
-    setSelectedFile(file);
 
     // Create a preview of the selected image
     const reader = new FileReader();
@@ -57,10 +57,12 @@ export function FrameInputs(props: FrameInputsProps) {
       setTitle(selectedFrame.title);
       setIntents(selectedFrame.intents);
       setPath(selectedFrame.path);
+      setImageUrl(selectedFrame.imageUrl);
     }
   }, [selectedFrame, frames]);
 
   const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHasChanges(true);
     setTitle(e.target.value);
     if (selectedFrame) {
       const tempFrames = [...frames];
@@ -70,7 +72,22 @@ export function FrameInputs(props: FrameInputsProps) {
       setFrameEditorContext(tempFrames, tempFrame);
     }
   };
+
+  const handleChangePath = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHasChanges(true);
+    setPath(e.target.value);
+    if (selectedFrame) {
+      const tempFrames = [...frames];
+      const idx = findFrameIdxById(tempFrames, selectedFrame.id);
+      const tempFrame = { ...selectedFrame, path: e.target.value };
+      tempFrames[idx] = tempFrame;
+      setFrameEditorContext(tempFrames, tempFrame);
+    }
+  };
+
   const handleAddIntent = () => {
+    setHasChanges(true);
+
     const exampleIntent = {
       id: `${intents.length + 1}`,
       displayText: 'Example Intent',
@@ -108,6 +125,7 @@ export function FrameInputs(props: FrameInputsProps) {
     }
   };
   const handleChangeImageUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHasChanges(true);
     setImageUrl(e.target.value);
     if (selectedFrame) {
       const tempFrames = [...frames];
@@ -119,6 +137,7 @@ export function FrameInputs(props: FrameInputsProps) {
   };
 
   const handleChangeImageUrlUpload = (preview: string) => {
+    setHasChanges(true);
     setImageUrl(preview);
     if (selectedFrame) {
       const tempFrames = [...frames];
@@ -130,7 +149,10 @@ export function FrameInputs(props: FrameInputsProps) {
   };
 
   const handleSaveFrame = async () => {
-    const clientSdk = FramerClientSDK();
+    if (!hasChanges) return;
+
+    setHasChanges(false);
+
     const loadingToast = addToast(ToastTypes.LOADING, 'Saving', 'infinite');
     if (selectedFrame) {
       const body: EditFrameRequestBody = {
@@ -158,14 +180,15 @@ export function FrameInputs(props: FrameInputsProps) {
     }
   };
 
-  const handleButtonClick = () => {
+  const handleImageUpload = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
+
   return (
     selectedFrame && (
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div className="flex flex-col">
         <div>
           <label className="block mb-2 text-sm font-medium text-gray-100 ">
             Title
@@ -176,6 +199,7 @@ export function FrameInputs(props: FrameInputsProps) {
             placeholder="Title"
             value={title}
             onChange={handleChangeTitle}
+            onBlur={handleSaveFrame}
           />
         </div>
 
@@ -188,24 +212,39 @@ export function FrameInputs(props: FrameInputsProps) {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
             placeholder="Path"
             value={path}
-            onChange={(e) => {
-              setPath(e.target.value);
-            }}
+            onChange={handleChangePath}
+            onBlur={handleSaveFrame}
           />
         </div>
         <div className="w-full">
-          <div className="relative flex flex-col">
+          <div className="flex flex-col">
             <label className=" pt-1 block mb-2 text-sm font-medium text-gray-100 ">
               Image URL/Upload
             </label>
-
-            <input
+            {selectedFrame ? (
+              <button
+                type="button"
+                className="text-white justify-center mt-3 bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
+                onClick={() => {
+                  setShow(true);
+                }}
+              >
+                <ArrowUpOnSquareIcon className="h-5 w-5 mr-2" />
+                Upload Image
+              </button>
+            ) : null}
+            <ImageUploadModal
+              show={show}
+              setShow={setShow}
+              handleChangeImageUrl={handleChangeImageUrl}
+            />
+            {/* <input
               id="npm-install-copy-button"
               type="text"
               className="col-span-6 bg-gray-50 border border-gray-300 text-gray-500 text-sm  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              style={selectedFile ? { display: 'none' } : {}} // hide the input if file is selected
               value={imageUrl}
               onChange={handleChangeImageUrl}
+              onBlur={handleSaveFrame}
             />
 
             <input
@@ -213,17 +252,18 @@ export function FrameInputs(props: FrameInputsProps) {
               id="file_input"
               type="file"
               ref={fileInputRef}
-              style={selectedFile ? {} : { display: 'none' }} // hide the input if file is not selected
+              style={{ display: 'none' }} // hide the input if file is not selected
               onChange={fileSelectedHandler}
+              onBlur={handleSaveFrame}
             />
 
             <button
               type="button"
-              onClick={() => handleButtonClick()}
-              className="mr-1 mt-0.5 absolute top-8 end-2 self-end text-gray-500 dark:text-gray-400 hover:text-gray-100 hover:bg-gray-300 rounded-lg p-2 inline-flex items-center justify-center"
+              onClick={() => handleImageUpload()}
+              className="mr-1 mt-0.5 absolute top-8 end-2 self-end text-gray-500 dark:text-gray-400 bg-white hover:text-gray-100 hover:bg-gray-300 rounded-lg p-2 inline-flex items-center justify-center"
             >
               <ArrowUpOnSquareIcon className="h-5 w-5" />
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -233,12 +273,14 @@ export function FrameInputs(props: FrameInputsProps) {
               key={intent.id}
               intent={intent}
               handleRemoveIntent={handleRemoveIntent}
+              handleSaveFrame={handleSaveFrame}
+              setHasChanges={(hasChanges: boolean) => setHasChanges(hasChanges)}
             />
           ))}
         {selectedFrame && selectedFrame.intents.length < 4 ? (
           <button
             type="button"
-            className="text-white mt-3 bg-gray-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
+            className="text-white items-center justify-center mt-3 bg-gray-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
             onClick={() => {
               handleAddIntent();
             }}
@@ -250,7 +292,7 @@ export function FrameInputs(props: FrameInputsProps) {
         {selectedFrame ? (
           <button
             type="button"
-            className="text-white mt-3 bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
+            className="text-white justify-center mt-3 bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
             onClick={() => {
               handleSaveFrame();
             }}

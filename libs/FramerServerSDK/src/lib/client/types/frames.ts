@@ -118,6 +118,10 @@ export type FrameSDKType = {
    * @returns FrameResponseType | { error: string}
    */
   edit: (id: string, body: EditFrameRequestBody) => Promise<EditFrameResponse>;
+  /** delete a frame
+   * @param id Frame id
+   */
+  delete: (id: string) => Promise<void>;
   /**
    * Related image operations
    */

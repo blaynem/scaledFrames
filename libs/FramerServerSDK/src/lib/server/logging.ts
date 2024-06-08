@@ -31,6 +31,7 @@ export enum LOG_ERROR_TYPES {
   CONSUMER_FETCH_FRAME = 'Consumer Fetch Frame Error',
   FRAME_CREATE = 'Frame Create Error',
   FRAME_UPDATE = 'Frame Update Error',
+  FRAME_DELETE = 'Frame Delete Error',
   PROJECT_CREATE = 'Project Create Error',
   PROJECT_UPDATE = 'Project Update Error',
   USER_SIGNUP = 'User Signup Error',
@@ -42,6 +43,7 @@ export enum LOG_ERROR_TYPES {
 export const LOG_ACTIONS = {
   FrameCreated: 'Frame created',
   FrameUpdated: 'Frame updated',
+  FrameDeleted: 'Frame deleted',
   ProjectCreated: 'Project created',
   ProjectUpdated: 'Project updated',
   UserCreated: 'User created',
@@ -49,6 +51,7 @@ export const LOG_ACTIONS = {
 export const LOG_DESCRIPTIONS = {
   FrameCreated: 'User created a frame',
   FrameUpdated: 'User updated a frame',
+  FrameDeleted: 'User deleted a frame',
   ProjectCreated: 'User created a project',
   ProjectUpdated: 'User updated a project',
   UserCreated: 'User created their account',

@@ -48,6 +48,7 @@ frameFrogInstance.get('/', async (c) => {
     const frame = await prisma.frame.findMany({
       where: {
         ...queries,
+        isDeleted: false,
         team: {
           users: {
             some: {
@@ -192,52 +193,55 @@ frameFrogInstance.post('/edit/:id', async (c) => {
       isDeleted: intent.isDeleted || false,
       type: intent.type || IntentType.ExternalLink, // Replace `undefined` with a default value for `type`
     }));
-    const deleted = await prisma.intents.deleteMany({
-      where: {
-        framesId: id,
-      },
-    });
+    const frame = await prisma.$transaction(async (prisma) => {
+      await prisma.intents.deleteMany({
+        where: {
+          framesId: id,
+        },
+      });
 
-    await prisma.intents.createMany({
-      skipDuplicates: true,
-      data: filteredIntents.map((intent) => ({
-        framesId: id,
-        linkUrl: intent.linkUrl || '',
-        displayText: intent.displayText || '',
-        displayOrder: intent.displayOrder || 0,
-        isDeleted: intent.isDeleted || false,
-        type: intent.type || IntentType.ExternalLink, // Replace `undefined` with a default value for `type`
-      })),
-    });
+      await prisma.intents.createMany({
+        skipDuplicates: true,
+        data: filteredIntents.map((intent) => ({
+          framesId: id,
+          linkUrl: intent.linkUrl || '',
+          displayText: intent.displayText || '',
+          displayOrder: intent.displayOrder || 0,
+          isDeleted: intent.isDeleted || false,
+          type: intent.type || IntentType.ExternalLink, // Replace `undefined` with a default value for `type`
+        })),
+      });
 
-    const intents = await prisma.intents.findMany({
-      where: {
-        framesId: id,
-      },
-    });
+      const intents = await prisma.intents.findMany({
+        where: {
+          framesId: id,
+        },
+      });
 
-    const frame = await prisma.frame.update({
-      where: {
-        id,
-        teamId: body.teamId,
-        team: {
-          users: {
-            some: {
-              userId: authUser.id,
+      return await prisma.frame.update({
+        where: {
+          id,
+          teamId: body.teamId,
+          team: {
+            users: {
+              some: {
+                userId: authUser.id,
+              },
             },
           },
         },
-      },
-      data: {
-        ...updateData,
-        intents: {
-          connect: intents,
+        data: {
+          ...updateData,
+          intents: {
+            connect: intents,
+          },
         },
-      },
-      include: {
-        intents: true,
-      },
+        include: {
+          intents: true,
+        },
+      });
     });
+
     logActivity(prisma, {
       action: LOG_ACTIONS.FrameUpdated,
       description: LOG_DESCRIPTIONS.FrameUpdated,
@@ -253,6 +257,51 @@ frameFrogInstance.post('/edit/:id', async (c) => {
       errorType: LOG_ERROR_TYPES.FRAME_UPDATE,
     });
     return c.json<EditFrameResponse>({ error: 'Error editing frame' });
+  }
+});
+
+frameFrogInstance.post('/delete/:id', async (c) => {
+  try {
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+
+    const id = c.req.param('id');
+    const authUser = await getUserFromEmail(prisma, email);
+
+    const frame = await prisma.frame.update({
+      where: {
+        id,
+        team: {
+          users: {
+            some: {
+              userId: authUser.id,
+            },
+          },
+        },
+      },
+      data: {
+        isDeleted: true,
+      },
+      include: {
+        intents: true,
+      },
+    });
+
+    logActivity(prisma, {
+      action: LOG_ACTIONS.FrameDeleted,
+      description: LOG_DESCRIPTIONS.FrameDeleted,
+      userId: authUser.id,
+    });
+
+    return c.json<EditFrameResponse>(frame);
+  } catch (error) {
+    console.error('Delete a frame Error: ', error);
+    logError({
+      prisma,
+      error,
+      errorType: LOG_ERROR_TYPES.FRAME_DELETE,
+    });
+    return c.json<EditFrameResponse>({ error: 'Error deleting frame' });
   }
 });
 
