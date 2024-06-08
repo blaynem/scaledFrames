@@ -1,5 +1,8 @@
 import { PrismaClient, SubscriptionType } from '@prisma/client';
 
+// const STRIPE_PROD_STANDARD_PLAN_ID = 'price_1PNRPlJekjVFjxbGCEl07ZoF';
+// const STRIPE_PROD_PREMIUM_PLAN_ID = 'price_1PNRUcJekjVFjxbGs8vrZZx3';
+// const STRIPE_PROD_TEAM_MEMBER_ADDON_ID = 'price_1PNRWzJekjVFjxbGyxcFUhNN';
 /**
  * Creates the subscription plans in the database.
  *

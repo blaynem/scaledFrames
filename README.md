@@ -22,7 +22,7 @@ Standard:
 
 URL:
 ```ts
-var url = `https://${subdomain}.framer.com/f/${path}`
+var url = `https://${subdomain}.scaledframes.com/f/${path}`
 ```
 
 # Set up

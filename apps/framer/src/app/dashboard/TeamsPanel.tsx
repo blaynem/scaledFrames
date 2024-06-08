@@ -8,9 +8,10 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUser } from '../components/UserContext';
+import { PAGES } from '../lib/constants';
 
 export const TeamsPanel = () => {
-  const { selectedTeam, teams, changeSelectedTeam } = useUser();
+  const { selectedTeam, teams, changeSelectedTeam, user } = useUser();
   const pathname = usePathname();
 
   if (!selectedTeam) {
@@ -19,15 +20,13 @@ export const TeamsPanel = () => {
 
   return (
     <div className="relative px-8 py-4 min-w-[360px]">
-      <h1 className="p-8 pl-0 font-bold text-xl uppercase">Framer (beta)</h1>
       <Popover>
         {({ open: popperOpen, close: closePopper }) => (
           <>
+            <p className="font-semibold text-lg">Selected Team</p>
             <PopoverButton className="rounded-md bg-zinc-100 w-full text-left p-2 pl-3 text-sm/6 border border-slate-400 focus:outline-none data-[active]:border-slate-800 data-[hover]:border-slate-800 data-[focus]:border-slate-800">
               <div className="flex">
-                <p className="flex-1 font-semibold ">
-                  {selectedTeam.name} Team
-                </p>
+                <p className="flex-1 font-semibold ">{selectedTeam.name}</p>
                 <ChevronDownIcon
                   className={`w-5 h-5 transition ${
                     popperOpen ? 'rotate-180' : 'rotate-0'
@@ -60,12 +59,14 @@ export const TeamsPanel = () => {
                   <p className="py-2 px-3">Change Teams</p>
                   <ul className="list-disc list-inside">
                     {teams.map((team) => {
-                      const isTeam = team.id === selectedTeam.id;
+                      const isSelectedTeam = team.id === selectedTeam.id;
+                      const userIsOwner = team.ownerId === user?.id;
                       return (
                         <li key={team.id} className="px-3 mb-2">
-                          {isTeam ? (
+                          {isSelectedTeam ? (
                             <span className="cursor-default font-medium bg-slate-300">
                               {team.name}
+                              {userIsOwner ? ' (Owner)' : ''}
                             </span>
                           ) : (
                             <button
@@ -76,6 +77,7 @@ export const TeamsPanel = () => {
                               className="hover:text-teal-500"
                             >
                               {team.name}
+                              {userIsOwner ? ' (Owner)' : ''}
                             </button>
                           )}
                         </li>
@@ -89,9 +91,9 @@ export const TeamsPanel = () => {
         )}
       </Popover>
       <Link
-        href="/dashboard"
+        href={PAGES.DASHBOARD}
         className={`block mt-4 text-slate-600 ${
-          pathname === '/dashboard'
+          pathname === PAGES.DASHBOARD
             ? 'font-semibold cursor-default'
             : 'hover:text-teal-500 '
         }`}
@@ -99,9 +101,9 @@ export const TeamsPanel = () => {
         Projects
       </Link>
       <Link
-        href={`/dashboard/team`}
+        href={PAGES.TEAM_SETTINGS}
         className={`block mt-4 text-slate-600 ${
-          pathname === '/dashboard/team'
+          pathname === PAGES.TEAM_SETTINGS
             ? 'font-semibold cursor-default'
             : 'hover:text-teal-500 '
         }`}

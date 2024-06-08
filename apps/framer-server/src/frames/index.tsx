@@ -3,7 +3,6 @@ import {
   LOG_ERROR_TYPES,
   logError,
   logIntentTrackingFarcaster,
-  parseFramerUrl,
 } from '@framer/FramerServerSDK/server';
 import prisma from '../prismaClient';
 import { FrameImageAspectRatio } from 'node_modules/frog/_lib/types/frame';
@@ -14,6 +13,7 @@ import {
 } from './utils';
 import { getFrameIntents } from './getIntents';
 import { IntentConversionType } from '@prisma/client';
+import { parseFramerUrl } from '@framer/FramerServerSDK';
 
 const routeApp = new Frog();
 
@@ -71,7 +71,7 @@ routeApp.frame('/*', async (frameContext) => {
     // We do this both as a gating mechanism, as well as security.
     // We accept a wildcard subdomain, so we want to ensure that if a subdomain IS being used, it's valid.
     //
-    // For example, let's say some random user creates a link: `nike.framer.com/f/project/frameid`
+    // For example, let's say some random user creates a link: `nike.scaledframes.com/f/project/frameid`
     // That link will correctly redirect to the frame, regarldess of the subdomain (nike).
     // So we want to ensure that if a subdomain is being used, it's valid.
     // The simplest this is by checking the subscription type of the team.

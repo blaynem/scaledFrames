@@ -5,16 +5,20 @@ import {
   AspectRatio,
   Role,
 } from '@prisma/client';
-import { UserSignupRequestBody, UserSignupResponse } from '../client/types';
-import { convertToUrlSafe, createUniqueName, getRandomColor } from './utils';
+import { UserSignupRequestBody, UserSignupResponse } from '../../client/types';
+import {
+  convertToUrlSafe,
+  createUniqueSubdomain,
+  getRandomColor,
+} from '../../utils';
 import {
   LOG_ERROR_TYPES,
   LOG_ACTIONS,
   logActivity,
   logError,
   LOG_DESCRIPTIONS,
-} from './logging';
-import { AuthUser } from './types';
+} from '../logging';
+import { AuthUser } from '../types';
 
 /**
  * Signs up a user. If a user already exists, it will return the first team and project they have.
@@ -72,15 +76,14 @@ export const signupUser = async (
     const data = await prismaClient.$transaction(async (_prisma) => {
       const userId = authUser.id;
 
-      const uniqueName = await createUniqueName(_prisma as PrismaClient);
-      if (!uniqueName) {
+      const uniqueSubdomain = await createUniqueSubdomain(
+        _prisma as PrismaClient
+      );
+      if (!uniqueSubdomain) {
         throw new Error('Could not create unique name.');
       }
-      const teamName = uniqueName;
-      const projectTitle = `${uniqueName}'s Project`;
-
-      const customSubDomain = convertToUrlSafe(uniqueName);
-      const customBasePath = `/${convertToUrlSafe(uniqueName)}`;
+      const customSubDomain = convertToUrlSafe(uniqueSubdomain);
+      const customBasePath = `/${convertToUrlSafe(uniqueSubdomain)}`;
       // If there is no subscriptionType, default to Free.
       const _subscriptionType =
         reqBody.subscriptionType || SubscriptionType.Free;
@@ -136,7 +139,7 @@ export const signupUser = async (
                   },
                 },
               },
-              name: teamName,
+              name: 'My Team',
               // We can set this, but we don't display it unless they have a subscription.
               customSubDomain,
             },
@@ -146,7 +149,7 @@ export const signupUser = async (
 
       const createdProject = await _prisma.project.create({
         data: {
-          title: projectTitle,
+          title: 'My First Project',
           description: 'Placeholder description.',
           notes: 'This is where you can add notes about your project.',
           isProjectLive: false,
