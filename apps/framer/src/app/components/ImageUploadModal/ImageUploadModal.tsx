@@ -10,7 +10,7 @@ import { findFrameIdxById } from '../../utils/utils';
 type ImageUploadModalProps = {
   show: boolean;
   setShow: (show: boolean) => void;
-  handleChangeImageUrl: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChangeImageUrl: (imageUrl: string) => void;
 };
 
 const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
@@ -23,35 +23,37 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   const clientSdk = FramerClientSDK();
   const { frames, selectedFrame, setFrameEditorContext } =
     useContext(FrameEditorContext);
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      setSelectedImage(file);
-      handleGetPreviewUrl(file);
-    }
-  };
-
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+  const [imageUrlInput, setImageUrlInput] = useState<string>('');
 
-  const handleImageDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    preventDefaults(event);
-    if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-      setSelectedImage(event.dataTransfer.files[0]);
-      const file = event.dataTransfer.files[0];
-      handleGetPreviewUrl(file);
-      // Create a preview of the selected image
-    }
+  const handleSetSelectedImage = (file: File) => {
+    setSelectedImage(file);
+    handleGetPreviewUrl(file);
+    setImageUrlInput('');
   };
 
   const handleGetPreviewUrl = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreviewSrc(reader.result as string);
+      return reader.result as string;
     };
     reader.readAsDataURL(file);
   };
+
+  const handleChangePreviewImageUrl = async (imageUrl: string) => {
+    setImageUrlInput(imageUrl);
+    setPreviewSrc(imageUrl);
+  };
+
   const handleUpload = async () => {
+    if (imageUrlInput !== '') {
+      handleChangeImageUrl(imageUrlInput);
+      handleClose();
+      return;
+    }
     if (!selectedImage || !selectedFrame) return;
+
     const body: ImageSaveSDKBody = {
       file: selectedImage,
       frameId: selectedFrame?.id,
@@ -68,8 +70,15 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     const idx = findFrameIdxById(tempFrames, selectedFrame.id);
     const tempFrame = { ...selectedFrame, imageUrl: frame.imageUrl };
     tempFrames[idx] = tempFrame;
-    setPreviewSrc(frame.imageUrl);
+
     setFrameEditorContext(tempFrames, tempFrame);
+    handleClose();
+  };
+
+  const handleClose = () => {
+    setPreviewSrc('');
+    setSelectedImage(null);
+    setImageUrlInput('');
     setShow(false);
   };
 
@@ -94,27 +103,26 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
           <h1 className="text-xl font-bold">Upload Image</h1>
           <button
             className="text-white rounded-lg relative -top-4 -right-4"
-            onClick={() => setShow(false)}
+            onClick={() => handleClose()}
           >
             <XCircleIcon className="text-gray-400 h-12 w-12" />
           </button>
         </div>
         <input
-          id="npm-install-copy-button"
           type="text"
           placeholder="Paste Image URL"
           className="col-span-6 mb-2 bg-gray-50 border border-gray-300 text-gray-500 text-sm  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-          onChange={handleChangeImageUrl}
+          onChange={(e) => handleChangePreviewImageUrl(e.target.value)}
+          value={imageUrlInput}
         />
         <div className="flex flex-row items-center justify-center my-2">
           <div className="h-0 w-full border border-gray-200"></div>
           <div className="text-sm  text-center text-gray-500 mx-4">or</div>
           <div className="h-0 w-full border border-gray-200"></div>
         </div>
-
         <div
           onDragOver={preventDefaults}
-          onDrop={handleImageDrop}
+          onDrop={(e) => handleSetSelectedImage(e.dataTransfer.files[0])}
           onClick={handleImageUpload}
           className="flex flex-col  rounded-lg h-80 w-96 "
         >
@@ -138,11 +146,14 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
           type="file"
           accept="image/*"
           ref={fileInputRef}
-          onChange={handleImageChange}
+          onChange={(e) => {
+            if (e.target.files && e.target.files.length > 0)
+              handleSetSelectedImage(e.target.files[0]);
+          }}
         />
         <div className="flex w-full flex-row">
           <button
-            onClick={() => setShow(false)}
+            onClick={() => handleClose()}
             className="w-full bg-red-500 text-white rounded-lg p-2 m-2"
           >
             Cancel

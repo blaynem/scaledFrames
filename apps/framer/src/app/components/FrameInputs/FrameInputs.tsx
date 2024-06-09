@@ -39,19 +39,6 @@ export function FrameInputs(props: FrameInputsProps) {
   const [show, setShow] = useState(false);
   const clientSdk = FramerClientSDK();
 
-  const fileSelectedHandler = (event: any) => {
-    const file = event.target.files[0];
-
-    // Create a preview of the selected image
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      handleChangeImageUrlUpload(reader.result as string);
-    };
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  };
-
   useEffect(() => {
     if (selectedFrame) {
       setTitle(selectedFrame.title);
@@ -124,25 +111,13 @@ export function FrameInputs(props: FrameInputsProps) {
       setFrameEditorContext(tempFrames, tempFrame);
     }
   };
-  const handleChangeImageUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeImageUrl = (imageUrl: string) => {
     setHasChanges(true);
-    setImageUrl(e.target.value);
+    setImageUrl(imageUrl);
     if (selectedFrame) {
       const tempFrames = [...frames];
       const idx = findFrameIdxById(tempFrames, selectedFrame.id);
-      const tempFrame = { ...selectedFrame, imageUrl: e.target.value };
-      tempFrames[idx] = tempFrame;
-      setFrameEditorContext(tempFrames, tempFrame);
-    }
-  };
-
-  const handleChangeImageUrlUpload = (preview: string) => {
-    setHasChanges(true);
-    setImageUrl(preview);
-    if (selectedFrame) {
-      const tempFrames = [...frames];
-      const idx = findFrameIdxById(tempFrames, selectedFrame.id);
-      const tempFrame = { ...selectedFrame, imageUrl: preview };
+      const tempFrame = { ...selectedFrame, imageUrl: imageUrl };
       tempFrames[idx] = tempFrame;
       setFrameEditorContext(tempFrames, tempFrame);
     }
@@ -177,12 +152,6 @@ export function FrameInputs(props: FrameInputsProps) {
       addToast(ToastTypes.SUCCESS, 'Frame Saved', 5000);
       tempFrames[idx] = newFrame;
       setFrameEditorContext([...tempFrames], newFrame);
-    }
-  };
-
-  const handleImageUpload = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
     }
   };
 
@@ -238,32 +207,6 @@ export function FrameInputs(props: FrameInputsProps) {
               setShow={setShow}
               handleChangeImageUrl={handleChangeImageUrl}
             />
-            {/* <input
-              id="npm-install-copy-button"
-              type="text"
-              className="col-span-6 bg-gray-50 border border-gray-300 text-gray-500 text-sm  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              value={imageUrl}
-              onChange={handleChangeImageUrl}
-              onBlur={handleSaveFrame}
-            />
-
-            <input
-              className="col-span-6 bg-gray-50 border border-gray-300 text-gray-500 text-sm  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-              id="file_input"
-              type="file"
-              ref={fileInputRef}
-              style={{ display: 'none' }} // hide the input if file is not selected
-              onChange={fileSelectedHandler}
-              onBlur={handleSaveFrame}
-            />
-
-            <button
-              type="button"
-              onClick={() => handleImageUpload()}
-              className="mr-1 mt-0.5 absolute top-8 end-2 self-end text-gray-500 dark:text-gray-400 bg-white hover:text-gray-100 hover:bg-gray-300 rounded-lg p-2 inline-flex items-center justify-center"
-            >
-              <ArrowUpOnSquareIcon className="h-5 w-5" />
-            </button> */}
           </div>
         </div>
 
