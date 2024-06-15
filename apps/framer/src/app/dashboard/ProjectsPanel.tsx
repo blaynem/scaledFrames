@@ -96,7 +96,7 @@ export const ProjectsPanel = () => {
               borderWidth: 1,
               borderStyle: 'solid',
             }}
-            className="border-slate-200 p-2 rounded-l data-[hover]:cursor-pointer focus:outline-none data-[active]:border-slate-800 data-[hover]:border-slate-800 data-[focus]:border-slate-800"
+            className="border-slate-200 p-2 rounded-l data-[hover]:cursor-pointer focus:outline-none data-[active]:border-slate-800 data-[hover]:border-slate-800 data-[focus]:border-slate-800 dark:bg-slate-800 dark:border-slate-800 dark:text-white dark:data-[hover]:border-slate-800 dark:data-[active]:border-slate-800 dark:data-[focus]:border-slate-800 dark:focus:outline-1 dark:focus:outline-black dark:data-[hover]:cursor-pointer"
           >
             {filterOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -137,7 +137,9 @@ const ProjectCard = ({
         )}
       </Link>
       <Link href={href}>
-        <h3 className="mb-2 text-lg font-semibold">{projectTitle}</h3>
+        <h3 className="mb-2 text-lg font-semibold dark:text-black">
+          {projectTitle}
+        </h3>
       </Link>
 
       <CopyButtonInput textToCopy={projectUrl} value={projectUrlSmall} />

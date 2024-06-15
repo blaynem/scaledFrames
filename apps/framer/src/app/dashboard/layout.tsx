@@ -13,12 +13,12 @@ export default function RootLayout({
       <div>
         <div
           id="background"
-          className="fixed w-full h-full m-0 p-0 bg-zinc-100 -z-10"
+          className="fixed w-full h-full m-0 p-0 bg-zinc-100 -z-10 dark:bg-slate-900 dark:text-white"
         />
         <Header />
-        <div className="w-full flex">
+        <div className="w-full flex dark:text-white ">
           <TeamsPanel />
-          <div className="px-8 w-full">{children}</div>
+          <div className="px-8 py-4 w-full">{children}</div>
         </div>
       </div>
     </UserProvider>

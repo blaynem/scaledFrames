@@ -146,9 +146,9 @@ export function FrameInputs(props: FrameInputsProps) {
 
   return (
     selectedFrame && (
-      <div className="flex flex-col">
+      <div className="flex flex-col ">
         <div>
-          <label className="block mb-2 text-sm font-medium text-gray-100 ">
+          <label className="block mb-2 text-sm font-medium dark:text-gray-100 ">
             Title
           </label>
           <input
@@ -162,7 +162,7 @@ export function FrameInputs(props: FrameInputsProps) {
         </div>
 
         <div>
-          <label className=" pt-1 block mb-2 text-sm font-medium text-gray-100 ">
+          <label className=" pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
             Path
           </label>
           <input
@@ -176,7 +176,7 @@ export function FrameInputs(props: FrameInputsProps) {
         </div>
         <div className="w-full">
           <div className="flex flex-col">
-            <label className=" pt-1 block mb-2 text-sm font-medium text-gray-100 ">
+            <label className=" pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
               Image URL/Upload
             </label>
             {selectedFrame ? (
