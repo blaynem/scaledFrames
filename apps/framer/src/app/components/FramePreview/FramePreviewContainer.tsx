@@ -57,6 +57,16 @@ const FramePreviewContainer = () => {
   const handleDeleteFrame = async (frameId: string) => {
     const loadingToast = addToast(ToastTypes.LOADING, 'Loading', 'infinite');
     const currFrame = frames.find((frame) => frame.id === frameId);
+    if (frames.length === 1) {
+      loadingToast.clearToast();
+      console.error('Error deleting frame: cannot delete the only frame');
+      addToast(
+        ToastTypes.ERROR,
+        'Error deleting frame: cannot delete the only frame',
+        5000
+      );
+      return;
+    }
     if (!currFrame) {
       loadingToast.clearToast();
       console.error('Error deleting frame: frame not found');

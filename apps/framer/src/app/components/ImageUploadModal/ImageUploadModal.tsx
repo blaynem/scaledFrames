@@ -10,13 +10,11 @@ import { findFrameIdxById } from '../../utils/utils';
 type ImageUploadModalProps = {
   show: boolean;
   setShow: (show: boolean) => void;
-  handleChangeImageUrl: (imageUrl: string) => void;
 };
 
 const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   show,
   setShow,
-  handleChangeImageUrl,
 }: ImageUploadModalProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -29,7 +27,6 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   const handleSetSelectedImage = (file: File) => {
     setSelectedImage(file);
     handleGetPreviewUrl(file);
-    setImageUrlInput('');
   };
 
   const handleGetPreviewUrl = (file: File) => {
@@ -44,14 +41,29 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   const handleChangePreviewImageUrl = async (imageUrl: string) => {
     setImageUrlInput(imageUrl);
     setPreviewSrc(imageUrl);
+    try {
+      // Fetch the image
+      const blob: Blob | null = await fetch(imageUrl)
+        .then((res) => {
+          return res.blob();
+        })
+        .catch((error) => {
+          console.error('Error fetching image:', error);
+          setPreviewSrc('');
+          return null;
+        });
+
+      if (!blob) return;
+
+      const file = new File([blob], 'image.png', { type: 'image/png' });
+      handleSetSelectedImage(file);
+    } catch (error) {
+      console.error('Error fetching or converting image:', error);
+    }
   };
 
   const handleUpload = async () => {
-    if (imageUrlInput !== '') {
-      handleChangeImageUrl(imageUrlInput);
-      handleClose();
-      return;
-    }
+    setImageUrlInput('');
     if (!selectedImage || !selectedFrame) return;
 
     const body: ImageSaveSDKBody = {
@@ -93,6 +105,20 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     event.stopPropagation();
   };
 
+  const handleClearPreview = () => {
+    setImageUrlInput('');
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+      handleSetSelectedImage(
+        event.dataTransfer.files[event.dataTransfer.files.length - 1]
+      );
+    }
+  };
+
   return (
     <div
       className="flex w-screen h-screen top-0 right-0 fixed items-center justify-center bg-gray-200 bg-opacity-50 z-50"
@@ -122,7 +148,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
         </div>
         <div
           onDragOver={preventDefaults}
-          onDrop={(e) => handleSetSelectedImage(e.dataTransfer.files[0])}
+          onDrop={handleDrop}
           onClick={handleImageUpload}
           className="flex flex-col  rounded-lg h-80 w-96 "
         >
@@ -132,6 +158,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
               alt="Preview"
               style={{ maxWidth: '100%', maxHeight: '100%' }}
               className={'rounded-lg object-cover h-80 w-96'}
+              onError={() => setPreviewSrc('')}
             />
           ) : (
             <div className="flex flex-col bg-gray-300  border-2 border-gray-400 border-dashed items-center  justify-center rounded-lg h-80 w-96 text-white">
@@ -147,6 +174,9 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
           accept="image/*"
           ref={fileInputRef}
           onChange={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleClearPreview();
             if (e.target.files && e.target.files.length > 0)
               handleSetSelectedImage(e.target.files[0]);
           }}

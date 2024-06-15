@@ -111,20 +111,9 @@ export function FrameInputs(props: FrameInputsProps) {
       setFrameEditorContext(tempFrames, tempFrame);
     }
   };
-  const handleChangeImageUrl = (imageUrl: string) => {
-    setHasChanges(true);
-    setImageUrl(imageUrl);
-    if (selectedFrame) {
-      const tempFrames = [...frames];
-      const idx = findFrameIdxById(tempFrames, selectedFrame.id);
-      const tempFrame = { ...selectedFrame, imageUrl: imageUrl };
-      tempFrames[idx] = tempFrame;
-      setFrameEditorContext(tempFrames, tempFrame);
-    }
-  };
 
-  const handleSaveFrame = async () => {
-    if (!hasChanges) return;
+  const handleSaveFrame = async (forceSave?: boolean) => {
+    if (!hasChanges && !forceSave) return;
 
     setHasChanges(false);
 
@@ -168,7 +157,7 @@ export function FrameInputs(props: FrameInputsProps) {
             placeholder="Title"
             value={title}
             onChange={handleChangeTitle}
-            onBlur={handleSaveFrame}
+            onBlur={(e) => handleSaveFrame()}
           />
         </div>
 
@@ -182,7 +171,7 @@ export function FrameInputs(props: FrameInputsProps) {
             placeholder="Path"
             value={path}
             onChange={handleChangePath}
-            onBlur={handleSaveFrame}
+            onBlur={(e) => handleSaveFrame()}
           />
         </div>
         <div className="w-full">
@@ -202,11 +191,7 @@ export function FrameInputs(props: FrameInputsProps) {
                 Upload Image
               </button>
             ) : null}
-            <ImageUploadModal
-              show={show}
-              setShow={setShow}
-              handleChangeImageUrl={handleChangeImageUrl}
-            />
+            <ImageUploadModal show={show} setShow={setShow} />
           </div>
         </div>
 
