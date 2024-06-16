@@ -130,6 +130,15 @@ export const IntentInput: React.FC<IntentInputProps> = ({
                 frame.id !== selectedFrame.id &&
                 frame.isDeleted === false
               ) {
+                if (
+                  frames.length === 2 &&
+                  frame.path !== selectedFrame.path &&
+                  frame.path !== intent.linkUrl
+                ) {
+                  // If there are only two frames, and the frame is not the selected frame or the current linkUrl, set the linkUrl to the frame path
+                  // basically guarantees that the linkUrl will be set to the other frame if there are only 2 frames.
+                  handleSetLinkUrl(frame.path);
+                }
                 return (
                   <option key={frame.id} value={frame.path}>
                     {frame.title}
