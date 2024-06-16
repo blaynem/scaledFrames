@@ -129,6 +129,14 @@ export const FramerClientSDK = (
           body,
         });
       },
+      delete: async (id) => {
+        const url = createUrl(`/api/frames/delete/${id}`);
+        return postFetch({
+          authToken: (await getAuthToken()) ?? '',
+          url: url.toString(),
+          body: {},
+        });
+      },
       image: {
         async saveToFrame(body) {
           const supabase = createSupabaseClient();

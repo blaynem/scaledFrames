@@ -20,6 +20,7 @@ import {
   EditFrameResponse,
   ImageSaveToFrameBodyServer,
 } from '@framer/FramerServerSDK/client';
+import { IntentType } from '@prisma/client';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
 const frameFrogInstance = new Frog();
@@ -47,6 +48,7 @@ frameFrogInstance.get('/', async (c) => {
     const frame = await prisma.frame.findMany({
       where: {
         ...queries,
+        isDeleted: false,
         team: {
           users: {
             some: {
@@ -180,24 +182,64 @@ frameFrogInstance.post('/edit/:id', async (c) => {
     if (body.imageLinkUrl) updateData.imageLinkUrl = body.imageLinkUrl;
     if (body.imageType) updateData.imageType = body.imageType;
     if (body.aspectRatio) updateData.aspectRatio = body.aspectRatio;
+    if (body.isDeleted) updateData.isDeleted = body.isDeleted;
 
     const authUser = await getUserFromEmail(prisma, email);
-    const frame = await prisma.frame.update({
-      where: {
-        id,
-        teamId: body.teamId,
-        team: {
-          users: {
-            some: {
-              userId: authUser.id,
+
+    const filteredIntents = body.intents.map((intent) => ({
+      linkUrl: intent.linkUrl || '',
+      displayText: intent.displayText || '',
+      displayOrder: intent.displayOrder || 0,
+      isDeleted: intent.isDeleted || false,
+      type: intent.type || IntentType.ExternalLink, // Replace `undefined` with a default value for `type`
+    }));
+    const frame = await prisma.$transaction(async (prisma) => {
+      await prisma.intents.deleteMany({
+        where: {
+          framesId: id,
+        },
+      });
+
+      await prisma.intents.createMany({
+        skipDuplicates: true,
+        data: filteredIntents.map((intent) => ({
+          framesId: id,
+          linkUrl: intent.linkUrl || '',
+          displayText: intent.displayText || '',
+          displayOrder: intent.displayOrder || 0,
+          isDeleted: intent.isDeleted || false,
+          type: intent.type || IntentType.ExternalLink, // Replace `undefined` with a default value for `type`
+        })),
+      });
+
+      const intents = await prisma.intents.findMany({
+        where: {
+          framesId: id,
+        },
+      });
+
+      return await prisma.frame.update({
+        where: {
+          id,
+          teamId: body.teamId,
+          team: {
+            users: {
+              some: {
+                userId: authUser.id,
+              },
             },
           },
         },
-      },
-      data: updateData,
-      include: {
-        intents: true,
-      },
+        data: {
+          ...updateData,
+          intents: {
+            connect: intents,
+          },
+        },
+        include: {
+          intents: true,
+        },
+      });
     });
 
     logActivity(prisma, {
@@ -215,6 +257,51 @@ frameFrogInstance.post('/edit/:id', async (c) => {
       errorType: LOG_ERROR_TYPES.FRAME_UPDATE,
     });
     return c.json<EditFrameResponse>({ error: 'Error editing frame' });
+  }
+});
+
+frameFrogInstance.post('/delete/:id', async (c) => {
+  try {
+    const token = c.req.header('Authorization') as string;
+    const { email } = await decodeJwt(token);
+
+    const id = c.req.param('id');
+    const authUser = await getUserFromEmail(prisma, email);
+
+    const frame = await prisma.frame.update({
+      where: {
+        id,
+        team: {
+          users: {
+            some: {
+              userId: authUser.id,
+            },
+          },
+        },
+      },
+      data: {
+        isDeleted: true,
+      },
+      include: {
+        intents: true,
+      },
+    });
+
+    logActivity(prisma, {
+      action: LOG_ACTIONS.FrameDeleted,
+      description: LOG_DESCRIPTIONS.FrameDeleted,
+      userId: authUser.id,
+    });
+
+    return c.json<EditFrameResponse>(frame);
+  } catch (error) {
+    console.error('Delete a frame Error: ', error);
+    logError({
+      prisma,
+      error,
+      errorType: LOG_ERROR_TYPES.FRAME_DELETE,
+    });
+    return c.json<EditFrameResponse>({ error: 'Error deleting frame' });
   }
 });
 

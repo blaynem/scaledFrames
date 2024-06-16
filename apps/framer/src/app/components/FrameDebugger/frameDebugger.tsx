@@ -26,7 +26,7 @@ export function FrameDebugger() {
 
   return (
     selectedFrame && (
-      <div className="rounded-lg bg-white p-4 m-4 max-h-fit flex-shrink-1 w-9/12 h-9/12 flex flex-col items-center justify-center">
+      <div className="rounded-lg bg-white m-4 max-h-fit flex-shrink-1 w-9/12 h-9/12 flex flex-col items-center justify-center">
         <FrameImage
           aspectRatio={aspectRatio}
           imageUrl={

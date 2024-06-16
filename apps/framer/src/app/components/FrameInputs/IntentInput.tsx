@@ -1,16 +1,20 @@
 'use client';
 import { IntentType, Intents } from '@prisma/client';
-import React, { use, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
-import { MinusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { XCircleIcon } from '@heroicons/react/24/outline';
 
 export interface IntentInputProps {
   intent: Intents;
   handleRemoveIntent: (id: string) => void;
+  handleSaveFrame: () => void;
+  setHasChanges: (hasChanges: boolean) => void;
 }
 export const IntentInput: React.FC<IntentInputProps> = ({
   intent,
   handleRemoveIntent,
+  handleSaveFrame,
+  setHasChanges,
 }: IntentInputProps) => {
   const { frames, selectedFrame, setFrameEditorContext } =
     useContext(FrameEditorContext);
@@ -21,16 +25,50 @@ export const IntentInput: React.FC<IntentInputProps> = ({
 
   const [displayText, setDisplayText] = useState(intent?.displayText ?? '');
 
+  const [linkUrl, setLinkUrl] = useState(intent?.linkUrl ?? '');
+
   const handleSetIntentType = (type: IntentType) => {
+    setHasChanges(true);
     setIntentType(type);
     if (selectedFrame) {
       const tempFrames = [...frames];
       const idx = tempFrames.findIndex(
         (frame) => frame.id === selectedFrame.id
       );
+      const tempIntents = selectedFrame.intents.map((i: Intents) => {
+        if (i.id === intent.id) {
+          return { ...i, type };
+        }
+        return i;
+      });
+
       const tempFrame = {
         ...selectedFrame,
-        intents: [...selectedFrame.intents],
+        intents: [...tempIntents],
+      };
+      tempFrames[idx] = tempFrame;
+      setFrameEditorContext(tempFrames, tempFrame);
+    }
+  };
+
+  const handleSetLinkUrl = (linkUrl: string) => {
+    setHasChanges(true);
+    setLinkUrl(linkUrl);
+    if (selectedFrame) {
+      const tempFrames = [...frames];
+      const idx = tempFrames.findIndex(
+        (frame) => frame.id === selectedFrame.id
+      );
+      const tempIntents = selectedFrame.intents.map((i: Intents) => {
+        if (i.id === intent.id) {
+          return { ...i, linkUrl };
+        }
+        return i;
+      });
+
+      const tempFrame = {
+        ...selectedFrame,
+        intents: tempIntents,
       };
       tempFrames[idx] = tempFrame;
       setFrameEditorContext(tempFrames, tempFrame);
@@ -38,6 +76,7 @@ export const IntentInput: React.FC<IntentInputProps> = ({
   };
 
   const handleSetIntentText = (text: string) => {
+    setHasChanges(true);
     setDisplayText(text);
     if (selectedFrame) {
       const tempFrames = [...frames];
@@ -64,6 +103,7 @@ export const IntentInput: React.FC<IntentInputProps> = ({
     if (intent) {
       setIntentType(intent.type);
       setDisplayText(intent.displayText);
+      setLinkUrl(intent.linkUrl);
     }
   }, [intent]);
 
@@ -75,16 +115,32 @@ export const IntentInput: React.FC<IntentInputProps> = ({
             type="text"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             placeholder="URL"
+            value={intent.linkUrl}
+            onChange={(e) => handleSetLinkUrl(e.target.value)}
+            onBlur={handleSaveFrame}
           />
         );
       case IntentType.InternalLink:
         return (
-          <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-            {frames.map((frame) => (
-              <option key={frame.id} value={frame.id}>
-                {frame.title}
-              </option>
-            ))}
+          <select
+            onChange={(e) => handleSetLinkUrl(e.target.value)}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            value={intent.linkUrl}
+            onBlur={handleSaveFrame}
+          >
+            {frames.map((frame) => {
+              if (
+                selectedFrame &&
+                frame.id !== selectedFrame.id &&
+                frame.isDeleted === false
+              ) {
+                return (
+                  <option key={frame.id} value={frame.path}>
+                    {frame.title}
+                  </option>
+                );
+              }
+            })}
           </select>
         );
       case IntentType.Post:
@@ -95,51 +151,62 @@ export const IntentInput: React.FC<IntentInputProps> = ({
           />
         );
       default:
-        return <input type="number" placeholder="Input for Type2" />;
+        return <span>coming soon!</span>;
     }
   };
 
   return (
-    <div className="mt-2 flex flex-row columns-2">
+    <div className="grid relative grid-cols-8 w-full items-center justify-center h-full my-6">
       <button
-        onClick={(e) => {
+        onClick={() => {
           handleRemoveIntent(intent.id);
         }}
-        className="mx-2 flex justify-center items-end"
+        className="absolute -top-2 -right-2 bg-white rounded-full"
       >
-        <MinusCircleIcon className="m-2 rounded-sm h-8 w-8 text-red-500" />
+        <XCircleIcon className="h-8 w-8 text-red-500" />
       </button>
-      <div className="w-full mx-1">
-        <label className=" pt-1 block mb-2 text-sm font-medium text-gray-100 ">
-          Intent Text
-        </label>
-        <input
-          className="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-          placeholder="Intent Display Text"
-          value={displayText}
-          onChange={(e) => handleSetIntentText(e.target.value)}
-        />
-      </div>
-      <div className="w-full mx-1">
-        <label className="pt-1 block mb-2 text-sm font-medium text-gray-100 ">
-          Type
-        </label>
-        <select
-          className="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-          value={intentType}
-          onChange={(e) => handleSetIntentType(e.target.value as IntentType)}
-        >
-          <option value={IntentType.InternalLink}>InternalLink</option>
-          <option value={IntentType.ExternalLink}>ExternalLink</option>
-          <option value={IntentType.Post}>Post</option>
-        </select>
-      </div>
-
-      <div className="w-full mx-1">
-        <label className="pt-1 block mb-2 text-sm font-medium text-gray-100 ">
-          Value
-        </label>
-        {renderInputs()}
+      <div className="grid col-span-8 mt-2 flex flex-col w-full h-full ">
+        <div className="flex flex-row">
+          <div className="w-full mx-1">
+            <label className="pt-1 block mb-2 text-sm font-medium text-gray-100 ">
+              Type
+            </label>
+            <select
+              className="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              value={intentType}
+              onChange={(e) =>
+                handleSetIntentType(e.target.value as IntentType)
+              }
+              onBlur={handleSaveFrame}
+            >
+              <option value={IntentType.InternalLink}>InternalLink</option>
+              <option value={IntentType.ExternalLink}>ExternalLink</option>
+              <option value={IntentType.Post}>Post</option>
+              <option value={IntentType.Transaction}>Transaction</option>
+              <option value={IntentType.TextInput}>TextInput</option>
+            </select>
+          </div>
+          <div className="w-full mx-1">
+            <label className=" pt-1 block mb-2 text-sm font-medium text-gray-100 ">
+              Intent Text
+            </label>
+            <input
+              className="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              placeholder="Intent Display Text"
+              value={displayText}
+              onChange={(e) => handleSetIntentText(e.target.value)}
+              onBlur={handleSaveFrame}
+            />
+          </div>
+        </div>
+        <div className="flex flex-row">
+          <div className="w-full mx-1">
+            <label className="pt-1 block mb-2 text-sm font-medium text-gray-100 ">
+              Value
+            </label>
+            {renderInputs()}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -38,8 +38,8 @@ const FramePreviewContainer = () => {
       teamId: selectedFrame?.teamId,
       path: `new-frame ${frames.length + 1}`,
       title: `New Frame ${frames.length + 1}`,
-      imageUrl: 'https://via.placeholder.com/1080x565',
-      imageLinkUrl: 'https://via.placeholder.com/1080x565',
+      imageUrl: '',
+      imageLinkUrl: '',
       aspectRatio: frames[0].aspectRatio,
       imageType: 'Static',
       isDeleted: false,
@@ -57,6 +57,16 @@ const FramePreviewContainer = () => {
   const handleDeleteFrame = async (frameId: string) => {
     const loadingToast = addToast(ToastTypes.LOADING, 'Loading', 'infinite');
     const currFrame = frames.find((frame) => frame.id === frameId);
+    if (frames.length === 1) {
+      loadingToast.clearToast();
+      console.error('Error deleting frame: cannot delete the only frame');
+      addToast(
+        ToastTypes.ERROR,
+        'Error deleting frame: cannot delete the only frame',
+        5000
+      );
+      return;
+    }
     if (!currFrame) {
       loadingToast.clearToast();
       console.error('Error deleting frame: frame not found');
@@ -66,6 +76,7 @@ const FramePreviewContainer = () => {
     const body: EditFrameRequestBody = {
       projectId: currFrame.projectId,
       teamId: currFrame.teamId,
+      intents: currFrame.intents,
       isDeleted: true,
     };
     const response = await clientSdk.frames.edit(frameId, body);
@@ -82,28 +93,28 @@ const FramePreviewContainer = () => {
 
   return (
     <div className="flex flex-col  justify-items-center items-center">
-      {frames.map((frame) => (
-        frame.isDeleted ? null : (
-        <FramePreview
-          key={frame.title}
-          imageUrl={frame.imageUrl}
-          title={frame.title}
-          onClick={() => {
-            setFrameEditorContext(frames, frame);
-          }}
-          aspectRatio={aspectRatio}
-          isSelected={selectedFrame?.id === frame.id}
-          handleRemove={() => handleDeleteFrame(frame.id)}
-        />
-      )))}
-
       <button
-        className="w-9/12 h-40 bg-white rounded-md flex flex-row items-center justify-center mt-4"
+        className="w-9/12 h-10 bg-white rounded-md flex flex-row items-center justify-center mb-4"
         onClick={handleCreateNewFrame}
       >
-        <PlusIcon className="h-8 w-8"></PlusIcon>
+        <PlusIcon className="lg:h-7 lg:w-7 p-1 md:w-4 md:h-4 sm:w-2 sm:h-2"></PlusIcon>
         Create New Frame
       </button>
+      {frames.map((frame) =>
+        frame.isDeleted ? null : (
+          <FramePreview
+            key={frame.title}
+            imageUrl={frame.imageUrl}
+            title={frame.title}
+            onClick={() => {
+              setFrameEditorContext(frames, frame);
+            }}
+            aspectRatio={aspectRatio}
+            isSelected={selectedFrame?.id === frame.id}
+            handleRemove={() => handleDeleteFrame(frame.id)}
+          />
+        )
+      )}
     </div>
   );
 };

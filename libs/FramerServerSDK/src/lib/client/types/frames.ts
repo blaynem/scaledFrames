@@ -56,8 +56,13 @@ export type EditFrameRequestBody = {
    * Id of the Project this belongs to.
    */
   projectId: string;
+  intents: Partial<EditableIntentFields>[];
 } & Partial<EditableFrameFields>;
 
+export type EditableIntentFields = Pick<
+  Intents,
+  'displayText' | 'type' | 'displayOrder' | 'isDeleted' | 'linkUrl'
+>;
 /**
  * Request body to save an image to a frame when using the SDK.
  */
@@ -113,6 +118,10 @@ export type FrameSDKType = {
    * @returns FrameResponseType | { error: string}
    */
   edit: (id: string, body: EditFrameRequestBody) => Promise<EditFrameResponse>;
+  /** delete a frame
+   * @param id Frame id
+   */
+  delete: (id: string) => Promise<void>;
   /**
    * Related image operations
    */

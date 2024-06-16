@@ -9,7 +9,7 @@ export interface IntentContainerProps {
 
 export function IntentContainer(props: IntentContainerProps) {
   return (
-    <div className={styles['intentContainer']}>
+    <div className={'flex flex-row justify-center items-center w-full p-4'}>
       {props.intents.map((intent) => (
         <IntentButton key={intent.id} intent={intent} />
       ))}
