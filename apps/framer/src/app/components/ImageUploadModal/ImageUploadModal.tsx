@@ -184,7 +184,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
         <div className="flex w-full flex-row">
           <button
             onClick={() => handleClose()}
-            className="w-full bg-red-500 text-white rounded-lg p-2 m-2"
+            className="w-full border-2 rounded-lg p-2 m-2"
           >
             Cancel
           </button>

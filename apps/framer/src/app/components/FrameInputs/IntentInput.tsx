@@ -22,10 +22,8 @@ export const IntentInput: React.FC<IntentInputProps> = ({
   const [intentType, setIntentType] = useState<IntentType>(
     intent.type ?? IntentType.InternalLink
   );
-
+  const [showRemove, setShowRemove] = useState(false);
   const [displayText, setDisplayText] = useState(intent?.displayText ?? '');
-
-  const [linkUrl, setLinkUrl] = useState(intent?.linkUrl ?? '');
 
   const handleSetIntentType = (type: IntentType) => {
     setHasChanges(true);
@@ -53,7 +51,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
 
   const handleSetLinkUrl = (linkUrl: string) => {
     setHasChanges(true);
-    setLinkUrl(linkUrl);
     if (selectedFrame) {
       const tempFrames = [...frames];
       const idx = tempFrames.findIndex(
@@ -103,7 +100,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
     if (intent) {
       setIntentType(intent.type);
       setDisplayText(intent.displayText);
-      setLinkUrl(intent.linkUrl);
     }
   }, [intent]);
 
@@ -134,6 +130,15 @@ export const IntentInput: React.FC<IntentInputProps> = ({
                 frame.id !== selectedFrame.id &&
                 frame.isDeleted === false
               ) {
+                if (
+                  frames.length === 2 &&
+                  frame.path !== selectedFrame.path &&
+                  frame.path !== intent.linkUrl
+                ) {
+                  // If there are only two frames, and the frame is not the selected frame or the current linkUrl, set the linkUrl to the frame path
+                  // basically guarantees that the linkUrl will be set to the other frame if there are only 2 frames.
+                  handleSetLinkUrl(frame.path);
+                }
                 return (
                   <option key={frame.id} value={frame.path}>
                     {frame.title}
@@ -156,19 +161,24 @@ export const IntentInput: React.FC<IntentInputProps> = ({
   };
 
   return (
-    <div className="grid relative grid-cols-8 w-full items-center justify-center h-full my-6">
+    <div
+      onMouseEnter={() => setShowRemove(true)}
+      onMouseLeave={() => setShowRemove(false)}
+      className="grid relative grid-cols-8 w-full items-center justify-center h-full my-6"
+    >
       <button
         onClick={() => {
           handleRemoveIntent(intent.id);
         }}
         className="absolute -top-2 -right-2 bg-white rounded-full"
+        style={{ display: showRemove ? 'block' : 'none' }}
       >
         <XCircleIcon className="h-8 w-8 text-red-500" />
       </button>
       <div className="grid col-span-8 mt-2 flex flex-col w-full h-full ">
         <div className="flex flex-row">
           <div className="w-full mx-1">
-            <label className="pt-1 block mb-2 text-sm font-medium text-gray-100 ">
+            <label className="pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
               Type
             </label>
             <select
@@ -187,7 +197,7 @@ export const IntentInput: React.FC<IntentInputProps> = ({
             </select>
           </div>
           <div className="w-full mx-1">
-            <label className=" pt-1 block mb-2 text-sm font-medium text-gray-100 ">
+            <label className=" pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
               Intent Text
             </label>
             <input
@@ -201,7 +211,7 @@ export const IntentInput: React.FC<IntentInputProps> = ({
         </div>
         <div className="flex flex-row">
           <div className="w-full mx-1">
-            <label className="pt-1 block mb-2 text-sm font-medium text-gray-100 ">
+            <label className="pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
               Value
             </label>
             {renderInputs()}

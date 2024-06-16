@@ -24,7 +24,7 @@ export const TeamsPanel = () => {
         {({ open: popperOpen, close: closePopper }) => (
           <>
             <p className="font-semibold text-lg">Selected Team</p>
-            <PopoverButton className="rounded-md bg-zinc-100 w-full text-left p-2 pl-3 text-sm/6 border border-slate-400 focus:outline-none data-[active]:border-slate-800 data-[hover]:border-slate-800 data-[focus]:border-slate-800">
+            <PopoverButton className="rounded-md bg-zinc-100 w-full text-left p-2 pl-3 text-sm/6 border border-slate-400 focus:outline-none data-[active]:border-slate-800 dark:bg-slate-800 data-[hover]:border-slate-800 data-[focus]:border-slate-800">
               <div className="flex">
                 <p className="flex-1 font-semibold ">{selectedTeam.name}</p>
                 <ChevronDownIcon
@@ -92,7 +92,7 @@ export const TeamsPanel = () => {
       </Popover>
       <Link
         href={PAGES.DASHBOARD}
-        className={`block mt-4 text-slate-600 ${
+        className={`block mt-4 text-slate-600 dark:text-white ${
           pathname === PAGES.DASHBOARD
             ? 'font-semibold cursor-default'
             : 'hover:text-teal-500 '
@@ -102,7 +102,7 @@ export const TeamsPanel = () => {
       </Link>
       <Link
         href={PAGES.TEAM_SETTINGS}
-        className={`block mt-4 text-slate-600 ${
+        className={`block mt-4 text-slate-600 dark:text-white ${
           pathname === PAGES.TEAM_SETTINGS
             ? 'font-semibold cursor-default'
             : 'hover:text-teal-500 '

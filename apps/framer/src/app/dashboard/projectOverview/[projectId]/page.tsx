@@ -83,16 +83,20 @@ export default function ProjectOverview() {
         {projectData.title}
       </h1>
       <div className="flex">
-        <div className="p-8 flex-1 border-r-2 border-red-400">
+        <div className="p-8 flex-1 light:border-r-2 border-red-400 ">
           <div className="mb-8">
-            <h2 className="mb-4 text-xl font-semibold">Share your Frame</h2>
+            <h2 className="mb-4 text-xl font-semibold dark:text-white">
+              Share your Frame
+            </h2>
             <div>
-              <p>Share this link to your Frame</p>
+              <p className="dark:text-white">Share this link to your Frame</p>
               <CopyButtonInput value={shareableUrl} textToCopy={shareableUrl} />
             </div>
           </div>
           <form onSubmit={onSubmit}>
-            <h2 className="mb-4 text-xl font-semibold">Project Details</h2>
+            <h2 className="mb-4 text-xl font-semibold dark:text-white">
+              Project Details
+            </h2>
             <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               {/* isProjectLive */}
               <div className="sm:col-span-full">
@@ -190,13 +194,15 @@ export default function ProjectOverview() {
         </div>
         <div className="p-8 w-[400px]">
           <div className="mb-12 flex items-center justify-between">
-            <h2 className="text-xl font-semibold ">Edit Frame</h2>
+            <h2 className="text-xl font-semibold dark:text-white">
+              Edit Frame
+            </h2>
             <Link href={PAGES.FRAME_EDITOR + '/' + projectData.id}>
-              <PencilSquareIcon className="ml- h-8 w-8" />
+              <PencilSquareIcon className="ml- h-8 w-8 dark:text-white" />
             </Link>
           </div>
-          <h2 className="text-xl font-semibold ">Preview</h2>
-          <p className="">
+          <h2 className="text-xl font-semibold dark:text-white">Preview</h2>
+          <p className="dark:text-white">
             This is a preview of what your Project will look like when displayed
             on a supported application or website.
           </p>

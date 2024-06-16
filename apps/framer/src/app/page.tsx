@@ -16,14 +16,14 @@ export default function Index() {
    * Note: The corresponding styles are in the ./index.css file.
    */
   return (
-    <div>
+    <div className="dark:bg-slate-800 dark:text-white ">
       <LoginModal
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
       />
       <header>
         <nav
-          className="flex items-center justify-between p-6 lg:px-8"
+          className="flex items-center justify-between p-6 lg:px-8 "
           aria-label="Global"
         >
           <div className="w-full flex justify-end lg:hidden">
@@ -39,7 +39,7 @@ export default function Index() {
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             <button
               onClick={() => setLoginModalOpen(true)}
-              className="text-sm font-semibold leading-6 text-gray-900"
+              className="text-sm font-semibold leading-6 text-gray-900 dark:text-white "
             >
               Log in <span aria-hidden="true">&rarr;</span>
             </button>

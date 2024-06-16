@@ -43,22 +43,24 @@ export default function Header() {
   }, [supabase]);
 
   return (
-    <div className="relative p-4 flex justify-between">
+    <div className="relative p-4 flex justify-between dark:bg-slate-800">
       <div className="flex items-center">
         <Link href={PAGES.DASHBOARD}>
-          <h2 className="mr-8 text-2xl font-bold leading-7 text-gray-900">
+          <h2 className="mr-8 text-2xl font-bold leading-7 text-gray-900 dark:text-white">
             {APP_NAME} (BETA)
           </h2>
         </Link>
         <Link href={PAGES.DASHBOARD}>
-          <h2 className={`mr-4 text-xl font-medium text-gray-900`}>
+          <h2
+            className={`mr-4 text-xl font-medium text-gray-900 dark:text-white`}
+          >
             Dashboard
           </h2>
         </Link>
       </div>
       <Menu>
-        <MenuButton className="p-2 rounded-full bg-green-400 text-sm/6 font-semibold focus:outline-none data-[hover]:bg-green-600 data-[open]:bg-green-600 data-[focus]:outline-1 data-[focus]:outline-black">
-          <UserCircleIcon className="w-12" />
+        <MenuButton className="p-0.5 rounded-full bg-green-400 dark:bg-zinc-300 text-sm/6 font-semibold focus:outline-none data-[hover]:bg-green-600 data-[open]:bg-green-600 data-[focus]:outline-1 data-[focus]:outline-black">
+          <UserCircleIcon className="w-8" />
         </MenuButton>
         <Transition
           enter="transition ease-out duration-75"
@@ -70,7 +72,7 @@ export default function Header() {
         >
           <MenuItems
             anchor="bottom end"
-            className="origin-top-right rounded-xl border border-black/5 bg-black/5 p-1 text-sm/6 [--anchor-gap:var(--spacing-1)] focus:outline-none"
+            className="origin-top-right dark:bg-zinc-200 rounded-xl border border-black/5 bg-black/5 p-1 text-sm/6 [--anchor-gap:var(--spacing-1)] focus:outline-none"
           >
             {email && (
               <MenuItem>

@@ -20,7 +20,7 @@ export function FramePreview({
   handleRemove,
 }: FramePreviewProps) {
   const [showPlaceHolder, setShowPlaceHolder] = useState(true);
-
+  const [showRemove, setShowRemove] = useState(false);
   const toggleShowPlaceHolder = (show: boolean) => {
     setShowPlaceHolder(show);
   };
@@ -37,10 +37,13 @@ export function FramePreview({
           : 'm-1 mb-3 p-1 rounded-lg bg-slate-700 from-blue-100  border-1 border-white h-9/12 w-9/12 relative'
       }
       onClick={() => onClick()}
+      onMouseEnter={() => setShowRemove(true)}
+      onMouseLeave={() => setShowRemove(false)}
     >
       <button
         className="absolute -top-2 -right-4 bg-white rounded-full "
         onClick={() => handleRemove()}
+        style={{ display: showRemove ? 'block' : 'none' }}
       >
         <XCircleIcon className="rounded-sm lg:h-6 lg:w-6 md:w-4 md:h-4 sm:w-2 sm:h-2 text-red-500" />
       </button>
