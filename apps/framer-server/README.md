@@ -1,3 +1,11 @@
+# Docker
+
+To build the docker image, run the following command in the root of the project.
+```bash
+nx run framer-server:docker-build
+```
+You can check what it does in the `project.json` file. We're basicaly just using the Dockerfile in the framer-server directory.
+
 # To run the server
 
 Nx Console or this bash command.

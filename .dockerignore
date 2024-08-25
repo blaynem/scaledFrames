@@ -1,0 +1,10 @@
+# Docker is basically just for the framer-server. So we can ignore some things.
+node_modules
+.vscode
+.nx
+.env
+dist
+coverage
+
+apps/framer
+apps/framer-e2e

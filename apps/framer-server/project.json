@@ -1,24 +1,27 @@
 {
-    "name": "framer-server",
-    "$schema": "../../node_modules/nx/schemas/project-schema.json",
-    "sourceRoot": "apps/framer-server/src",
-    "projectType": "application",
-    "tags": [],
-    "// targets": "to see all targets run: nx show project framer-server --web",
-    "targets": {
-        "serve:dev": {
-            "executor": "nx:run-commands",
-            "options": {
-                "cwd": "apps/framer-server",
-                "command": "NODE_ENV=development tsx watch src/index.tsx"
-            }
-        },
-        "serve:prod": {
-            "executor": "nx:run-commands",
-            "options": {
-                "cwd": "apps/framer-server",
-                "command": "tsx src/index.tsx"
-            }
-        }
+  "name": "framer-server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/framer-server/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve:dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/framer-server",
+        "command": "NODE_ENV=development tsx watch src/index.tsx"
+      }
+    },
+    "serve:prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/framer-server",
+        "command": "tsx src/index.tsx"
+      }
+    },
+    "docker-build": {
+      "dependsOn": ["build"],
+      "command": "docker build -f apps/framer-server/Dockerfile . -t framer-server"
     }
+  }
 }
