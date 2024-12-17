@@ -127,6 +127,9 @@ export const TeamMembers = () => {
 
   // Determine if we show the edit role button or not.
   const showEditRole = (member: MemberDisplay) => {
+    if (member.id == user.id) {
+      return false;
+    }
     if (userRole === Role.Owner) {
       // Owner can't edit their own role.
       if (member.role === Role.Owner) return false;
