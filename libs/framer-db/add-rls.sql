@@ -1,6 +1,3 @@
---- Modify default privileges on the public schema, removal at the end.
-GRANT supabase_storage_admin TO postgres;
-
 -- START: PRISMA LOVES DELETING ALL THE GRANTS. REEE
 grant usage on schema public to postgres, anon, authenticated, service_role;
 grant all privileges on all tables in schema public to postgres, anon, authenticated, service_role;
@@ -109,5 +106,3 @@ BEGIN
   );
 END
 $$;
-
-REVOKE supabase_storage_admin FROM postgres;

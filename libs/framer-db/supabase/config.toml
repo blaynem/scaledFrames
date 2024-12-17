@@ -171,3 +171,7 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 [auth.email.template.magic_link]
 subject = "Your OTP"
 content_path = "./supabase/templates/otp-email.html"
+
+[auth.email.template.confirmation]
+subject = "Confirm Your Signup"
+content_path = "./supabase/templates/confirm-signup.html"
