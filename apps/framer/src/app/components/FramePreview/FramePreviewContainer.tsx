@@ -9,7 +9,6 @@ import { AspectRatio } from '@prisma/client';
 import { useToast } from '../Toasts/ToastProvider';
 import { ToastTypes } from '../Toasts/GenericToast';
 import { PlusIcon } from '@heroicons/react/24/outline';
-import { fr } from '@faker-js/faker';
 
 const FramePreviewContainer = () => {
   const { frames, selectedFrame, setFrameEditorContext } =
@@ -93,6 +92,7 @@ const FramePreviewContainer = () => {
 
   return (
     <div className="flex flex-col  justify-items-center items-center">
+      <h2 className='text-center text-lg font-bold mb-4'>All Frames</h2>
       <button
         className="w-9/12 h-10 bg-white rounded-md flex flex-row items-center justify-center mb-4"
         onClick={handleCreateNewFrame}

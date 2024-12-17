@@ -5,7 +5,7 @@ import {
   BookmarkIcon,
   PlusCircleIcon,
 } from '@heroicons/react/24/outline';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 import { IntentInput } from './IntentInput';
 import { IntentType } from '@prisma/client';
@@ -30,7 +30,6 @@ export function FrameInputs(props: FrameInputsProps) {
   );
   const { addToast } = useToast();
   const [hasChanges, setHasChanges] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState(selectedFrame ? selectedFrame.title : '');
   const [path, setPath] = useState(selectedFrame ? selectedFrame.path : '');
   const [imageUrl, setImageUrl] = useState(
@@ -146,9 +145,10 @@ export function FrameInputs(props: FrameInputsProps) {
 
   return (
     selectedFrame && (
-      <div className="flex flex-col ">
-        <div>
-          <label className="block mb-2 text-sm font-medium dark:text-gray-100 ">
+      <div className="flex flex-col">
+        <h2 className='text-center text-lg font-bold'>Edit Frame</h2>
+        <div className="mb-2">
+          <label className="block mb-1 text-sm font-medium dark:text-gray-100 ">
             Title
           </label>
           <input
@@ -161,8 +161,8 @@ export function FrameInputs(props: FrameInputsProps) {
           />
         </div>
 
-        <div>
-          <label className=" pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
+        <div className="mb-2">
+          <label className="block mb-1 text-sm font-medium dark:text-gray-100 ">
             Path
           </label>
           <input
@@ -175,37 +175,34 @@ export function FrameInputs(props: FrameInputsProps) {
           />
         </div>
         <div className="w-full">
-          <div className="flex flex-col">
-            <label className=" pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
-              Image URL/Upload
-            </label>
-            {selectedFrame ? (
-              <button
-                type="button"
-                className="text-white justify-center mt-3 bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
-                onClick={() => {
-                  setShow(true);
-                }}
-              >
-                <ArrowUpOnSquareIcon className="h-5 w-5 mr-2" />
-                Upload Image
-              </button>
-            ) : null}
-            <ImageUploadModal show={show} setShow={setShow} />
-          </div>
+          <label className="pb-1 block text-sm font-medium dark:text-gray-100 ">
+            Select Image
+          </label>
+
+          <button
+            type="button"
+            className="text-white justify-center bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
+            onClick={() => {
+              setShow(true);
+            }}
+          >
+            <ArrowUpOnSquareIcon className="h-5 w-5 mr-2" />
+            Upload Image
+          </button>
+
+          <ImageUploadModal show={show} setShow={setShow} />
         </div>
 
-        {selectedFrame &&
-          selectedFrame.intents.map((intent) => (
-            <IntentInput
-              key={intent.id}
-              intent={intent}
-              handleRemoveIntent={handleRemoveIntent}
-              handleSaveFrame={handleSaveFrame}
-              setHasChanges={(hasChanges: boolean) => setHasChanges(hasChanges)}
-            />
-          ))}
-        {selectedFrame && selectedFrame.intents.length < 4 ? (
+        {selectedFrame.intents.map((intent) => (
+          <IntentInput
+            key={intent.id}
+            intent={intent}
+            handleRemoveIntent={handleRemoveIntent}
+            handleSaveFrame={handleSaveFrame}
+            setHasChanges={(hasChanges: boolean) => setHasChanges(hasChanges)}
+          />
+        ))}
+        {selectedFrame.intents.length < 4 ? (
           <button
             type="button"
             className="text-white items-center justify-center mt-3 bg-gray-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
@@ -217,18 +214,17 @@ export function FrameInputs(props: FrameInputsProps) {
             Add Intent
           </button>
         ) : null}
-        {selectedFrame ? (
-          <button
-            type="button"
-            className="text-white justify-center mt-3 bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
-            onClick={() => {
-              handleSaveFrame();
-            }}
-          >
-            <BookmarkIcon className="h-5 w-5 mr-2" />
-            Save
-          </button>
-        ) : null}
+
+        <button
+          type="button"
+          className="text-white justify-center mt-3 bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
+          onClick={() => {
+            handleSaveFrame();
+          }}
+        >
+          <BookmarkIcon className="h-5 w-5 mr-2" />
+          Save
+        </button>
       </div>
     )
   );

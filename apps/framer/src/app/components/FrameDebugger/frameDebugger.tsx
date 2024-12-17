@@ -1,11 +1,9 @@
 'use client';
 
 import { useContext, useEffect, useState } from 'react';
-import { FrameAspectRatios, IntentTypes } from '../../lib/types';
 import FrameImage from '../FrameImage/FrameImage';
 import IntentContainer from '../IntentButton/IntentContainer';
-import { FramerClientSDK } from '@framer/FramerServerSDK/client';
-import { AspectRatio, Frame } from '@prisma/client';
+import { AspectRatio } from '@prisma/client';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 /* eslint-disable-next-line */
 
@@ -22,21 +20,24 @@ export function FrameDebugger() {
       setFrameEditorContext(frames, selectedFrame);
       setIntents(selectedFrame.intents);
     }
-  }, [selectedFrame, frames]);
+  }, [selectedFrame, frames, setFrameEditorContext]);
 
   return (
     selectedFrame && (
-      <div className="rounded-lg bg-white m-4 max-h-fit flex-shrink-1 w-9/12 h-9/12 flex flex-col items-center justify-center">
-        <FrameImage
-          aspectRatio={aspectRatio}
-          imageUrl={
-            selectedFrame
-              ? selectedFrame.imageUrl
-              : 'https://picsum.photos/1080/565'
-          }
-        />
-        <IntentContainer intents={intents} />
-      </div>
+      <>
+        <h2 className="text-center text-lg font-bold">Live Preview</h2>
+        <div className="rounded-lg bg-white m-4 max-h-fit flex-shrink-1 w-9/12 h-9/12 flex flex-col items-center justify-center">
+          <FrameImage
+            aspectRatio={aspectRatio}
+            imageUrl={
+              selectedFrame
+                ? selectedFrame.imageUrl
+                : 'https://picsum.photos/1080/565'
+            }
+          />
+          <IntentContainer intents={intents} />
+        </div>
+      </>
     )
   );
 }

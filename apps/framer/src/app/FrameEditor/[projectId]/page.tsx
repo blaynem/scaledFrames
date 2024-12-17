@@ -12,7 +12,7 @@ import { ToastProvider } from '../../components/Toasts/ToastProvider';
 const initialState: TFrameEditorContext = {
   frames: [],
   selectedFrame: null,
-  setFrameEditorContext: (frames, selectedFrame) => {},
+  setFrameEditorContext: (frames, selectedFrame) => undefined,
 };
 
 export const FrameEditorContext =
