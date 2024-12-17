@@ -84,16 +84,29 @@ export default function ProjectOverview() {
       </h1>
       <div className="flex">
         <div className="p-8 flex-1 light:border-r-2 border-red-400 ">
-          <div className="mb-8">
-            <h2 className="mb-4 text-xl font-semibold dark:text-white">
-              Share your Frame
-            </h2>
-            <div>
-              <p className="dark:text-white">Share this link to your Frame</p>
-              <CopyButtonInput value={shareableUrl} textToCopy={shareableUrl} />
-            </div>
-          </div>
           <form onSubmit={onSubmit}>
+            <div className="mb-8">
+              <div className="mb-4 flex justify-between">
+                <h2 className="text-xl font-semibold dark:text-white">
+                  Share your Frame
+                </h2>
+                {!isReadOnly && (
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                  >
+                    Save
+                  </button>
+                )}
+              </div>
+              <div>
+                <p className="dark:text-white">Share this link to your Frame</p>
+                <CopyButtonInput
+                  value={shareableUrl}
+                  textToCopy={shareableUrl}
+                />
+              </div>
+            </div>
             <h2 className="mb-4 text-xl font-semibold dark:text-white">
               Project Details
             </h2>
@@ -134,7 +147,7 @@ export default function ProjectOverview() {
                   name={CUSTOM_BASE_PATH}
                   id={CUSTOM_BASE_PATH}
                   placeholder="Enter custom base path"
-                  defaultValue={'/' + projectData.customBasePath}
+                  defaultValue={projectData.customBasePath}
                 />
                 {!isReadOnly && !allowedFeatures.canHaveCustomProjectPaths && (
                   <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -182,14 +195,6 @@ export default function ProjectOverview() {
                 />
               </div>
             </div>
-            {!isReadOnly && (
-              <button
-                type="submit"
-                className="mt-8 px-4 py-2 bg-blue-600 text-white rounded-md"
-              >
-                Save
-              </button>
-            )}
           </form>
         </div>
         <div className="p-8 w-[400px]">
@@ -198,7 +203,7 @@ export default function ProjectOverview() {
               Edit Frame
             </h2>
             <Link href={PAGES.FRAME_EDITOR + '/' + projectData.id}>
-              <PencilSquareIcon className="ml- h-8 w-8 dark:text-white" />
+              <PencilSquareIcon className="h-10 w-10 p-2 bg-emerald-400 rounded dark:text-white" />
             </Link>
           </div>
           <h2 className="text-xl font-semibold dark:text-white">Preview</h2>
