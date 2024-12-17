@@ -24,8 +24,8 @@ const checkDevPaths = (nextUrl: NextURL): boolean => {
 };
 
 export async function middleware(request: NextRequest) {
-  const devPathCheck = checkDevPaths(request.nextUrl);
-  if (devPathCheck) {
+  const isDevelopmentOnlyPath = checkDevPaths(request.nextUrl);
+  if (isDevelopmentOnlyPath) {
     return NextResponse.redirect(new URL('/', request.nextUrl));
   }
 
@@ -43,7 +43,6 @@ export async function middleware(request: NextRequest) {
 
   // If the user is not logged in, we're going to redirect them to the home page.
   if (!user) {
-    // TODO: We should flip this from being a check of what paths are NOT authed to what paths ARE authed.
     const authCheck = checkPaths(request.nextUrl, AUTHED_PATHS);
     if (authCheck) {
       return NextResponse.redirect(new URL('/', request.nextUrl));

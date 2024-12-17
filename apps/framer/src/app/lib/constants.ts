@@ -4,6 +4,7 @@ export const PAGES = {
   TEAM_SETTINGS: '/dashboard/team',
   PROJECT_OVERVIEW: '/dashboard/projectOverview',
   FRAME_EDITOR: '/FrameEditor',
+  SIGNUP: "/signup"
 };
 
 /**

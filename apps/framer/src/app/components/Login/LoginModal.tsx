@@ -67,6 +67,10 @@ export default function MyModal({
     );
     const response = await supabase.auth.signInWithOtp({
       email,
+      options: {
+        // The user only sees this redirect if they are signing up. Otherwise they get a OTP code.
+        emailRedirectTo: process.env.NEXT_PUBLIC_CLIENT_URL + PAGES.SIGNUP,
+      }
     });
     if ('erorr' in response) {
       loadingToast.clearToast();
@@ -133,7 +137,7 @@ export default function MyModal({
             <>
               <DialogTitle className="font-bold">Verify OTP</DialogTitle>
               <Description>
-                {`Please check your email for your One-Time Password (OTP).`}
+                {`Please check your email`}
               </Description>
               <Input
                 value={enteredOtp}
@@ -147,6 +151,7 @@ export default function MyModal({
                 placeholder="6-Digit OTP"
                 className="input w-full p-2 border-2 border-gray-200 rounded-md"
               />
+              <p className='text-sm'>{`New user? Click the magic link in your email instead!`}</p>
               <div className="flex flex-1 gap-4">
                 <button
                   className="flex-1 rounded-md bg-slate-200 p-2 text-sm font-semibold text-black shadow-sm hover:bg-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
