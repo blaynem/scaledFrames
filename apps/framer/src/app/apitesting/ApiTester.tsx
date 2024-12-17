@@ -47,8 +47,9 @@ export const APITester = () => {
 
   const uploadImage = async () => {
     const user = await clientSDK.user.get();
-    if ('error' in user) {
-      return console.error('---error', user);
+    const _teams = await clientSDK.teams.getAll();
+    if ('error' in user || 'error' in _teams) {
+      return console.error('---error', {user, _teams});
     }
 
     if (!image) {
@@ -56,7 +57,7 @@ export const APITester = () => {
       return;
     }
 
-    const team = user.teams[0];
+    const team = _teams[0];
 
     const response = await clientSDK.frames.image.saveToFrame({
       teamId: team.id,
@@ -74,15 +75,16 @@ export const APITester = () => {
 
   const deleteImage = async () => {
     const user = await clientSDK.user.get();
-    if ('error' in user) {
-      return console.error('---error', user);
+    const _teams = await clientSDK.teams.getAll();
+    if ('error' in user || 'error' in _teams) {
+      return console.error('---error', {user, _teams});
     }
 
     if (!image) {
       return;
     }
 
-    const team = user.teams[0];
+    const team = _teams[0];
     const { data, error } = await supabase.storage.from('frames').remove([
       createImagePath({
         teamId: team.id,

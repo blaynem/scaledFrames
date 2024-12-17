@@ -16,7 +16,7 @@ When we go to run a migration or a dev migration to update a schema, prisma will
 You likely have the `.env.local` file already set up as it's the local environment variables for the supabase instance itself. If not, when you run the `npx supabase:start` command, it will print out all of the necessary environment variables you need to set up.
 
 
-You can run these commands either through a bash script or a VsSCode extension called NX Console.
+You can run these commands either through a bash script or a VsSCode extension called NX Console. I'd use NX Console for these start / deploy scripts.
 
 _Install link here: [NX Console](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console)_
 

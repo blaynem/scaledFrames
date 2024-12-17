@@ -39,6 +39,18 @@ We're using npm instead of yarn for this project.
     npm install
     ```
 
+# Starting Application
+
+1. Start framer-db lib (local supabase in docker)
+    1. Ensure docker is open
+    2. (Note: Use nx console its easier) Follow the setup if needed [here](/libs/framer-db/README.md#setup)
+    3. Open Supabase Studio: http://127.0.0.1:54323/project/default
+2. Start framer-server - `npm run dev:server`
+3. Start framer - ``npm run dev:web`
+4. Login to web app
+    - To get the Supabase login OTP on localhost, you can visit `http://localhost:54324/` in your browser when the container is running. There you will get your Magic Link to login.
+    - Note: Login with `blayne.marjama@gmail.com` right now, since there is a bug with OTP and magic key
+
 # Database
 
 We're using our typical Prisma + Supabase setup.
