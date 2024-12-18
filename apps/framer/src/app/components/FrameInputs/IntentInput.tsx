@@ -1,20 +1,84 @@
 'use client';
 import { IntentType, Intents } from '@prisma/client';
-import React, { useContext, useEffect, useState } from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 import { XCircleIcon } from '@heroicons/react/24/outline';
+import { FrameResponseType } from '@framer/FramerServerSDK/client';
 
 export interface IntentInputProps {
   intent: Intents;
   handleRemoveIntent: (id: string) => void;
   handleSaveFrame: () => void;
-  setHasChanges: (hasChanges: boolean) => void;
 }
+
+interface RenderInputProps {
+  intent: Intents;
+  intentType: IntentType;
+  handleSetLinkUrl: (e: string) => void;
+  handleSaveFrame: (e: string) => void;
+  frames: FrameResponseType[];
+  selectedFrame: FrameResponseType | null;
+}
+
+const RenderInputs = ({
+  intentType,
+  intent,
+  handleSetLinkUrl,
+  handleSaveFrame,
+  frames,
+  selectedFrame,
+}: RenderInputProps) => {
+  switch (intentType) {
+    case IntentType.ExternalLink:
+      return (
+        <input
+          type="text"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+          placeholder="URL"
+          value={intent.linkUrl}
+          onChange={(e) => handleSetLinkUrl(e.target.value)}
+          onBlur={(e) => handleSaveFrame(e.target.value)}
+        />
+      );
+    case IntentType.InternalLink:
+      // eslint-disable-next-line no-case-declarations
+      const selectableFrames = frames.filter(
+        (f) => f.id !== selectedFrame?.id && f.isDeleted === false
+      );
+      return (
+        <select
+          onChange={(e) => handleSetLinkUrl(e.target.value)}
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+          value={intent.linkUrl}
+          onBlur={(e) => handleSaveFrame(e.target.value)}
+        >
+          {selectableFrames.map((frame) => (
+            <option key={frame.id} value={frame.path}>
+              {frame.title}
+            </option>
+          ))}
+        </select>
+      );
+    case IntentType.Post:
+      return (
+        <input
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+          placeholder="Input for Type3"
+        />
+      );
+    default:
+      return <span>coming soon!</span>;
+  }
+};
+
 export const IntentInput: React.FC<IntentInputProps> = ({
   intent,
   handleRemoveIntent,
   handleSaveFrame,
-  setHasChanges,
 }: IntentInputProps) => {
   const { frames, selectedFrame, setFrameEditorContext } =
     useContext(FrameEditorContext);
@@ -26,7 +90,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
   const [displayText, setDisplayText] = useState(intent?.displayText ?? '');
 
   const handleSetIntentType = (type: IntentType) => {
-    setHasChanges(true);
     setIntentType(type);
     if (selectedFrame) {
       const tempFrames = [...frames];
@@ -50,7 +113,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
   };
 
   const handleSetLinkUrl = (linkUrl: string) => {
-    setHasChanges(true);
     if (selectedFrame) {
       const tempFrames = [...frames];
       const idx = tempFrames.findIndex(
@@ -73,7 +135,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
   };
 
   const handleSetIntentText = (text: string) => {
-    setHasChanges(true);
     setDisplayText(text);
     if (selectedFrame) {
       const tempFrames = [...frames];
@@ -102,62 +163,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
       setDisplayText(intent.displayText);
     }
   }, [intent]);
-
-  const renderInputs = () => {
-    switch (intentType) {
-      case IntentType.ExternalLink:
-        return (
-          <input
-            type="text"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            placeholder="URL"
-            value={intent.linkUrl}
-            onChange={(e) => handleSetLinkUrl(e.target.value)}
-            onBlur={handleSaveFrame}
-          />
-        );
-      case IntentType.InternalLink:
-        return (
-          <select
-            onChange={(e) => handleSetLinkUrl(e.target.value)}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            value={intent.linkUrl}
-          >
-            {frames.map((frame) => {
-              if (
-                selectedFrame &&
-                frame.id !== selectedFrame.id &&
-                frame.isDeleted === false
-              ) {
-                if (
-                  frames.length === 2 &&
-                  frame.path !== selectedFrame.path &&
-                  frame.path !== intent.linkUrl
-                ) {
-                  // If there are only two frames, and the frame is not the selected frame or the current linkUrl, set the linkUrl to the frame path
-                  // basically guarantees that the linkUrl will be set to the other frame if there are only 2 frames.
-                  handleSetLinkUrl(frame.path);
-                }
-                return (
-                  <option key={frame.id} value={frame.path}>
-                    {frame.title}
-                  </option>
-                );
-              }
-            })}
-          </select>
-        );
-      case IntentType.Post:
-        return (
-          <input
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            placeholder="Input for Type3"
-          />
-        );
-      default:
-        return <span>coming soon!</span>;
-    }
-  };
 
   return (
     <div
@@ -213,7 +218,14 @@ export const IntentInput: React.FC<IntentInputProps> = ({
             <label className="pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
               Value
             </label>
-            {renderInputs()}
+            <RenderInputs
+              intent={intent}
+              intentType={intentType}
+              handleSetLinkUrl={handleSetLinkUrl}
+              handleSaveFrame={handleSaveFrame}
+              frames={frames}
+              selectedFrame={selectedFrame}
+            />
           </div>
         </div>
       </div>

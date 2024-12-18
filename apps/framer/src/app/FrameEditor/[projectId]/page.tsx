@@ -34,10 +34,10 @@ export default function Index({ params }: { params: { projectId: string } }) {
     fetchFrames();
   }, [params]);
 
-  function setFrameEditorContext(
+  const setFrameEditorContext = (
     newFrames: TFrameEditorContext['frames'],
     newSelectedFrame: TFrameEditorContext['selectedFrame']
-  ) {
+  ) => {
     setFrames(newFrames);
     setSelectedFrame(newSelectedFrame);
   }
