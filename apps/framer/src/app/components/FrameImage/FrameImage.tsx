@@ -6,6 +6,7 @@ export interface FrameImageProps {
 }
 
 export function FrameImage({ aspectRatio, imageUrl }: FrameImageProps) {
+  console.log({aspectRatio})
   const [showPlaceHolder, setShowPlaceHolder] = useState(false);
 
   const toggleShowPlaceHolder = (show: boolean) => {
