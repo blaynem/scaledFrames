@@ -9,7 +9,7 @@ import {
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 import { IntentInput } from './IntentInput';
-import { IntentType } from '@prisma/client';
+import { AspectRatio, IntentType } from '@prisma/client';
 import {
   EditFrameRequestBody,
   FramerClientSDK,
@@ -23,7 +23,8 @@ import ImageUploadModal from '../ImageUploadModal/ImageUploadModal';
 import deepEqual from 'deep-equal';
 import { HoverCardComponent } from '../ui/HoverCard';
 
-const getDisplayPathValue = (path: string) => {
+const getDisplayPathValue = (path?: string) => {
+  if (!path) return "";
   let _path = path;
   while (_path[0] == '/') {
     _path = _path.slice(1);
@@ -38,25 +39,12 @@ export function FrameInputs() {
   const [initFrameData, setInitFrameData] = useState<FrameResponseType>();
   const { frames, selectedFrame, setFrameEditorContext } =
     useContext(FrameEditorContext);
-  const [intents, setIntents] = useState(
-    selectedFrame ? selectedFrame.intents : []
-  );
   const { addToast } = useToast();
-  const [title, setTitle] = useState(selectedFrame ? selectedFrame.title : '');
-  const [path, setPath] = useState(selectedFrame ? selectedFrame.path : '');
-  const [imageUrl, setImageUrl] = useState(
-    selectedFrame ? selectedFrame.imageUrl : ''
-  );
   const [show, setShow] = useState(false);
   const clientSdk = FramerClientSDK();
 
   useEffect(() => {
     if (selectedFrame) {
-      setTitle(selectedFrame.title);
-      setIntents(selectedFrame.intents);
-      setPath(selectedFrame.path);
-      setImageUrl(selectedFrame.imageUrl);
-
       // This rerenders a lot, so only set it when we havent yet. Otherwise the onSave does it.
       if (!initFrameData) {
         setInitFrameData(selectedFrame);
@@ -66,7 +54,6 @@ export function FrameInputs() {
   }, [selectedFrame]);
 
   const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
     if (selectedFrame) {
       const tempFrames = [...frames];
       const idx = findFrameIdxById(tempFrames, selectedFrame.id);
@@ -78,7 +65,6 @@ export function FrameInputs() {
 
   const handleChangePath = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPath = e.target.value;
-    setPath(newPath);
     if (selectedFrame) {
       const tempFrames = [...frames];
       const idx = findFrameIdxById(tempFrames, selectedFrame.id);
@@ -88,13 +74,24 @@ export function FrameInputs() {
     }
   };
 
+  const handleSaveAspectRatio = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as AspectRatio;
+    if (selectedFrame) {
+      const tempFrames = [...frames];
+      const idx = findFrameIdxById(tempFrames, selectedFrame.id);
+      const tempFrame = { ...selectedFrame, aspectRatio: value };
+      tempFrames[idx] = tempFrame;
+      setFrameEditorContext(tempFrames, tempFrame);
+    }
+  };
+
   const handleAddIntent = () => {
-    console.log('addintent', selectedFrame);
+    if (!selectedFrame) return;
     const exampleIntent = {
-      id: `${intents.length + 1}`,
+      id: `${selectedFrame.intents.length + 1}`,
       displayText: 'Example Intent',
       type: IntentType.InternalLink,
-      displayOrder: intents.length + 1,
+      displayOrder: selectedFrame.intents.length + 1,
       framesId: selectedFrame ? selectedFrame.id : '1234',
       isDeleted: false,
       linkUrl: APP_DOMAIN,
@@ -107,7 +104,6 @@ export function FrameInputs() {
       const tempFrame = { ...selectedFrame, intents: tempIntents };
       tempFrames[idx].intents = tempIntents;
 
-      setIntents([...intents, exampleIntent]);
       setFrameEditorContext(frames, tempFrame);
     }
   };
@@ -122,7 +118,6 @@ export function FrameInputs() {
       const tempFrame = { ...selectedFrame, intents: tempIntents };
       tempFrames[idx].intents = tempIntents;
 
-      setIntents(tempIntents);
       setFrameEditorContext(tempFrames, tempFrame);
       // No onBlur will be fired, so we need to save the frame
       handleSaveFrame();
@@ -133,16 +128,16 @@ export function FrameInputs() {
     if (!selectedFrame) return;
 
     // Append the "/" back once we've removed all the other stuff.
-    let _path = path.trim();
+    let _path = selectedFrame.path.trim();
     if (_path.indexOf('/') != 0) {
       _path = '/' + _path;
     }
     const body: EditFrameRequestBody = {
       projectId: selectedFrame.projectId,
-      teamId: selectedFrame?.teamId,
-      title: title,
+      teamId: selectedFrame.teamId,
+      title: selectedFrame.title,
       path: _path,
-      imageUrl: imageUrl,
+      imageUrl: selectedFrame.imageUrl,
       isDeleted: false,
       intents: selectedFrame.intents,
     };
@@ -197,7 +192,7 @@ export function FrameInputs() {
   };
 
   // We don't want to display the beginning "/" to the user is all this is
-  const displayPathValue = useMemo(() => getDisplayPathValue(path), [path]);
+  const displayPathValue = useMemo(() => getDisplayPathValue(selectedFrame?.path), [selectedFrame]);
 
   return (
     selectedFrame && (
@@ -211,7 +206,7 @@ export function FrameInputs() {
             type="text"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
             placeholder="Title"
-            value={title}
+            value={selectedFrame.title}
             onChange={handleChangeTitle}
             onBlur={handleSaveFrame}
           />
@@ -248,23 +243,42 @@ export function FrameInputs() {
             />
           </div>
         </div>
-        <div className="w-full">
-          <label className="pb-1 block text-sm font-medium dark:text-gray-100 ">
-            Select Image
-          </label>
+        <div className="flex">
+          <div className="grow">
+            <label className="pb-1 block text-sm font-medium dark:text-gray-100 ">
+              Select Image
+            </label>
 
-          <button
-            type="button"
-            className="text-white justify-center bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
-            onClick={() => {
-              setShow(true);
-            }}
-          >
-            <ArrowUpOnSquareIcon className="h-5 w-5 mr-2" />
-            Upload Image
-          </button>
+            <button
+              type="button"
+              className="text-white justify-center bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
+              onClick={() => {
+                setShow(true);
+              }}
+            >
+              <ArrowUpOnSquareIcon className="h-5 w-5 mr-2" />
+              Upload Image
+            </button>
 
-          <ImageUploadModal show={show} setShow={setShow} />
+            <ImageUploadModal show={show} setShow={setShow} />
+          </div>
+          <div className="grow">
+            <label className="pb-1 block text-sm font-medium dark:text-gray-100 ">
+              Select Aspect Ratio
+            </label>
+            <select
+              required
+              onChange={handleSaveAspectRatio}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              value={selectedFrame.aspectRatio}
+              onBlur={handleSaveFrame}
+            >
+              <option value={AspectRatio.STANDARD}>
+                {AspectRatio.STANDARD}
+              </option>
+              <option value={AspectRatio.WIDE}>{AspectRatio.WIDE}</option>
+            </select>
+          </div>
         </div>
 
         {selectedFrame.intents.map((intent) => (

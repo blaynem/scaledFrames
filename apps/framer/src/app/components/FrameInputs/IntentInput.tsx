@@ -2,7 +2,6 @@
 import { IntentType, Intents } from '@prisma/client';
 import React, {
   useContext,
-  useEffect,
   useState,
 } from 'react';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
@@ -18,7 +17,6 @@ export interface IntentInputProps {
 
 interface RenderInputProps {
   intent: Intents;
-  intentType: IntentType;
   handleSetLinkUrl: (e: string) => void;
   handleSaveFrame: (e: string) => void;
   frames: FrameResponseType[];
@@ -26,14 +24,13 @@ interface RenderInputProps {
 }
 
 const RenderInputs = ({
-  intentType,
   intent,
   handleSetLinkUrl,
   handleSaveFrame,
   frames,
   selectedFrame,
 }: RenderInputProps) => {
-  switch (intentType) {
+  switch (intent.type) {
     case IntentType.ExternalLink:
       return (
         <input
@@ -85,15 +82,9 @@ export const IntentInput: React.FC<IntentInputProps> = ({
 }: IntentInputProps) => {
   const { frames, selectedFrame, setFrameEditorContext } =
     useContext(FrameEditorContext);
-
-  const [intentType, setIntentType] = useState<IntentType>(
-    intent.type ?? IntentType.InternalLink
-  );
   const [showRemove, setShowRemove] = useState(false);
-  const [displayText, setDisplayText] = useState(intent?.displayText ?? '');
 
   const handleSetIntentType = (type: IntentType) => {
-    setIntentType(type);
     // When the intent changes, we need to clear the link url value
     if (selectedFrame) {
       const tempFrames = [...frames];
@@ -142,7 +133,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
   };
 
   const handleSetIntentText = (text: string) => {
-    setDisplayText(text);
     if (selectedFrame) {
       const tempFrames = [...frames];
       const idx = tempFrames.findIndex(
@@ -163,13 +153,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
       setFrameEditorContext(tempFrames, tempFrame);
     }
   };
-
-  useEffect(() => {
-    if (intent) {
-      setIntentType(intent.type);
-      setDisplayText(intent.displayText);
-    }
-  }, [intent]);
 
   return (
     <div
@@ -207,7 +190,7 @@ export const IntentInput: React.FC<IntentInputProps> = ({
             </div>
             <select
               className="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              value={intentType}
+              value={intent.type}
               onChange={(e) =>
                 handleSetIntentType(e.target.value as IntentType)
               }
@@ -234,7 +217,7 @@ export const IntentInput: React.FC<IntentInputProps> = ({
             <input
               className="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               placeholder="Intent Display Text"
-              value={displayText}
+              value={intent.displayText}
               onChange={(e) => handleSetIntentText(e.target.value)}
               onBlur={handleSaveFrame}
             />
@@ -260,7 +243,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
             </div>
             <RenderInputs
               intent={intent}
-              intentType={intentType}
               handleSetLinkUrl={handleSetLinkUrl}
               handleSaveFrame={handleSaveFrame}
               frames={frames}
