@@ -6,8 +6,9 @@ import React, {
   useState,
 } from 'react';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
-import { XCircleIcon } from '@heroicons/react/24/outline';
+import { QuestionMarkCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { FrameResponseType } from '@framer/FramerServerSDK/client';
+import { HoverCardComponent } from '../ui/HoverCard';
 
 export interface IntentInputProps {
   intent: Intents;
@@ -182,9 +183,22 @@ export const IntentInput: React.FC<IntentInputProps> = ({
       <div className="grid col-span-8 mt-2 flex flex-col w-full h-full ">
         <div className="flex flex-row">
           <div className="w-full mx-1">
-            <label className="pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
-              Type
-            </label>
+            <div className="flex items-center">
+              <label className="mr-2 text-sm font-medium dark:text-gray-100 ">
+                Type
+              </label>
+              <HoverCardComponent
+                className="bg-white border-gray-300 border z-50"
+                cardContent={
+                  <ul>
+                    <li><b>Internal Link:</b> Links to another frame in this project.</li>
+                    <li><b>External Link:</b> Link to another website, etc.</li>
+                    {/* <li><b>Post:</b> Coming soon...</li> */}
+                  </ul>
+              }
+                headerNode={<QuestionMarkCircleIcon className="h-4 w-4" />}
+              />
+            </div>
             <select
               className="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               value={intentType}
@@ -195,15 +209,22 @@ export const IntentInput: React.FC<IntentInputProps> = ({
             >
               <option value={IntentType.InternalLink}>InternalLink</option>
               <option value={IntentType.ExternalLink}>ExternalLink</option>
-              <option value={IntentType.Post}>Post</option>
+              {/* <option value={IntentType.Post}>Post</option>
               <option value={IntentType.Transaction}>Transaction</option>
-              <option value={IntentType.TextInput}>TextInput</option>
+              <option value={IntentType.TextInput}>TextInput</option> */}
             </select>
           </div>
           <div className="w-full mx-1">
-            <label className=" pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
-              Intent Text
-            </label>
+          <div className="flex items-center">
+              <label className="mr-2 text-sm font-medium dark:text-gray-100 ">
+                Intent Text
+              </label>
+              <HoverCardComponent
+                className="bg-white border-gray-300 border z-50"
+                cardContent={`The 'button' text under the frame`}
+                headerNode={<QuestionMarkCircleIcon className="h-4 w-4" />}
+              />
+            </div>
             <input
               className="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               placeholder="Intent Display Text"
@@ -215,9 +236,22 @@ export const IntentInput: React.FC<IntentInputProps> = ({
         </div>
         <div className="flex flex-row">
           <div className="w-full mx-1">
-            <label className="pt-1 block mb-2 text-sm font-medium dark:text-gray-100 ">
-              Value
-            </label>
+            <div className="flex items-center">
+              <label className="mr-2 text-sm font-medium dark:text-gray-100 ">
+                Value
+              </label>
+              <HoverCardComponent
+                className="bg-white border-gray-300 border z-50"
+                cardContent={
+                  <ul>
+                    <li><b>Internal Link:</b> On button press, the user will be directed to the selected frame.</li>
+                    <li><b>External Link:</b> On button press, the user can be directed anywhere. Typically to another website, frame, etc.</li>
+                    {/* <li><b>Post:</b> Coming soon...</li> */}
+                  </ul>
+              }
+                headerNode={<QuestionMarkCircleIcon className="h-4 w-4" />}
+              />
+            </div>
             <RenderInputs
               intent={intent}
               intentType={intentType}
