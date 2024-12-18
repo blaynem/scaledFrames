@@ -52,11 +52,13 @@ const RenderInputs = ({
       );
       return (
         <select
+          required
           onChange={(e) => handleSetLinkUrl(e.target.value)}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
           value={intent.linkUrl}
           onBlur={(e) => handleSaveFrame(e.target.value)}
         >
+          <option disabled value="">Select</option>
           {selectableFrames.map((frame) => (
             <option key={frame.id} value={frame.path}>
               {frame.title}
@@ -92,14 +94,16 @@ export const IntentInput: React.FC<IntentInputProps> = ({
 
   const handleSetIntentType = (type: IntentType) => {
     setIntentType(type);
+    // When the intent changes, we need to clear the link url value
     if (selectedFrame) {
       const tempFrames = [...frames];
       const idx = tempFrames.findIndex(
         (frame) => frame.id === selectedFrame.id
       );
+
       const tempIntents = selectedFrame.intents.map((i: Intents) => {
         if (i.id === intent.id) {
-          return { ...i, type };
+          return { ...i, type, linkUrl: "" };
         }
         return i;
       });
@@ -116,9 +120,11 @@ export const IntentInput: React.FC<IntentInputProps> = ({
   const handleSetLinkUrl = (linkUrl: string) => {
     if (selectedFrame) {
       const tempFrames = [...frames];
+      // get the index of the frame
       const idx = tempFrames.findIndex(
         (frame) => frame.id === selectedFrame.id
       );
+      // replacing the text in the intent with this value
       const tempIntents = selectedFrame.intents.map((i: Intents) => {
         if (i.id === intent.id) {
           return { ...i, linkUrl };
