@@ -5,7 +5,7 @@ import {
   BookmarkIcon,
   PlusCircleIcon,
 } from '@heroicons/react/24/outline';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
 import { IntentInput } from './IntentInput';
 import { IntentType } from '@prisma/client';
@@ -20,6 +20,15 @@ import { useToast } from '../Toasts/ToastProvider';
 import { APP_DOMAIN } from '@framer/FramerServerSDK';
 import ImageUploadModal from '../ImageUploadModal/ImageUploadModal';
 import deepEqual from 'deep-equal';
+
+const getDisplayPathValue = (path: string) => {
+  let _path = path;
+  while (_path[0] == "/") {
+    _path = _path.slice(1)
+  }
+
+  return _path;
+}
 
 export function FrameInputs() {
   // We need to remove the frameEditorContext. The inputs themselves don't need the context its fucking things up.
@@ -66,11 +75,12 @@ export function FrameInputs() {
   };
 
   const handleChangePath = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPath(e.target.value);
+    const newPath = e.target.value
+    setPath(newPath);
     if (selectedFrame) {
       const tempFrames = [...frames];
       const idx = findFrameIdxById(tempFrames, selectedFrame.id);
-      const tempFrame = { ...selectedFrame, path: e.target.value };
+      const tempFrame = { ...selectedFrame, path: newPath };
       tempFrames[idx] = tempFrame;
       setFrameEditorContext(tempFrames, tempFrame);
     }
@@ -118,11 +128,16 @@ export function FrameInputs() {
   const handleSaveFrame = async () => {
     if (!selectedFrame) return;
 
+    // Append the "/" back once we've removed all the other stuff.
+    let _path = path.trim();
+    if (_path.indexOf("/") != 0) {
+      _path = "/" + _path;
+    }
     const body: EditFrameRequestBody = {
       projectId: selectedFrame.projectId,
       teamId: selectedFrame?.teamId,
       title: title,
-      path: path,
+      path: _path,
       imageUrl: imageUrl,
       isDeleted: false,
       intents: selectedFrame.intents,
@@ -136,20 +151,24 @@ export function FrameInputs() {
       body.isDeleted == initFrameData?.isDeleted
     ) {
       // this is so annoying.
-      const intents1 = body.intents.map(({displayText, type, displayOrder, isDeleted, linkUrl}) => ({
-        displayOrder,
-        displayText,
-        type,
-        isDeleted,
-        linkUrl
-      }))
-      const intents2 = initFrameData?.intents.map(({displayText, type, displayOrder, isDeleted, linkUrl}) => ({
-        displayOrder,
-        displayText,
-        type,
-        isDeleted,
-        linkUrl
-      }))
+      const intents1 = body.intents.map(
+        ({ displayText, type, displayOrder, isDeleted, linkUrl }) => ({
+          displayOrder,
+          displayText,
+          type,
+          isDeleted,
+          linkUrl,
+        })
+      );
+      const intents2 = initFrameData?.intents.map(
+        ({ displayText, type, displayOrder, isDeleted, linkUrl }) => ({
+          displayOrder,
+          displayText,
+          type,
+          isDeleted,
+          linkUrl,
+        })
+      );
       // If the intents are equal, lets break early.
       if (deepEqual(intents1, intents2)) return;
     }
@@ -173,6 +192,9 @@ export function FrameInputs() {
     setInitFrameData(selectedFrame);
   };
 
+  // We don't want to display the beginning "/" to the user is all this is
+  const displayPathValue = useMemo(() => getDisplayPathValue(path), [path]);
+
   return (
     selectedFrame && (
       <div className="flex flex-col">
@@ -195,14 +217,17 @@ export function FrameInputs() {
           <label className="block mb-1 text-sm font-medium dark:text-gray-100 ">
             Path
           </label>
-          <input
-            type="text"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-            placeholder="Path"
-            value={path}
-            onChange={handleChangePath}
-            onBlur={handleSaveFrame}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', position: "relative" }}>
+            <span className='content-center h-full absolute pl-2 pr-1 border-r border-gray-300/70 text-gray-900'>{'/'}</span>
+            <input
+              type="text"
+              className="pl-6 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              placeholder="Path"
+              value={displayPathValue}
+              onChange={handleChangePath}
+              onBlur={handleSaveFrame}
+            />
+          </div>
         </div>
         <div className="w-full">
           <label className="pb-1 block text-sm font-medium dark:text-gray-100 ">
