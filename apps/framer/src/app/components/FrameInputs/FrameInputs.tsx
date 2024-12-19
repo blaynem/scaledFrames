@@ -274,9 +274,9 @@ export function FrameInputs() {
               onBlur={handleSaveFrame}
             >
               <option value={AspectRatio.STANDARD}>
-                {AspectRatio.STANDARD}
+                {AspectRatio.STANDARD} (1:1)
               </option>
-              <option value={AspectRatio.WIDE}>{AspectRatio.WIDE}</option>
+              <option value={AspectRatio.WIDE}>{AspectRatio.WIDE} (1.91:1)</option>
             </select>
           </div>
         </div>

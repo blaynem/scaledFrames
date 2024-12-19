@@ -5,6 +5,8 @@ import FrameImage from '../FrameImage/FrameImage';
 import IntentContainer from '../IntentButton/IntentContainer';
 import { AspectRatio } from '@prisma/client';
 import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { HoverCardComponent } from '../ui/HoverCard';
 /* eslint-disable-next-line */
 
 export function FrameDebugger() {
@@ -25,7 +27,14 @@ export function FrameDebugger() {
   return (
     selectedFrame && (
       <>
-        <h2 className="text-center text-lg font-bold">Live Preview</h2>
+        <div className="flex mb-1 items-center">
+          <h2 className="mr-2 text-center text-lg font-bold">Live Preview</h2>
+          <HoverCardComponent
+            className="bg-white border-gray-300 border z-50"
+            cardContent={`Warning: Different websites and applications may display the image differently.`}
+            headerNode={<ExclamationTriangleIcon className="h-4 w-4" />}
+          />
+        </div>
         <div className="rounded-lg bg-white m-4 max-h-fit flex-shrink-1 w-9/12 h-9/12 flex flex-col items-center justify-center">
           <FrameImage
             aspectRatio={aspectRatio}
