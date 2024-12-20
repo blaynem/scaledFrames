@@ -26,7 +26,7 @@ export const frogApp = new Frog({
 
 frogApp.use(
   cors({
-    origin: isDevelopment ? '*' : 'https://your-production-site.com',
+    origin: isDevelopment ? '*' : ['http://www.scaledframes.com', 'http://scaledframes.com'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
   })

@@ -24,6 +24,22 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        "source": "/f/poop",
+        "destination": "http://@NEXT_PUBLIC_API_FRAMER_URL/f/poop"
+      },
+      {
+        "source": "/f/123/",
+        "destination": "@NEXT_PUBLIC_API_FRAMER_URL/f/123"
+      },
+      {
+        "source": "/api/:path*",
+        "destination": "http://ec2-54-224-175-29.compute-1.amazonaws.com/:path*"
+      }
+    ]
+  },
 };
 
 const plugins = [
