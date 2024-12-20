@@ -10,17 +10,7 @@ import { useUser } from '../../components/UserContext';
 import { useRouter } from 'next/navigation';
 import GeneralModal from '../../components/Modal';
 import { useState } from 'react';
-
-export const convertToUrlSafe = (val: string): string =>
-  val
-    .replace(/[^a-zA-Z0-9 -]/g, '')
-    .replace(/\s+/g, '-')
-    .toLowerCase();
-
-export const sectionWrapper =
-  'mb-4 p-6 bg-white rounded-lg shadow-xl dark:bg-gray-800';
-export const headerSection =
-  'mb-4 text-xl font-bold text-gray-900 dark:text-white';
+import { sectionWrapper, headerSection } from './styles';
 
 export default function TeamPage() {
   const { addToast } = useToast();

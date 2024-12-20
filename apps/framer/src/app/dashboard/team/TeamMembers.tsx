@@ -1,5 +1,4 @@
 import { FramerClientSDK } from '@framer/FramerServerSDK/client';
-import { sectionWrapper, headerSection } from './page';
 import { MinusCircleIcon } from '@heroicons/react/24/solid';
 import { Role } from '@prisma/client';
 import InviteUserModal from './InviteUserModal';
@@ -9,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '../../components/UserContext';
 import GeneralModal from '../../components/Modal';
 import { PencilIcon } from '@heroicons/react/24/outline';
+import { sectionWrapper, headerSection } from './styles';
 
 type MemberDisplay = {
   id: string;

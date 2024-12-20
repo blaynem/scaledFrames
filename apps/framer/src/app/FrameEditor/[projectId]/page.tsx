@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FrameDebugger from '../../components/FrameDebugger/frameDebugger';
 import FrameInputs from '../../components/FrameInputs/FrameInputs';
 import FramePreviewContainer from '../../components/FramePreview/FramePreviewContainer';
@@ -8,20 +8,12 @@ import Layout from '../../components/Layout/Layout';
 import { TFrameEditorContext } from '../../lib/types';
 import { getFrames } from '../../utils/utils';
 import { ToastProvider } from '../../components/Toasts/ToastProvider';
-
-const initialState: TFrameEditorContext = {
-  frames: [],
-  selectedFrame: null,
-  setFrameEditorContext: (frames, selectedFrame) => undefined,
-};
-
-export const FrameEditorContext =
-  createContext<TFrameEditorContext>(initialState);
+import { FrameEditorContext, defaultState } from '../../lib/frame-context';
 
 export default function Index({ params }: { params: { projectId: string } }) {
-  const [frames, setFrames] = useState(initialState.frames);
+  const [frames, setFrames] = useState(defaultState.frames);
   const [selectedFrame, setSelectedFrame] = useState(
-    initialState.selectedFrame
+    defaultState.selectedFrame
   );
 
   useEffect(() => {

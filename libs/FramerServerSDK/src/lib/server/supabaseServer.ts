@@ -78,15 +78,15 @@ export const decodeJwt = async (
   const token = access_token.split(' ')[1];
   try {
     const decoded = await verify(token, process.env['SUPABASE_JWT_SECRET']!);
-    if (!decoded.email) {
+    if (!decoded['email']) {
       throw new Error('Could not get email from JWT.');
     }
-    if (!decoded.sub) {
+    if (!decoded['sub']) {
       throw new Error('Could not get user id from JWT.');
     }
     return {
-      email: decoded.email,
-      id: decoded.sub,
+      email: decoded['email'] as string,
+      id: decoded['sub'] as string,
     };
   } catch (err) {
     console.error('Error decoding token', err);

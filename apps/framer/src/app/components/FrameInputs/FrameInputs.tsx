@@ -7,7 +7,7 @@ import {
   QuestionMarkCircleIcon,
 } from '@heroicons/react/24/outline';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
+import { FrameEditorContext } from '../../lib/frame-context';
 import { IntentInput } from './IntentInput';
 import { AspectRatio, IntentType } from '@prisma/client';
 import {

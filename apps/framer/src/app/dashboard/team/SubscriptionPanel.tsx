@@ -1,5 +1,6 @@
 // import { useUser } from '../../components/UserContext';
-import { sectionWrapper, headerSection } from './page';
+
+import { sectionWrapper, headerSection } from "./styles";
 
 export const SubscriptionPanel = () => {
   // const { userPermissions } = useUser();

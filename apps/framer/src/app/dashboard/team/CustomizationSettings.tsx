@@ -1,11 +1,11 @@
 'use client';
 import { useState } from 'react';
-import { sectionWrapper, headerSection } from './page';
 import { APP_NAME } from '@framer/FramerServerSDK';
 import { useUser } from '../../components/UserContext';
 import { FramerClientSDK } from '@framer/FramerServerSDK/client';
 import { useToast } from '../../components/Toasts/ToastProvider';
 import { ToastTypes } from '../../components/Toasts/GenericToast';
+import { headerSection, sectionWrapper } from './styles';
 
 export const CustomizationSettings = () => {
   const {

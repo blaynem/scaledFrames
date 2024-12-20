@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import FrameImage from '../FrameImage/FrameImage';
 import IntentContainer from '../IntentButton/IntentContainer';
 import { AspectRatio } from '@prisma/client';
-import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
+import { FrameEditorContext } from '../../lib/frame-context';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { HoverCardComponent } from '../ui/HoverCard';
 /* eslint-disable-next-line */

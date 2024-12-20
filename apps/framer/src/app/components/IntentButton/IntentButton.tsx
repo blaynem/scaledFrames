@@ -1,7 +1,7 @@
 import { Intents } from '@prisma/client';
 import styles from './IntentButton.module.css';
 import { useContext } from 'react';
-import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
+import { FrameEditorContext } from '../../lib/frame-context';
 
 /* eslint-disable-next-line */
 export interface IntentButtonProps

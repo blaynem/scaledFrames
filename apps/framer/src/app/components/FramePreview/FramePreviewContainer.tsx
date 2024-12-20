@@ -1,6 +1,6 @@
 import React from 'react';
 import FramePreview from './FramePreview';
-import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
+import { FrameEditorContext } from '../../lib/frame-context';
 import {
   EditFrameRequestBody,
   FramerClientSDK,

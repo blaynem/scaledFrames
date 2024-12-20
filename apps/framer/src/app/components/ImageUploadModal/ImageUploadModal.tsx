@@ -4,7 +4,7 @@ import {
 } from '@framer/FramerServerSDK/client';
 import { PhotoIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import React, { useContext, useRef, useState } from 'react';
-import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
+import { FrameEditorContext } from '../../lib/frame-context';
 import { findFrameIdxById } from '../../utils/utils';
 
 type ImageUploadModalProps = {

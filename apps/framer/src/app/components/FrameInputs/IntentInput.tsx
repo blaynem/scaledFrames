@@ -4,7 +4,7 @@ import React, {
   useContext,
   useState,
 } from 'react';
-import { FrameEditorContext } from '../../FrameEditor/[projectId]/page';
+import { FrameEditorContext } from '../../lib/frame-context';
 import { QuestionMarkCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { FrameResponseType } from '@framer/FramerServerSDK/client';
 import { HoverCardComponent } from '../ui/HoverCard';
