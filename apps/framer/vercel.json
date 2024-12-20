@@ -1,0 +1,13 @@
+{
+    "rewrites": [
+      {
+        "source": "/f/:path*",
+        "destination": "http://@NEXT_PUBLIC_API_FRAMER_URL/:path*"
+      },
+      {
+        "source": "/api/:path*",
+        "destination": "http://@NEXT_PUBLIC_API_FRAMER_URL/api/:path*"
+      }
+    ]
+  }
+  

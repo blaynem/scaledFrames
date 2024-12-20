@@ -5,6 +5,7 @@
   "scripts": {
     "dev:web": "nx dev framer -p 3001",
     "dev:server": "nx serve:dev framer-server",
+    "generate": "npx nx prisma:generate framer-db",
     "ngrok": "ngrok http 3000",
     "typecheck": "nx run-many --target=typecheck --all"
   },
