@@ -1,13 +1,12 @@
 name: Deploy Server
 run-name: Deploy Server. Run by ${{ github.actor }}
 on: [workflow_dispatch]
+env:
+  FOLDER_NAME: scaled-frames
 jobs:
-  Explore-GitHub-Actions:
+  deploy-server:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
-
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
@@ -15,23 +14,19 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
       
       - name: Add Known Hosts
+        # removing the `user@` from the ec2_host
         run: |
-          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$(echo ${{ secrets.EC2_HOST }} | awk -F@ '{print $2}')" >> ~/.ssh/known_hosts
       
-      - name: Transfer Repository to EC2
-        run: |
-          tar -czf repo.tar.gz .
-          scp -i ~/.ssh/id_rsa repo.tar.gz ${{ secrets.EC2_HOST }}:~/repo.tar.gz
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.FOLDER_NAME }}
 
-      - name: Extract Repository on EC2
-        run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_HOST }} << 'EOF'
-          tar -xzf repo.tar.gz -C ~/scaled-frames
-          rm repo.tar.gz
-          EOF
-      
+      # Going into folder, creating an .env
       - name: Create .env file
         run: |
+          cd ${{ env.FOLDER_NAME }}
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
           echo "DIRECT_DB_URL=${{ secrets.DIRECT_DB_URL }}" >> .env
           echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
@@ -42,10 +37,24 @@ jobs:
           echo "NEXT_PUBLIC_API_FRAMER_URL=${{ secrets.NEXT_PUBLIC_API_FRAMER_URL }}" >> .env
           echo "NEXT_PUBLIC_API_FRAMER_PORT=${{ secrets.NEXT_PUBLIC_API_FRAMER_PORT }}" >> .env
       
-      -name: Upload .env to EC2
+      - name: Transfer Repository to EC2
         run: |
-          scp -i ~/.ssh/id_rsa .env ${{ secrets.EC2_HOST }}:~/scaled-frames
+          tar -czf repo.tar.gz ${{ env.FOLDER_NAME }}
+          scp -i ~/.ssh/id_rsa repo.tar.gz ${{ secrets.EC2_HOST }}:~/repo.tar.gz
+
+      - name: Extract Repository on EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_HOST }} << 'EOF'
+            # Remove the folder if its still there
+            rm -rf ${{ env.FOLDER_NAME }}
+            tar -xzf repo.tar.gz
+            rm repo.tar.gz
+          EOF
       
+      - name: Run install script on EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_HOST }} 'bash ${{ env.FOLDER_NAME }}/scripts/install.sh'
+
       - name: Run build/deploy script on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_HOST }} 'bash ~/deploy.sh'
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_HOST }} 'bash ${{ env.FOLDER_NAME }}/scripts/deploy.sh'
