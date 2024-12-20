@@ -1,5 +1,4 @@
 name: Deploy Server
-run-name: Deploy Server. Run by ${{ github.actor }}
 on: [workflow_dispatch]
 env:
   FOLDER_NAME: scaled-frames
@@ -36,25 +35,26 @@ jobs:
           echo "NEXT_PUBLIC_CLIENT_URL=${{ secrets.NEXT_PUBLIC_CLIENT_URL }}" >> .env
           echo "NEXT_PUBLIC_API_FRAMER_URL=${{ secrets.NEXT_PUBLIC_API_FRAMER_URL }}" >> .env
           echo "NEXT_PUBLIC_API_FRAMER_PORT=${{ secrets.NEXT_PUBLIC_API_FRAMER_PORT }}" >> .env
-      
-      - name: Transfer Repository to EC2
-        run: |
-          tar -czf repo.tar.gz ${{ env.FOLDER_NAME }}
-          scp -i ~/.ssh/id_rsa repo.tar.gz ${{ secrets.EC2_HOST }}:~/repo.tar.gz
 
-      - name: Extract Repository on EC2
+      - name: Transfer Repository to EC2
+        # Copying over only what has changed
         run: |
+          cd ${{ env.FOLDER_NAME }}
+          rsync -avz --exclude 'node_modules' --exclude '.git' --exclude 'apps/framer' --exclude 'apps/framer-e2e' \
+            -e "ssh -i ~/.ssh/aws-west-mbp.pem" \
+            . ${{ secrets.EC2_HOST }}:~/framer
+      
+      - name: Update install
+        run: | 
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_HOST }} << 'EOF'
-            # Remove the folder if its still there
-            rm -rf ${{ env.FOLDER_NAME }}
-            tar -xzf repo.tar.gz
-            rm repo.tar.gz
+            npm install
+            cd framer/libs/framer-db/
+            npx prisma generate
           EOF
       
-      - name: Run install script on EC2
+      - name: Restart EC2 Services
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_HOST }} 'bash ${{ env.FOLDER_NAME }}/scripts/install.sh'
-
-      - name: Run build/deploy script on EC2
-        run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_HOST }} 'bash ${{ env.FOLDER_NAME }}/scripts/deploy.sh'
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_host }} << 'EOF'
+            sudo systemctl restart myapp.service
+            sudo systemctl restart caddy
+          EOF
