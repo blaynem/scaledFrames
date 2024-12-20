@@ -1,3 +1,9 @@
+# How to deploy server
+
+1. SSH into ec2 instance.
+    - Note: Save the keypair to your `~/.ssh` folder for command to work.
+    `ssh -i "~/.ssh/aws-west-mbp.pem" ubuntu@ec2-3-95-217-48.compute-1.amazonaws.com`
+
 # To run the server
 
 Nx Console or this bash command.
