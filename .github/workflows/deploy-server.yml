@@ -13,9 +13,8 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
       
       - name: Add Known Hosts
-        # removing the `user@` from the ec2_host
         run: |
-          ssh-keyscan -H "$(echo ${{ secrets.EC2_HOST }} | awk -F@ '{print $2}')" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$(echo ${{ secrets.NEXT_PUBLIC_API_FRAMER_URL }} | awk -F@ '{print $2}')" >> ~/.ssh/known_hosts
       
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -41,20 +40,17 @@ jobs:
         run: |
           cd ${{ env.FOLDER_NAME }}
           rsync -avz --exclude 'node_modules' --exclude '.git' --exclude 'apps/framer' --exclude 'apps/framer-e2e' \
-            -e "ssh -i ~/.ssh/aws-west-mbp.pem" \
-            . ${{ secrets.EC2_HOST }}:~/framer
+            -e "ssh -i ~/.ssh/aws-west-mbp.pem" . ubuntu@${{ secrets.NEXT_PUBLIC_API_FRAMER_URL }}:~/framer
       
       - name: Update install
         run: | 
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.NEXT_PUBLIC_API_FRAMER_URL }} << 'EOF'
+            echo "--- Installing NPM"
             npm install
+            echo "--- Generate Prisma data"
             cd framer/libs/framer-db/
             npx prisma generate
-          EOF
-      
-      - name: Restart EC2 Services
-        run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_host }} << 'EOF'
+            echo "Restarting ec2 Services"
             sudo systemctl restart myapp.service
             sudo systemctl restart caddy
           EOF
