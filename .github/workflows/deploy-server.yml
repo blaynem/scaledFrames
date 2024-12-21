@@ -47,11 +47,14 @@ jobs:
         run: | 
           ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_URL }} << 'EOF'
             echo "--- Installing NPM"
+            cd framer/
             npm install
             echo "--- Generate Prisma data"
-            cd framer/libs/framer-db/
+            cd libs/framer-db/
             npx prisma generate
+            
             echo "Restarting ec2 Services"
+            sudo systemctl daemon-reload
             sudo systemctl restart myapp.service
             sudo systemctl restart caddy
           EOF
