@@ -27,7 +27,7 @@ sudo sh -c 'cat > /etc/caddy/Caddyfile <<EOF
 :80 {
     reverse_proxy localhost:3000
 }
-scaledframes.com {
+scaledframes.com, www.scaledframes.com {
     reverse_proxy localhost:3000
 }
 EOF'
@@ -54,6 +54,7 @@ EOF'
 
 
 # Enable the service
+sudo systemctl daemon-reload
 sudo systemctl enable myapp.service
 sudo systemctl start myapp.service
 # restart caddy with vals

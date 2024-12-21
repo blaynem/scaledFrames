@@ -14,7 +14,7 @@ jobs:
       
       - name: Add Known Hosts
         run: |
-          ssh-keyscan -H "$(echo ${{ secrets.NEXT_PUBLIC_API_FRAMER_URL }} | awk -F@ '{print $2}')" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$(echo ${{ secrets.EC2_URL }} | awk -F@ '{print $2}')" >> ~/.ssh/known_hosts
       
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -34,17 +34,18 @@ jobs:
           echo "NEXT_PUBLIC_CLIENT_URL=${{ secrets.NEXT_PUBLIC_CLIENT_URL }}" >> .env
           echo "NEXT_PUBLIC_API_FRAMER_URL=${{ secrets.NEXT_PUBLIC_API_FRAMER_URL }}" >> .env
           echo "NEXT_PUBLIC_API_FRAMER_PORT=${{ secrets.NEXT_PUBLIC_API_FRAMER_PORT }}" >> .env
+          echo "EC2_URL=${{ secrets.EC2_URL }}" >> .env
 
       - name: Transfer Repository to EC2
         # Copying over only what has changed
         run: |
           cd ${{ env.FOLDER_NAME }}
-          rsync -avz --exclude 'node_modules' --exclude '.git' --exclude 'apps/framer' --exclude 'apps/framer-e2e' \
-            -e "ssh -i ~/.ssh/aws-west-mbp.pem" . ubuntu@${{ secrets.NEXT_PUBLIC_API_FRAMER_URL }}:~/framer
+          rsync -avz --exclude 'node_modules' --exclude '.git' --exclude '.env.local' --exclude 'apps/framer' --exclude 'apps/framer-e2e' \
+            -e "ssh -i ~/.ssh/aws-west-mbp.pem" . ubuntu@${{ secrets.EC2_URL }}:~/framer
       
       - name: Update install
         run: | 
-          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.NEXT_PUBLIC_API_FRAMER_URL }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_URL }} << 'EOF'
             echo "--- Installing NPM"
             npm install
             echo "--- Generate Prisma data"

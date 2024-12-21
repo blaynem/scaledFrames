@@ -6,4 +6,4 @@ export const FRAMES_SERVER_BASE_PATH = '/f';
 export const API_SERVER_BASE_PATH = '/api';
 
 export const APP_NAME = 'ScaledFrames';
-export const APP_DOMAIN = 'http://www.scaledframes.com';
+export const APP_DOMAIN = 'https://www.scaledframes.com';

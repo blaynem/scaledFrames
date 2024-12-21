@@ -75,16 +75,19 @@ routeApp.frame('/*', async (frameContext) => {
     // That link will correctly redirect to the frame, regarldess of the subdomain (nike).
     // So we want to ensure that if a subdomain is being used, it's valid.
     // The simplest this is by checking the subscription type of the team.
-    if (isUsingCustomSubdomain(frameParams)) {
-      if (!canUseCustomSubdomain(subscriptionType)) {
-        const messages = [
-          'Link to custom subdomain, but team does not have a Pro or Enterprise subscription.',
-          `Initial path: ${initialPath}.`,
-          `Farcaster Cast Hash: ${interactionFromFarcaster?.castId.hash}, Caster ID: ${interactionFromFarcaster?.castId.fid}`,
-        ];
-        throw new Error(messages.join('\n'));
-      }
-    }
+    //
+    // NOTE: This doesn't work as expected right now because of reverse proxying, ned to find out a better solution.
+    // if (isUsingCustomSubdomain(frameParams)) {
+    //   if (!canUseCustomSubdomain(subscriptionType)) {
+    //     const messages = [
+    //       'Link to custom subdomain, but team does not have a Pro or Enterprise subscription.',
+    //       `Initial path: ${initialPath}.`,
+    //       `Farcaster Cast Hash: ${interactionFromFarcaster?.castId.hash}, Caster ID: ${interactionFromFarcaster?.castId.fid}`,
+    //     ];
+    //     throw new Error(messages.join('\n'));
+    //   }
+    // }
+
     const intents = getFrameIntents(
       frameParams.projectBasePath,
       frameData.intents

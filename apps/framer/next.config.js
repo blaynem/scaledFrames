@@ -22,10 +22,14 @@ const nextConfig = {
         protocol: 'http',
         hostname: '127.0.0.1',
       },
+      {
+        protocol: 'https',
+        hostname: 'https://www.scaledframes.com',
+      },
     ],
   },
   async rewrites() {
-    const server_url = process.env.NEXT_PUBLIC_API_FRAMER_URL;
+    const server_url = process.env.EC2_URL;
     return [
       {
         "source": "/f/:path*",
