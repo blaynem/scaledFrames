@@ -33,11 +33,11 @@ const nextConfig = {
     return [
       {
         "source": "/f/:path*",
-        "destination": `${server_url}/f/:path*`
+        "destination": `http://${server_url}/f/:path*`
       },
       {
         "source": "/api/:path*",
-        "destination": `${server_url}/api/:path*`
+        "destination": `http://${server_url}/api/:path*`
       }
     ]
   },
