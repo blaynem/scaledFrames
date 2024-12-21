@@ -25,14 +25,15 @@ const nextConfig = {
     ],
   },
   async rewrites() {
+    const server_url = process.env.NEXT_PUBLIC_API_FRAMER_URL;
     return [
       {
         "source": "/f/:path*",
-        "destination": "http://@NEXT_PUBLIC_API_FRAMER_URL/f/:path*"
+        "destination": `${server_url}/f/:path*`
       },
       {
         "source": "/api/:path*",
-        "destination": "http://ec2-54-224-175-29.compute-1.amazonaws.com/api/:path*"
+        "destination": `${server_url}/api/:path*`
       }
     ]
   },
