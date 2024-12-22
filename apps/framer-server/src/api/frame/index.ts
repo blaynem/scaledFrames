@@ -23,7 +23,11 @@ import {
 import { IntentType } from '@prisma/client';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
-const frameFrogInstance = new Frog();
+const frameFrogInstance = new Frog({
+  title: "What's a title?",
+  origin: process.env.NEXT_PUBLIC_CLIENT_URL, 
+  verifyOrigin: false
+});
 
 // Fetch all Frames
 frameFrogInstance.get('/', async (c) => {

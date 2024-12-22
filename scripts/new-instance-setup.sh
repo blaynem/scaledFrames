@@ -27,9 +27,6 @@ sudo sh -c 'cat > /etc/caddy/Caddyfile <<EOF
 :80 {
     reverse_proxy localhost:3000
 }
-scaledframes.com, www.scaledframes.com {
-    reverse_proxy localhost:3000
-}
 EOF'
 
 # Add an app service so we restart.

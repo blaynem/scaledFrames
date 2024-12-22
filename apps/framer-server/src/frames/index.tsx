@@ -15,7 +15,11 @@ import { getFrameIntents } from './getIntents';
 import { IntentConversionType } from '@prisma/client';
 import { parseFramerUrl } from '@framer/FramerServerSDK';
 
-const routeApp = new Frog();
+const routeApp = new Frog({
+  title: "What's a title?",
+  origin: process.env.NEXT_PUBLIC_CLIENT_URL, 
+  verifyOrigin: false
+});
 
 // Catch for ALL paths from the frames endpoint.
 routeApp.frame('/*', async (frameContext) => {

@@ -18,7 +18,11 @@ import {
 import { decodeJwt } from '@framer/FramerServerSDK/server';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
-const teamsInstance = new Frog();
+const teamsInstance = new Frog({
+  title: "What's a title?",
+  origin: process.env.NEXT_PUBLIC_CLIENT_URL, 
+  verifyOrigin: false
+});
 
 teamsInstance.get('/', async (c) => {
   try {
