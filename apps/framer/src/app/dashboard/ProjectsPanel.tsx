@@ -3,7 +3,6 @@ import { Select } from '@headlessui/react';
 import { BoltIcon } from '@heroicons/react/20/solid';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import Image from 'next/image';
 import { useToast } from '../components/Toasts/ToastProvider';
 import { ToastTypes } from '../components/Toasts/GenericToast';
 import { FramerClientSDK } from '@framer/FramerServerSDK/client';
@@ -21,6 +20,7 @@ type TeamProject = {
   projectUrlSmall: string;
   projectTitle: string;
   imageSrc: string;
+  imageSrcAspectRatio: string;
   memberCount: number;
 };
 
@@ -66,6 +66,7 @@ export const ProjectsPanel = () => {
       projectUrl: `${APP_DOMAIN}/f${projectPath}`,
       projectUrlSmall: `/f${projectPath}`,
       imageSrc: p.rootFrame.imageUrl,
+      imageSrcAspectRatio: p.rootFrame.aspectRatio,
       projectTitle: p.title,
       memberCount: selectedTeam.userCount,
     } satisfies TeamProject;
@@ -118,6 +119,7 @@ export const ProjectsPanel = () => {
 const ProjectCard = ({
   isLive,
   imageSrc,
+  imageSrcAspectRatio,
   projectUrl,
   projectUrlSmall,
   projectId,
@@ -128,7 +130,12 @@ const ProjectCard = ({
     <div className="bg-slate-100 flex flex-col border p-4 rounded border-slate-300">
       <Link href={href} className="mb-1 relative flex grow items-center">
         <div className="w-full overflow-hidden">
-          <Image src={imageSrc} alt="Display" width={600} height={600} />
+          <img
+            className={'w-full h-full rounded-t-md object-cover'}
+            style={{ aspectRatio: imageSrcAspectRatio }}
+            src={imageSrc}
+            alt={'Projects Panel Display'}
+          />
         </div>
         {isLive && (
           <div className="bg-white/30 rounded absolute top-0 right-0">
