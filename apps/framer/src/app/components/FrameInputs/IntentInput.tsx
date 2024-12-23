@@ -12,13 +12,11 @@ import { HoverCardComponent } from '../ui/HoverCard';
 export interface IntentInputProps {
   intent: Intents;
   handleRemoveIntent: (id: string) => void;
-  handleSaveFrame: () => void;
 }
 
 interface RenderInputProps {
   intent: Intents;
   handleSetLinkUrl: (e: string) => void;
-  handleSaveFrame: (e: string) => void;
   frames: FrameResponseType[];
   selectedFrame: FrameResponseType | null;
 }
@@ -26,7 +24,6 @@ interface RenderInputProps {
 const RenderInputs = ({
   intent,
   handleSetLinkUrl,
-  handleSaveFrame,
   frames,
   selectedFrame,
 }: RenderInputProps) => {
@@ -39,7 +36,6 @@ const RenderInputs = ({
           placeholder="URL"
           value={intent.linkUrl}
           onChange={(e) => handleSetLinkUrl(e.target.value)}
-          onBlur={(e) => handleSaveFrame(e.target.value)}
         />
       );
     case IntentType.InternalLink:
@@ -53,7 +49,6 @@ const RenderInputs = ({
           onChange={(e) => handleSetLinkUrl(e.target.value)}
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
           value={intent.linkUrl}
-          onBlur={(e) => handleSaveFrame(e.target.value)}
         >
           <option disabled value="">Select</option>
           {selectableFrames.map((frame) => (
@@ -78,7 +73,6 @@ const RenderInputs = ({
 export const IntentInput: React.FC<IntentInputProps> = ({
   intent,
   handleRemoveIntent,
-  handleSaveFrame,
 }: IntentInputProps) => {
   const { frames, selectedFrame, setFrameEditorContext } =
     useContext(FrameEditorContext);
@@ -194,7 +188,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
               onChange={(e) =>
                 handleSetIntentType(e.target.value as IntentType)
               }
-              onBlur={handleSaveFrame}
             >
               <option value={IntentType.InternalLink}>InternalLink</option>
               <option value={IntentType.ExternalLink}>ExternalLink</option>
@@ -219,7 +212,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
               placeholder="Intent Display Text"
               value={intent.displayText}
               onChange={(e) => handleSetIntentText(e.target.value)}
-              onBlur={handleSaveFrame}
             />
           </div>
         </div>
@@ -244,7 +236,6 @@ export const IntentInput: React.FC<IntentInputProps> = ({
             <RenderInputs
               intent={intent}
               handleSetLinkUrl={handleSetLinkUrl}
-              handleSaveFrame={handleSaveFrame}
               frames={frames}
               selectedFrame={selectedFrame}
             />

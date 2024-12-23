@@ -45,11 +45,10 @@ export default function Index({ params }: { params: { projectId: string } }) {
         value={{ frames, selectedFrame, setFrameEditorContext }}
       >
         <ToastProvider>
-          <div className="page from-blue-900">
+          <div className="page from-blue-900 overflow-scroll" style={{ height: "calc(100vh - 68px)"}}>
             <div className="wrapper">
               <div
-                className="divide-x bg-zinc-200 dark:bg-slate-900"
-                style={{ display: 'flex', height: '100vh' }}
+                className="flex divide-x bg-zinc-200 dark:bg-slate-900"
               >
                 <div
                   className="flex-item column1 overflow-y-auto"

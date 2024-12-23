@@ -7,8 +7,6 @@ import {
 import prisma from '../prismaClient';
 import { FrameImageAspectRatio } from 'node_modules/frog/_lib/types/frame';
 import {
-  isUsingCustomSubdomain,
-  canUseCustomSubdomain,
   getCustomFallbackUrl,
 } from './utils';
 import { getFrameIntents } from './getIntents';
