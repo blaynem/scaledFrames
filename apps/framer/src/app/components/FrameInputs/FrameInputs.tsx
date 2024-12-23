@@ -20,7 +20,6 @@ import { ToastTypes } from '../Toasts/GenericToast';
 import { useToast } from '../Toasts/ToastProvider';
 import { APP_DOMAIN } from '@framer/FramerServerSDK';
 import ImageUploadModal from '../ImageUploadModal/ImageUploadModal';
-import deepEqual from 'deep-equal';
 import { HoverCardComponent } from '../ui/HoverCard';
 
 const getDisplayPathValue = (path?: string) => {
@@ -140,37 +139,8 @@ export function FrameInputs() {
       imageUrl: selectedFrame.imageUrl,
       isDeleted: false,
       intents: selectedFrame.intents,
+      aspectRatio: selectedFrame.aspectRatio,
     };
-
-    // basically a deep compare.. lol
-    if (
-      body.title == initFrameData?.title &&
-      body.path == initFrameData?.path &&
-      body.imageUrl == initFrameData?.imageUrl &&
-      body.isDeleted == initFrameData?.isDeleted
-    ) {
-      // this is so annoying.
-      const intents1 = body.intents.map(
-        ({ displayText, type, displayOrder, isDeleted, linkUrl }) => ({
-          displayOrder,
-          displayText,
-          type,
-          isDeleted,
-          linkUrl,
-        })
-      );
-      const intents2 = initFrameData?.intents.map(
-        ({ displayText, type, displayOrder, isDeleted, linkUrl }) => ({
-          displayOrder,
-          displayText,
-          type,
-          isDeleted,
-          linkUrl,
-        })
-      );
-      // If the intents are equal, lets break early.
-      if (deepEqual(intents1, intents2)) return;
-    }
 
     const loadingToast = addToast(ToastTypes.LOADING, 'Saving', 'infinite');
     const newFrame = await clientSdk.frames.edit(selectedFrame.id, body);
@@ -208,7 +178,6 @@ export function FrameInputs() {
             placeholder="Title"
             value={selectedFrame.title}
             onChange={handleChangeTitle}
-            onBlur={handleSaveFrame}
           />
         </div>
 
@@ -239,7 +208,6 @@ export function FrameInputs() {
               placeholder="Path"
               value={displayPathValue}
               onChange={handleChangePath}
-              onBlur={handleSaveFrame}
             />
           </div>
         </div>
@@ -271,7 +239,6 @@ export function FrameInputs() {
               onChange={handleSaveAspectRatio}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               value={selectedFrame.aspectRatio}
-              onBlur={handleSaveFrame}
             >
               <option value={AspectRatio.STANDARD}>
                 {AspectRatio.STANDARD} (1:1)
@@ -286,7 +253,6 @@ export function FrameInputs() {
             key={intent.id}
             intent={intent}
             handleRemoveIntent={handleRemoveIntent}
-            handleSaveFrame={handleSaveFrame}
           />
         ))}
         {selectedFrame.intents.length < 4 ? (
@@ -302,7 +268,7 @@ export function FrameInputs() {
 
         <button
           type="button"
-          className="text-white justify-center mt-3 bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
+          className="mb-8 text-white justify-center mt-3 bg-blue-600 hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2"
           onClick={handleSaveFrame}
         >
           <BookmarkIcon className="h-5 w-5 mr-2" />

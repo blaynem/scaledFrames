@@ -22,7 +22,11 @@ import { Frog } from 'frog';
 import { convertToUrlSafe, getAllowedFeatures } from '@framer/FramerServerSDK';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
-const projectsFrogInstance = new Frog();
+const projectsFrogInstance = new Frog({
+  title: "What's a title?",
+  origin: process.env.NEXT_PUBLIC_CLIENT_URL, 
+  verifyOrigin: false
+});
 
 // Fetch all projects
 projectsFrogInstance.get('/', async (c) => {

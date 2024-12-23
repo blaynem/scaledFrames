@@ -17,6 +17,9 @@ const PORT = process.env.NEXT_PUBLIC_API_FRAMER_PORT!;
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 export const frogApp = new Frog({
+  title: "main title",
+  origin: process.env.NEXT_PUBLIC_CLIENT_URL,
+  verifyOrigin: false,
   basePath: '/',
   // Supply a Hub to enable frame verification.
   hub: pinata(),

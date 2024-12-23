@@ -8,7 +8,11 @@ import { Frog } from 'frog';
 import prisma from '../../prismaClient';
 
 // Instantiate a new Frog instance that we export to be used in the router above.
-const usersInstance = new Frog();
+const usersInstance = new Frog({
+  title: "What's a title?",
+  origin: process.env.NEXT_PUBLIC_CLIENT_URL, 
+  verifyOrigin: false
+});
 
 usersInstance.get('/', async (c) => {
   try {

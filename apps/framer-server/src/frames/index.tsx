@@ -7,15 +7,17 @@ import {
 import prisma from '../prismaClient';
 import { FrameImageAspectRatio } from 'node_modules/frog/_lib/types/frame';
 import {
-  isUsingCustomSubdomain,
-  canUseCustomSubdomain,
   getCustomFallbackUrl,
 } from './utils';
 import { getFrameIntents } from './getIntents';
 import { IntentConversionType } from '@prisma/client';
 import { parseFramerUrl } from '@framer/FramerServerSDK';
 
-const routeApp = new Frog();
+const routeApp = new Frog({
+  title: "What's a title?",
+  origin: process.env.NEXT_PUBLIC_CLIENT_URL, 
+  verifyOrigin: false
+});
 
 // Catch for ALL paths from the frames endpoint.
 routeApp.frame('/*', async (frameContext) => {
@@ -95,8 +97,6 @@ routeApp.frame('/*', async (frameContext) => {
 
     // If intent is from farcaster, we should have all the needed data.
     if (interactionFromFarcaster) {
-      // We set the value of buttons to be the intentId.
-      const buttonId = frameContext.buttonValue || '';
       // Input text will only be set if the intent is from an input.
       const inputText = frameContext.inputText || null;
 
@@ -113,7 +113,8 @@ routeApp.frame('/*', async (frameContext) => {
         intentData: {
           conversionType,
           frameId: frameData.id,
-          intentId: buttonId,
+          // We set the buttonValue from the Frame as the intent id.
+          intentId: frameContext.buttonValue ?? null,
           intentTextValue: inputText,
           farcasterCastHash: interactionFromFarcaster?.castId.hash,
           projectId: frameData.projectId,
