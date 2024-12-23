@@ -26,6 +26,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'https://www.scaledframes.com',
       },
+      {
+        protocol: 'https',
+        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "BORKED_SUPABASE_URL",
+      },
     ],
   },
   async rewrites() {

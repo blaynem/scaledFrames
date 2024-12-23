@@ -41,7 +41,7 @@ jobs:
         run: |
           cd ${{ env.FOLDER_NAME }}
           rsync -avz --exclude 'node_modules' --exclude '.git' --exclude '.env.local' --exclude 'apps/framer' --exclude 'apps/framer-e2e' \
-            -e "ssh -i ~/.ssh/aws-west-mbp.pem" . ubuntu@${{ secrets.EC2_URL }}:~/framer
+            -e "ssh -i ~/.ssh/id_rsa" . ubuntu@${{ secrets.EC2_URL }}:~/framer
       
       - name: Update install
         run: | 
@@ -50,8 +50,7 @@ jobs:
             cd framer/
             npm install
             echo "--- Generate Prisma data"
-            cd libs/framer-db/
-            npx prisma generate
+            npm run generate
             
             echo "Restarting ec2 Services"
             sudo systemctl daemon-reload
