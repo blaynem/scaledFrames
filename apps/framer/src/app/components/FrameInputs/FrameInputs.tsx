@@ -20,7 +20,6 @@ import { ToastTypes } from '../Toasts/GenericToast';
 import { useToast } from '../Toasts/ToastProvider';
 import { APP_DOMAIN } from '@framer/FramerServerSDK';
 import ImageUploadModal from '../ImageUploadModal/ImageUploadModal';
-import deepEqual from 'deep-equal';
 import { HoverCardComponent } from '../ui/HoverCard';
 
 const getDisplayPathValue = (path?: string) => {
@@ -142,36 +141,6 @@ export function FrameInputs() {
       intents: selectedFrame.intents,
       aspectRatio: selectedFrame.aspectRatio,
     };
-
-    // basically a deep compare.. lol
-    if (
-      body.title == initFrameData?.title &&
-      body.path == initFrameData?.path &&
-      body.imageUrl == initFrameData?.imageUrl &&
-      body.isDeleted == initFrameData?.isDeleted
-    ) {
-      // this is so annoying.
-      const intents1 = body.intents.map(
-        ({ displayText, type, displayOrder, isDeleted, linkUrl }) => ({
-          displayOrder,
-          displayText,
-          type,
-          isDeleted,
-          linkUrl,
-        })
-      );
-      const intents2 = initFrameData?.intents.map(
-        ({ displayText, type, displayOrder, isDeleted, linkUrl }) => ({
-          displayOrder,
-          displayText,
-          type,
-          isDeleted,
-          linkUrl,
-        })
-      );
-      // If the intents are equal, lets break early.
-      if (deepEqual(intents1, intents2)) return;
-    }
 
     const loadingToast = addToast(ToastTypes.LOADING, 'Saving', 'infinite');
     const newFrame = await clientSdk.frames.edit(selectedFrame.id, body);
