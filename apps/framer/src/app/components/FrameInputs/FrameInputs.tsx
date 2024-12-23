@@ -140,6 +140,7 @@ export function FrameInputs() {
       imageUrl: selectedFrame.imageUrl,
       isDeleted: false,
       intents: selectedFrame.intents,
+      aspectRatio: selectedFrame.aspectRatio,
     };
 
     // basically a deep compare.. lol
