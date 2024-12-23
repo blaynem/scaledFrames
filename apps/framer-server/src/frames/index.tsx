@@ -97,8 +97,6 @@ routeApp.frame('/*', async (frameContext) => {
 
     // If intent is from farcaster, we should have all the needed data.
     if (interactionFromFarcaster) {
-      // We set the value of buttons to be the intentId.
-      const buttonId = frameContext.buttonValue || '';
       // Input text will only be set if the intent is from an input.
       const inputText = frameContext.inputText || null;
 
@@ -115,7 +113,8 @@ routeApp.frame('/*', async (frameContext) => {
         intentData: {
           conversionType,
           frameId: frameData.id,
-          intentId: buttonId,
+          // We set the buttonValue from the Frame as the intent id.
+          intentId: frameContext.buttonValue ?? null,
           intentTextValue: inputText,
           farcasterCastHash: interactionFromFarcaster?.castId.hash,
           projectId: frameData.projectId,

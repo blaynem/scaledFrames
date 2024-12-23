@@ -33,7 +33,7 @@ _Install link here: [NX Console](https://marketplace.visualstudio.com/items?item
 
     - Bash
         ```bash
-        npx nx supabase:start framer-db
+        npx nx run framer-db:supabase:start
         ```
 
 3. Deploy the prisma schema to the database:
@@ -45,7 +45,7 @@ _Install link here: [NX Console](https://marketplace.visualstudio.com/items?item
 
     - Bash
         ```bash
-        npx nx prisma:create-migration
+        npx nx run framer-db:prisma:create-migration
         ```
 
 ## Common Terms

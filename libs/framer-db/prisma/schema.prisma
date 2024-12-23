@@ -218,7 +218,6 @@ model Intents {
   // Frame that this intent is part of
   frame               Frame                 @relation(fields: [framesId], references: [id])
   framesId            String                @db.Uuid
-  IntentClickTracking IntentClickTracking[]
 }
 
 // =============== SUBSCRIPTIONS ===============
@@ -415,8 +414,7 @@ model IntentClickTracking {
   conversionType    IntentConversionType @default(None)
 
   /// Link to the clicked intent
-  intentId  String  @db.Uuid
-  intent    Intents @relation(fields: [intentId], references: [id])
+  intentId  String?  @db.Uuid
   /// Link to the frame containing the intent
   frameId   String  @db.Uuid
   frame     Frame   @relation(fields: [frameId], references: [id])
