@@ -46,6 +46,7 @@ export function FrameDebugger() {
           />
           <IntentContainer intents={intents} />
         </div>
+        <small className='px-20'><b>Note:</b> Warpcaster caches the first image it sees, including some metadata like the aspect ratio.</small>
       </>
     )
   );

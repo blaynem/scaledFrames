@@ -118,8 +118,6 @@ export function FrameInputs() {
       tempFrames[idx].intents = tempIntents;
 
       setFrameEditorContext(tempFrames, tempFrame);
-      // No onBlur will be fired, so we need to save the frame
-      handleSaveFrame();
     }
   };
 
