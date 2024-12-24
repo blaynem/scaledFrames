@@ -17,7 +17,6 @@ type TeamProject = {
   isLive: boolean;
   projectId: string;
   projectUrl: string;
-  projectUrlSmall: string;
   projectTitle: string;
   imageSrc: string;
   imageSrcAspectRatio: string;
@@ -64,7 +63,6 @@ export const ProjectsPanel = () => {
       isLive: p.isProjectLive,
       projectId: p.id,
       projectUrl: `${APP_DOMAIN}/f${projectPath}`,
-      projectUrlSmall: `/f${projectPath}`,
       imageSrc: p.rootFrame.imageUrl,
       imageSrcAspectRatio: p.rootFrame.aspectRatio,
       projectTitle: p.title,
@@ -121,7 +119,6 @@ const ProjectCard = ({
   imageSrc,
   imageSrcAspectRatio,
   projectUrl,
-  projectUrlSmall,
   projectId,
   projectTitle,
 }: TeamProject) => {
@@ -143,13 +140,11 @@ const ProjectCard = ({
           </div>
         )}
       </Link>
-      <Link href={href}>
-        <h3 className="mb-2 text-lg font-semibold dark:text-black">
-          {projectTitle}
-        </h3>
-      </Link>
+      <h3 className="mb-2 text-lg font-semibold dark:text-black">
+        {projectTitle}
+      </h3>
 
-      <CopyButtonInput textToCopy={projectUrl} value={projectUrlSmall} />
+      <CopyButtonInput textToCopy={projectUrl} value={projectUrl} />
     </div>
   );
 };

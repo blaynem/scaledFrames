@@ -86,19 +86,9 @@ export default function ProjectOverview() {
         <div className="p-8 flex-1 light:border-r-2 border-red-400 ">
           <form onSubmit={onSubmit}>
             <div className="mb-8">
-              <div className="mb-4 flex justify-between">
-                <h2 className="text-xl font-semibold dark:text-white">
-                  Share your Frame
-                </h2>
-                {!isReadOnly && (
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md"
-                  >
-                    Save
-                  </button>
-                )}
-              </div>
+              <h2 className="mb-4 text-xl font-semibold dark:text-white">
+                Share your Frame
+              </h2>
               <div>
                 <p className="dark:text-white">Share this link to your Frame</p>
                 <CopyButtonInput
@@ -196,9 +186,17 @@ export default function ProjectOverview() {
               </div>
             </div>
           </form>
+          {!isReadOnly && (
+            <button
+              type="submit"
+              className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-md"
+            >
+              Save
+            </button>
+          )}
         </div>
         <div className="p-8 w-[400px]">
-          <div className="mb-12 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold dark:text-white">
               Edit Frame
             </h2>
@@ -206,11 +204,14 @@ export default function ProjectOverview() {
               <PencilSquareIcon className="h-10 w-10 p-2 bg-emerald-400 rounded dark:text-white" />
             </Link>
           </div>
-          <h2 className="text-xl font-semibold dark:text-white">Preview</h2>
+          <p className="text-sm dark:text-white">
+            Edit the buttons and image of your frame by clicking the button above.
+          </p>
+          {/* <h2 className="text-xl font-semibold dark:text-white">Preview</h2>
           <p className="dark:text-white">
             This is a preview of what your Project will look like when displayed
             on a supported application or website.
-          </p>
+          </p> */}
           {/*TODO:  <p>Include button to edit the frame, to link the frame, etc</p> */}
         </div>
       </div>
