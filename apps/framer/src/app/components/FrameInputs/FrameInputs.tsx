@@ -142,8 +142,6 @@ export function FrameInputs() {
 
     const loadingToast = addToast(ToastTypes.LOADING, 'Saving', 'infinite');
     const newFrame = await clientSdk.frames.edit(selectedFrame.id, body);
-    const idx = findFrameIdxById(frames, selectedFrame.id);
-    const tempFrames = [...frames];
     if ('error' in newFrame) {
       loadingToast.clearToast();
       console.error('Error creating new project: ', newFrame.error);
@@ -152,8 +150,6 @@ export function FrameInputs() {
     }
     loadingToast.clearToast();
     addToast(ToastTypes.SUCCESS, 'Frame Saved', 5000);
-    tempFrames[idx] = newFrame;
-    setFrameEditorContext([...tempFrames], newFrame);
 
     // Keeps track of the state so we know when to not send
     setInitFrameData(selectedFrame);
