@@ -4,17 +4,22 @@
 # https://www.youtube.com/watch?v=nQdyiK7-VlQ&ab_channel=SamMeech-Ward
 
 # NOTES: 
-# Allegedly this _could_ work on a mini server, we gotta verify that though. We should test the connection speed somehow.
-
-# On instance creation you'll need to run the `rsync` script to put the repo onto the instance
-# Then you'll run this script when the repo is synced
-# then we can run the GHA deploy-script on the instance and it _should_ be good to go.
+# You'll run this script when the EC2 instance is initially created so we can get things setup.
+# From there use the rsync script to put the repo on the instance.
+# The first time this instance is set up, it might be beneficial to run ssh in to npm install instead. Since it
+# takes a hot minute and typically freezes inside the GHA.
 
 set -e
 
 sudo apt upgrade -y
 sudo apt update -y
-sudo apt install npm -y
+sudo apt install npm -y # Needed to install, otherwise something gets wonky.
+
+# Install NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+source ~/.bashrc
 
 # Install caddy
 sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl

@@ -1,3 +1,4 @@
+# Ensure you've run the `./scripts/new-instance-setup` script before this gets ran.
 name: Deploy Server
 on: [workflow_dispatch]
 env:
@@ -46,12 +47,10 @@ jobs:
       - name: Update install
         run: | 
           ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_URL }} << 'EOF'
-            echo "Running the initial instance setup scripts... Might be a minute..."
-            chmod +x ./framer/scripts/new-instance-setup.sh
-            ./framer/scripts/new-instance-setup.sh
-            
             echo "--- Installing NPM"
             cd framer/
+            nvm install
+            nvm use
             npm install
             echo "--- Generate Prisma data"
             npm run generate
