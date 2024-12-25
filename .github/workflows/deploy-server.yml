@@ -8,13 +8,13 @@ jobs:
     steps:
       - name: Setup SSH Key
         run: |
-          mkdir -p .ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > .ssh/id_rsa
-          chmod 600 .ssh/id_rsa
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
       
       - name: Add Known Hosts
         run: |
-          ssh-keyscan -H "$(echo ${{ secrets.EC2_URL }} | awk -F@ '{print $2}')" >> .ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.EC2_URL }} >> ~/.ssh/known_hosts
       
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -41,11 +41,11 @@ jobs:
         run: |
           cd ${{ env.FOLDER_NAME }}
           rsync -avz --exclude 'node_modules' --exclude '.git' --exclude '.env.local' --exclude 'apps/framer' --exclude 'apps/framer-e2e' \
-            -e "ssh -i .ssh/id_rsa" . ubuntu@${{ secrets.EC2_URL }}:~/framer
+            -e "ssh -i ~/.ssh/id_rsa" . ubuntu@${{ secrets.EC2_URL }}:~/framer
       
       - name: Update install
         run: | 
-          ssh -i .ssh/id_rsa ubuntu@${{ secrets.EC2_URL }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_URL }} << 'EOF'
             echo "--- Installing NPM"
             cd framer/
             npm install
