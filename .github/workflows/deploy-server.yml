@@ -46,6 +46,10 @@ jobs:
       - name: Update install
         run: | 
           ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_URL }} << 'EOF'
+            echo "Running the initial instance setup scripts... Might be a minute..."
+            chmod +x ./framer/scripts/new-instance-setup.sh
+            ./framer/scripts/new-instance-setup.sh
+            
             echo "--- Installing NPM"
             cd framer/
             npm install

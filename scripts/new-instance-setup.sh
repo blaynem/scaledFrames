@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # SUPER HELPFUL VID
 # https://www.youtube.com/watch?v=nQdyiK7-VlQ&ab_channel=SamMeech-Ward
 
@@ -8,7 +10,6 @@
 # Then you'll run this script when the repo is synced
 # then we can run the GHA deploy-script on the instance and it _should_ be good to go.
 
-#!/bin/bash
 set -e
 
 sudo apt upgrade -y
